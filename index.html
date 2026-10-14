@@ -131,7 +131,11 @@ dialog input[type=text]{width:100%;padding:12px 14px;font-size:1.1rem;border-rad
 .add{width:100%;aspect-ratio:1/1;border:2px dashed var(--line);border-radius:16px;background:transparent;color:var(--muted);font-weight:500;padding:8px}
 .vg{border:1px solid var(--line);border-radius:20px;padding:14px;margin-top:14px}
 .vh{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end}
-.opt{display:grid;grid-template-columns:1fr 96px 44px;gap:8px;margin-top:8px}
+.opt{display:grid;grid-template-columns:1fr 1fr 44px;gap:8px;margin-top:8px}
+.opt .on{grid-column:1/3}.opt .rm{grid-column:3;grid-row:1}
+@media (min-width:640px){.opt{grid-template-columns:1fr 100px 140px 44px}.opt .on{grid-column:auto}.opt .rm{grid-column:auto;grid-row:auto}}
+.crow{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+dialog{max-height:92vh;overflow:auto}
 .opt input{min-width:0;padding:11px 12px;border:1px solid var(--line);border-radius:12px;background:var(--bg);min-height:44px}
 .opt .ib{font-size:1.3rem}
 .vf{display:flex;flex-wrap:wrap;gap:8px 10px;align-items:center;margin-top:12px}.cnt{margin-left:auto;font-weight:700;font-size:.9rem}.over{color:var(--bad)}
@@ -241,7 +245,7 @@ dialog input[type=text]{width:100%;padding:12px 14px;font-size:1.1rem;border-rad
      <label class="fld"><span>Avisar quando restar</span><input id="f-min" type="number" min="0" step="1" inputmode="numeric"></label>
     </div><p class="sub" id="marg" style="margin-top:12px"></p><datalist id="cats"></datalist></div>
    <div class="card full"><h3>Variações</h3>
-    <p class="sub">Crie variações como Tamanho ou Cor. A soma das quantidades de cada variação não pode passar do estoque do produto.</p>
+    <p class="sub">Crie variações como Tamanho ou Cor. A soma das quantidades de cada variação não pode passar do estoque do produto. Cada opção pode ter um preço próprio; em branco, vale o preço do produto.</p>
     <div id="vars"></div><div class="vf"><button type="button" class="btn" id="addVar">Adicionar variação</button></div></div>
   </div>
   <div class="bar"><span class="err" id="ferr" hidden></span><button class="btn danger" id="delBtn" hidden>Excluir produto</button><button class="btn" id="cancel2">Cancelar</button><button class="btn main" id="saveP">Salvar produto</button></div>
@@ -275,7 +279,7 @@ dialog input[type=text]{width:100%;padding:12px 14px;font-size:1.1rem;border-rad
   <p class="sub">Arraste para posicionar e use o zoom. O resultado é um quadrado de 1000 × 1000 px.</p>
   <div class="cv"><canvas id="cv" width="360" height="360"></canvas></div>
   <label class="lbl" for="zoom">Zoom</label><input type="range" id="zoom" min="0" max="100" step="0.5" value="0">
-  <div class="sw" style="margin-top:12px"><button type="button" class="btn" id="rot">Girar</button><button type="button" class="btn" id="flip">Espelhar</button><button type="button" class="btn" id="ctr">Centralizar</button></div>
+  <div class="crow"><button type="button" class="btn" id="rot">Girar</button><button type="button" class="btn" id="flip">Espelhar</button><button type="button" class="btn" id="ctr">Centralizar</button></div>
   <div class="dlg-actions"><button type="button" class="btn" data-close>Cancelar</button><button type="button" class="btn main" id="cropOk">Usar foto</button></div>
 </dialog>
 <script>
@@ -387,9 +391,9 @@ function drawList(){
   var L=P.filter(function(p){return !q||(p.name+' '+p.sku+' '+p.cat).toLowerCase().indexOf(q)>=0});
   $('psum').textContent=P.length+(P.length==1?' produto, ':' produtos, ')+P.reduce(function(a,p){return a+p.stock},0)+' unidades em estoque';
   $('pgrid').innerHTML=L.length?L.map(function(p){
-    var v=p.vars.map(function(g){return esc(g.name)+': '+g.opts.map(function(o){return esc(o.n)+' '+o.q}).join(', ')}).join(' | ');
+    var v=p.vars.map(function(g){return esc(g.name)+': '+g.opts.map(function(o){return esc(o.n)+' '+o.q+(o.p!=null?' ('+brl(o.p)+')':'')}).join(', ')}).join(' | ');
     return '<button class="card pc" data-id="'+p.id+'">'+(p.imgs[0]?'<img alt="" src="'+blobUrl(p.imgs[0])+'">':'<div class="noimg">Sem foto</div>')+
-    '<div class="b"><strong>'+esc(p.name)+'</strong><div class="pr">'+brl(p.price)+'</div><p class="sub '+(p.stock<=p.min?'neg':'')+'">'+p.stock+' em estoque'+(p.stock<=p.min?' (repor)':'')+'</p>'+(v?'<p class="sub">'+v+'</p>':'')+'</div></button>'}).join('')
+    '<div class="b"><strong>'+esc(p.name)+'</strong><div class="pr">'+pr(p)+'</div><p class="sub '+(p.stock<=p.min?'neg':'')+'">'+p.stock+' em estoque'+(p.stock<=p.min?' (repor)':'')+'</p>'+(v?'<p class="sub">'+v+'</p>':'')+'</div></button>'}).join('')
   :'<div class="card empty" style="grid-column:1/-1">'+(P.length?'Nenhum produto encontrado para essa busca.':'Você ainda não tem produtos. Cadastre o primeiro para começar o estoque.')+'</div>';
   $('cats').innerHTML=Array.from(new Set(P.map(function(p){return p.cat}).filter(Boolean))).map(function(c){return '<option value="'+esc(c)+'">'}).join('');
 }
@@ -398,14 +402,16 @@ $('pgrid').onclick=function(e){var b=e.target.closest('.pc');if(b)openForm(P.fin
 $('newP').onclick=function(){openForm()};$('back').onclick=$('cancel2').onclick=showList;
 /* formulário */
 function openForm(p){
-  cur=p?Object.assign({},p,{imgs:p.imgs.slice(),vars:p.vars.map(function(g){return{name:g.name,opts:g.opts.map(function(o){return{n:o.n,q:o.q}})}})}):{id:null,imgs:[],vars:[]};
+  cur=p?Object.assign({},p,{imgs:p.imgs.slice(),vars:p.vars.map(function(g){return{name:g.name,opts:g.opts.map(function(o){return{n:o.n,q:o.q,p:o.p==null?null:o.p}})}})}):{id:null,imgs:[],vars:[]};
   FIELDS.forEach(function(k){$('f-'+k).value=cur[k]==null?'':cur[k]});
   $('ftitle').textContent=p?'Editar produto':'Novo produto';$('delBtn').hidden=!p;$('ferr').hidden=true;
   $('plist').hidden=true;$('plist').style.display='none';$('pform').hidden=false;$('pform').style.display='grid';
   drawPh();drawVars();marg();scrollTo(0,0);
 }
 function marg(){var p=+$('f-price').value,c=+$('f-cost').value;$('marg').textContent=p>0&&c>0?'Lucro por unidade: '+brl(p-c)+' (margem de '+pf((p-c)/p*100)+')':''}
-$('f-price').oninput=$('f-cost').oninput=marg;
+function pph(){var p=+$('f-price').value;return p>0?brl(p):'Preço'}
+$('f-price').oninput=$('f-cost').oninput=function(){marg();document.querySelectorAll('[data-k=op]').forEach(function(i){i.placeholder=pph()})};
+function pr(p){var a=[p.price];p.vars.forEach(function(g){g.opts.forEach(function(o){if(o.p!=null)a.push(o.p)})});var mn=Math.min.apply(null,a);return(mn<Math.max.apply(null,a)?'a partir de ':'')+brl(mn)}
 /* fotos */
 function drawPh(){
   var h=cur.imgs.map(function(b,i){return '<div class="ph"><img alt="Foto '+(i+1)+'" src="'+blobUrl(b)+'">'+(i==0?'<span class="tag">Principal</span>':'')+'<div class="mini"><button type="button" data-a="edit" data-i="'+i+'">Editar</button>'+(i?'<button type="button" data-a="main" data-i="'+i+'">Principal</button>':'')+'<button type="button" data-a="del" data-i="'+i+'">Remover</button></div></div>'}).join('');
@@ -460,7 +466,7 @@ cv.onwheel=function(e){e.preventDefault();var z=$('zoom');z.value=Math.max(0,Mat
 /* variações */
 function drawVars(){
   $('vars').innerHTML=cur.vars.map(function(g,gi){return '<div class="vg" data-g="'+gi+'"><div class="vh"><label class="fld"><span>Nome da variação</span><input data-k="gn" value="'+esc(g.name)+'" placeholder="Ex.: Tamanho, Cor"></label><button type="button" class="btn" data-a="rg">Remover</button></div>'+
-   g.opts.map(function(o,oi){return '<div class="opt" data-o="'+oi+'"><input data-k="on" value="'+esc(o.n)+'" placeholder="Opção (ex.: M)" aria-label="Nome da opção"><input data-k="oq" type="number" min="0" step="1" inputmode="numeric" value="'+o.q+'" aria-label="Quantidade"><button type="button" class="ib" data-a="ro" aria-label="Remover opção">×</button></div>'}).join('')+
+   g.opts.map(function(o,oi){return '<div class="opt" data-o="'+oi+'"><input class="on" data-k="on" value="'+esc(o.n)+'" placeholder="Opção (ex.: M)" aria-label="Nome da opção"><input data-k="oq" type="number" min="0" step="1" inputmode="numeric" value="'+o.q+'" aria-label="Quantidade" placeholder="Qtd."><input data-k="op" type="number" min="0" step="0.01" inputmode="decimal" value="'+(o.p==null?'':o.p)+'" placeholder="'+pph()+'" aria-label="Preço da opção (em branco usa o preço do produto)"><button type="button" class="ib rm" data-a="ro" aria-label="Remover opção">×</button></div>'}).join('')+
    '<div class="vf"><button type="button" class="btn" data-a="ao">Adicionar opção</button>'+(g.opts.length?'':'<button type="button" class="btn" data-a="pm">Usar P, M, G, GG</button>')+'<span class="cnt" data-c></span></div></div>'}).join('');
   $('addVar').hidden=cur.vars.length>=3;cnt();
 }
@@ -471,14 +477,15 @@ $('vars').oninput=function(e){
   if(k==='gn')g.name=t.value;
   else{var o=g.opts[+t.closest('.opt').dataset.o];
     if(k==='on')o.n=t.value;
+    else if(k==='op')o.p=t.value===''?null:Math.max(0,+t.value||0);
     else{o.q=Math.max(0,parseInt(t.value)||0);var ex=sum(g)-(parseInt($('f-stock').value)||0);
       if(ex>0){o.q=Math.max(0,o.q-ex);t.value=o.q;toast('A soma não pode passar do estoque do produto.')}}}
   cnt();
 };
 $('vars').onclick=function(e){
   var b=e.target.closest('button');if(!b)return;var gi=+b.closest('.vg').dataset.g,g=cur.vars[gi],a=b.dataset.a;
-  if(a==='rg')cur.vars.splice(gi,1);else if(a==='ao')g.opts.push({n:'',q:0});
-  else if(a==='pm')g.opts=['P','M','G','GG'].map(function(n){return{n:n,q:0}});
+  if(a==='rg')cur.vars.splice(gi,1);else if(a==='ao')g.opts.push({n:'',q:0,p:null});
+  else if(a==='pm')g.opts=['P','M','G','GG'].map(function(n){return{n:n,q:0,p:null}});
   else if(a==='ro')g.opts.splice(+b.closest('.opt').dataset.o,1);
   drawVars();
 };
@@ -503,7 +510,7 @@ $('saveP').onclick=async function(){
   FIELDS.forEach(function(k){cur[k]=$('f-'+k).value.trim()});
   var er=check();$('ferr').textContent=er;$('ferr').hidden=!er;if(er)return;
   var p={id:cur.id||Date.now().toString(36),name:cur.name,desc:cur.desc,cat:cur.cat,sku:cur.sku,price:+cur.price,cost:+cur.cost||0,stock:parseInt(cur.stock),min:parseInt(cur.min)||0,imgs:cur.imgs,
-    vars:cur.vars.map(function(g){return{name:g.name.trim(),opts:g.opts.map(function(o){return{n:o.n.trim(),q:o.q}})}})};
+    vars:cur.vars.map(function(g){return{name:g.name.trim(),opts:g.opts.map(function(o){return{n:o.n.trim(),q:o.q,p:o.p==null?null:o.p}})}})};
   var i=P.findIndex(function(x){return x.id===p.id});if(i<0)P.unshift(p);else P[i]=p;
   await kvSet('products',P);syncStock();render();showList();toast('Produto salvo.');
 };

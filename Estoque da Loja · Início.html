@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Estoque da Loja · Início</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,700&display=swap" rel="stylesheet">
+<script>
+(function(){var t=null;try{t=localStorage.getItem('tema')}catch(e){}
+if(t!=='light'&&t!=='dark'){t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'}
+document.documentElement.setAttribute('data-theme',t)})();
+</script>
+<style>
+:root{--bg:#EEF1F0;--surface:#fff;--ink:#16231F;--muted:#5C6B66;--line:#D8DFDC;--accent:#0B6E5B;--accent-ink:#fff;--warn:#B45309;--bad:#B3261E;--track:#DDE5E2;color-scheme:light;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0E1513;--surface:#162019;--ink:#E6EFEB;--muted:#93A59E;--line:#263530;--accent:#3DD6A5;--accent-ink:#06201A;--warn:#F5A524;--bad:#FF8A80;--track:#25332E;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0E1513;--surface:#162019;--ink:#E6EFEB;--muted:#93A59E;--line:#263530;--accent:#3DD6A5;--accent-ink:#06201A;--warn:#F5A524;--bad:#FF8A80;--track:#25332E;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.45 "Bricolage Grotesque",system-ui,-apple-system,"Segoe UI",sans-serif}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;display:flex;align-items:center;gap:12px;padding:10px 16px;background:var(--bg);border-bottom:1px solid var(--line)}
+.top h1{margin:0;font-size:1.05rem;font-weight:700;flex:1}
+.ib{width:44px;height:44px;display:grid;place-items:center;border:1px solid var(--line);background:var(--surface);border-radius:12px}
+.ib svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round}
+.sun{display:none}
+[data-theme="dark"] .sun{display:block}[data-theme="dark"] .moon{display:none}
+main{max-width:760px;margin:0 auto;padding:20px 16px 48px;display:grid;gap:16px}
+.hello{padding:8px 2px 4px}
+.hello h2{margin:0;font-size:clamp(1.9rem,7vw,2.8rem);line-height:1.05;font-weight:700;letter-spacing:-.02em}
+.when{margin:8px 0 0;color:var(--muted);display:flex;flex-wrap:wrap;gap:4px 14px}
+.when b{color:var(--ink);font-weight:500;font-variant-numeric:tabular-nums}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px}
+.card h3{margin:0 0 4px;font-size:.95rem;font-weight:500;color:var(--muted)}
+.num{font-size:1.7rem;font-weight:700;letter-spacing:-.02em;font-variant-numeric:tabular-nums;line-height:1.2}
+.sub{margin:2px 0 0;font-size:.88rem;color:var(--muted)}
+.grid2{display:grid;gap:16px;grid-template-columns:1fr 1fr}
+@media (max-width:480px){.grid2{grid-template-columns:1fr}}
+.goal{border-radius:22px;padding:20px}
+.goal .head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.goal .big{font-size:clamp(2.4rem,11vw,3.6rem);font-weight:700;letter-spacing:-.03em;line-height:1;color:var(--accent);font-variant-numeric:tabular-nums}
+.btn{border:1px solid var(--line);background:transparent;border-radius:10px;padding:9px 14px;min-height:44px;font-weight:500}
+.btn.main{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.track{height:14px;border-radius:99px;background:var(--track);overflow:hidden;margin:16px 0 10px}
+.fill{height:100%;width:0;background:var(--accent);border-radius:99px;transition:width .9s cubic-bezier(.2,.7,.2,1)}
+.meta-row{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;font-size:.92rem;color:var(--muted)}
+.meta-row b{color:var(--ink);font-weight:500}
+.pill{display:inline-block;padding:3px 10px;border-radius:99px;font-size:.82rem;font-weight:500;background:var(--track)}
+.pos{color:var(--accent)}.neg{color:var(--bad)}
+.rows{list-style:none;margin:8px 0 0;padding:0}
+.rows li{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-top:1px solid var(--line)}
+.rows li:first-child{border-top:0}
+.rows span:last-child{font-variant-numeric:tabular-nums;font-weight:500;text-align:right}
+.rows small{display:block;color:var(--muted);font-size:.82rem}
+.stock-nums{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:10px}
+@media (max-width:480px){.stock-nums{grid-template-columns:1fr 1fr}}
+.stock-nums .num{font-size:1.25rem}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.sec{display:flex;justify-content:space-between;align-items:baseline;margin:6px 2px -4px}
+.sec h2{margin:0;font-size:1.1rem}
+.scrim{position:fixed;inset:0;background:rgba(0,0,0,.45);opacity:0;visibility:hidden;transition:opacity .2s,visibility .2s;z-index:9}
+.drawer{position:fixed;top:0;bottom:0;left:0;width:min(300px,84vw);background:var(--surface);border-right:1px solid var(--line);z-index:10;transform:translateX(-100%);visibility:hidden;transition:transform .25s,visibility .25s;padding:calc(env(safe-area-inset-top,0px) + 16px) 12px calc(env(safe-area-inset-bottom,0px) + 16px);display:flex;flex-direction:column;gap:4px}
+body.open .drawer{transform:none;visibility:visible}
+body.open .scrim{opacity:1;visibility:visible}
+.brand{display:flex;align-items:center;justify-content:space-between;padding:4px 8px 14px;font-weight:700;font-size:1.1rem}
+.brand small{display:block;font-weight:400;color:var(--muted);font-size:.82rem}
+.nav{display:flex;align-items:center;gap:10px;width:100%;text-align:left;padding:12px;border:0;background:transparent;border-radius:10px;min-height:46px}
+.nav:hover{background:var(--track)}
+.nav[aria-current="page"]{background:var(--accent);color:var(--accent-ink);font-weight:500}
+.sep{height:1px;background:var(--line);margin:8px 4px}
+dialog{border:1px solid var(--line);border-radius:18px;background:var(--surface);color:var(--ink);padding:20px;width:min(380px,92vw)}
+dialog::backdrop{background:rgba(0,0,0,.5)}
+dialog h2{margin:0 0 4px;font-size:1.2rem}
+dialog label{display:block;margin:14px 0 6px;font-size:.9rem;color:var(--muted)}
+dialog input{width:100%;font:inherit;font-size:1.3rem;padding:12px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink)}
+.dlg-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:18px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<header class="top">
+  <button class="ib" id="menuBtn" aria-label="Abrir menu" aria-expanded="false" aria-controls="drawer"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+  <h1>Estoque da Loja</h1>
+  <button class="ib" id="themeBtn" aria-label="Alternar modo claro e escuro">
+    <svg class="moon" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5z"/></svg>
+    <svg class="sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5 19 19M5 19l1.5-1.5M17.5 6.5 19 5"/></svg>
+  </button>
+</header>
+
+<div class="scrim" id="scrim"></div>
+<nav class="drawer" id="drawer" aria-label="Menu principal">
+  <div class="brand"><span>Estoque da Loja<small>Painel do Lacerda</small></span>
+    <button class="ib" id="closeBtn" aria-label="Fechar menu"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
+  <button class="nav" aria-current="page">Início</button>
+  <button class="nav">Produtos</button>
+  <button class="nav">Estoque</button>
+  <button class="nav">Vendas</button>
+  <button class="nav">Compras</button>
+  <button class="nav">Fornecedores</button>
+  <button class="nav">Clientes</button>
+  <button class="nav">Relatórios</button>
+  <div class="sep"></div>
+  <button class="nav">Configurações</button>
+</nav>
+
+<main>
+  <section class="hello">
+    <h2 id="greet">Olá, Lacerda</h2>
+    <p class="when"><b id="date"></b><b id="time"></b></p>
+  </section>
+
+  <section class="card goal" aria-labelledby="goalT">
+    <div class="head">
+      <div><h3 id="goalT">Meta de vendas do mês</h3><div class="big" id="pct">0%</div></div>
+      <button class="btn" id="goalBtn">Definir meta</button>
+    </div>
+    <div class="track" role="progressbar" aria-labelledby="goalT" aria-valuemin="0" aria-valuemax="100" id="bar"><div class="fill" id="fill"></div></div>
+    <div class="meta-row"><span>Vendido <b id="gSold"></b></span><span>Meta <b id="gGoal"></b></span></div>
+    <p class="sub" id="gHint" style="margin-top:10px"></p>
+  </section>
+
+  <section class="grid2">
+    <div class="card"><h3>Vendido hoje</h3><div class="num" id="today"></div><p class="sub" id="todayN"></p></div>
+    <div class="card"><h3>Vendido no mês</h3><div class="num" id="month"></div><p class="sub" id="monthProj"></p></div>
+  </section>
+
+  <section class="card">
+    <h3>Resultado do mês</h3>
+    <ul class="rows">
+      <li><span>Faturamento</span><span id="rev"></span></li>
+      <li><span>Custo das mercadorias vendidas</span><span id="cost"></span></li>
+      <li><span>Lucro<small id="margin"></small></span><span class="pos" id="profit"></span></li>
+    </ul>
+  </section>
+
+  <section class="card">
+    <h3>Estoque agora</h3>
+    <div class="num" id="items"></div><p class="sub" id="units"></p>
+    <div class="stock-nums">
+      <div><p class="sub">Custo do estoque</p><div class="num" id="sCost"></div></div>
+      <div><p class="sub">Valor de venda</p><div class="num" id="sSale"></div></div>
+      <div><p class="sub">Lucro previsto</p><div class="num pos" id="sProfit"></div></div>
+    </div>
+  </section>
+
+  <div class="actions">
+    <button class="btn main">Nova venda</button>
+    <button class="btn">Cadastrar produto</button>
+  </div>
+
+  <div class="sec"><h2>Repor em breve</h2><span class="pill" id="lowCount"></span></div>
+  <section class="card"><ul class="rows" id="low"></ul></section>
+
+  <div class="sec"><h2>Últimas vendas</h2></div>
+  <section class="card"><ul class="rows" id="recent"></ul></section>
+</main>
+
+<dialog id="dlg">
+  <form method="dialog" id="goalForm">
+    <h2>Meta do mês</h2>
+    <p class="sub">Quanto você quer vender neste mês?</p>
+    <label for="goalIn">Valor em reais</label>
+    <input id="goalIn" inputmode="decimal" autocomplete="off" placeholder="25.000,00">
+    <div class="dlg-actions">
+      <button type="button" class="btn" id="cancel">Cancelar</button>
+      <button type="submit" class="btn main">Salvar meta</button>
+    </div>
+  </form>
+</dialog>
+
+<script>
+// Dados de exemplo — serão substituídos pelos dados reais da loja.
+var D={today:1284.9,todayN:14,month:18745.3,cost:11200,
+ items:248,units:1936,sCost:38420,sSale:71350,
+ low:[["Camiseta básica preta M",2,10],["Cabo USB-C 1m",3,15],["Garrafa térmica 500ml",4,8],["Carregador 20W",1,6]],
+ recent:[["Fone Bluetooth","há 12 min",129.9],["Camiseta básica branca G","há 41 min",59.9],["Capa de celular (2 un.)","há 1 h",78],["Mochila urbana","há 2 h",189.9]]};
+var $=function(i){return document.getElementById(i)};
+var brl=function(v){return v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'})};
+var pct=function(v){return v.toLocaleString('pt-BR',{maximumFractionDigits:1})+'%'};
+function lsGet(k){try{return localStorage.getItem(k)}catch(e){return null}}
+function lsSet(k,v){try{localStorage.setItem(k,v)}catch(e){}}
+var goal=Number(lsGet('meta'))||25000;
+
+function tick(){
+  var n=new Date(),h=n.getHours();
+  $('greet').textContent=(h>=5&&h<12?'Bom dia':h>=12&&h<18?'Boa tarde':'Boa noite')+', Lacerda';
+  var d=n.toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  $('date').textContent=d.charAt(0).toUpperCase()+d.slice(1);
+  $('time').textContent=n.toLocaleTimeString('pt-BR');
+}
+function render(){
+  var n=new Date(),dim=new Date(n.getFullYear(),n.getMonth()+1,0).getDate(),day=n.getDate(),left=dim-day+1;
+  var p=goal>0?D.month/goal*100:0,shown=Math.min(p,100);
+  $('pct').textContent=pct(p);
+  $('bar').setAttribute('aria-valuenow',Math.round(shown));
+  setTimeout(function(){$('fill').style.width=shown+'%'},120);
+  $('gSold').textContent=brl(D.month);$('gGoal').textContent=brl(goal);
+  var rest=goal-D.month;
+  $('gHint').textContent=rest<=0?'Meta batida! Você passou '+brl(-rest)+' do objetivo.':'Faltam '+brl(rest)+'. Vendendo '+brl(rest/left)+' por dia nos próximos '+left+' dias você chega lá.';
+  $('today').textContent=brl(D.today);$('todayN').textContent=D.todayN+' vendas hoje';
+  $('month').textContent=brl(D.month);
+  $('monthProj').textContent='Neste ritmo, fecha o mês em '+brl(D.month/day*dim);
+  var profit=D.month-D.cost;
+  $('rev').textContent=brl(D.month);$('cost').textContent=brl(D.cost);
+  $('profit').textContent=brl(profit);$('margin').textContent='Margem de '+pct(profit/D.month*100);
+  $('items').textContent=D.items.toLocaleString('pt-BR')+' produtos';
+  $('units').textContent=D.units.toLocaleString('pt-BR')+' unidades no total';
+  $('sCost').textContent=brl(D.sCost);$('sSale').textContent=brl(D.sSale);$('sProfit').textContent=brl(D.sSale-D.sCost);
+  $('lowCount').textContent=D.low.length+' produtos';
+  $('low').innerHTML=D.low.map(function(x){return '<li><span>'+x[0]+'<small>Mínimo: '+x[2]+' un.</small></span><span class="neg">'+x[1]+' un.</span></li>'}).join('');
+  $('recent').innerHTML=D.recent.map(function(x){return '<li><span>'+x[0]+'<small>'+x[1]+'</small></span><span>'+brl(x[2])+'</span></li>'}).join('');
+}
+tick();setInterval(tick,1000);render();
+
+// Menu
+function menu(o){document.body.classList.toggle('open',o);$('menuBtn').setAttribute('aria-expanded',o);if(o)$('closeBtn').focus();else $('menuBtn').focus()}
+$('menuBtn').onclick=function(){menu(true)};
+$('closeBtn').onclick=$('scrim').onclick=function(){menu(false)};
+document.addEventListener('keydown',function(e){if(e.key==='Escape'&&document.body.classList.contains('open'))menu(false)});
+document.querySelectorAll('.nav').forEach(function(b){b.onclick=function(){menu(false)}});
+
+// Tema
+$('themeBtn').onclick=function(){
+  var r=document.documentElement,t=r.getAttribute('data-theme')==='dark'?'light':'dark';
+  r.setAttribute('data-theme',t);lsSet('tema',t);
+};
+
+// Meta
+var dlg=$('dlg');
+$('goalBtn').onclick=function(){$('goalIn').value=goal.toLocaleString('pt-BR',{minimumFractionDigits:2});dlg.showModal();$('goalIn').select()};
+$('cancel').onclick=function(){dlg.close()};
+$('goalForm').onsubmit=function(){
+  var v=parseFloat($('goalIn').value.replace(/\./g,'').replace(',','.'));
+  if(v>0){goal=v;lsSet('meta',String(v));$('fill').style.width='0';render()}
+};
+</script>
+</body>
+</html>

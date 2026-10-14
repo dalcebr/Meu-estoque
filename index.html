@@ -134,8 +134,8 @@ dialog input[type=text]{width:100%;padding:12px 14px;font-size:1.1rem;border-rad
 .opt{display:grid;grid-template-columns:1fr 44px;gap:8px;margin-top:8px}
 .opt .on{grid-column:1}.opt .rm{grid-column:2}
 .opt .oline{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.opt .oline input[data-k=oc]{grid-column:1/-1}
-@media (min-width:640px){.opt{grid-template-columns:1fr 90px 120px 120px 44px;align-items:start}.opt .on{grid-column:auto}.opt .rm{grid-column:auto}.opt .oline{display:contents}.opt .oline input[data-k=oc]{grid-column:auto}}
+.opt .oline .full{grid-column:1/-1}
+@media (min-width:640px){.opt{grid-template-columns:1fr 90px 120px 120px 44px;align-items:start}.opt .on{grid-column:auto}.opt .rm{grid-column:auto}.opt .oline{display:contents}.opt .oline .full{grid-column:auto}}
 .crow{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
 dialog{max-height:92vh;overflow:auto}
 .opt input{min-width:0;padding:11px 12px;border:1px solid var(--line);border-radius:12px;background:var(--bg);min-height:44px}
@@ -167,7 +167,10 @@ dialog .fld{margin:14px 0 0}
 .sale-head .q{text-align:right;white-space:nowrap}
 .sale-head .q b{font-size:1.25rem;font-weight:800;font-variant-numeric:tabular-nums}
 .sale .rows{margin-top:10px}
-.sale-ac{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.row-ac{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.client{padding:14px 0;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:14px 20px;flex-wrap:wrap;align-items:flex-start}
+.client:first-child{padding-top:2px}
+.client .info strong{display:block}
 .linerm{border:0;background:none;color:var(--bad);font-weight:700;font-size:.8rem;padding:4px 8px;border-radius:8px;min-height:30px}
 .linerm:hover{background:var(--track)}
 .cart li{align-items:flex-start}
@@ -183,7 +186,7 @@ dialog .fld{margin:14px 0 0}
   <button class="nav" data-view="products">Produtos</button>
   <button class="nav" data-view="stock">Estoque</button>
   <button class="nav" data-view="sales">Vendas</button>
-  <button class="nav">Clientes</button>
+  <button class="nav" data-view="clients">Clientes</button>
   <button class="nav">Relatórios</button>
   <div class="grow"></div>
   <button class="nav" id="navCfg">Configurações</button>
@@ -279,7 +282,7 @@ dialog .fld{margin:14px 0 0}
      <label class="fld"><span>Avisar quando restar</span><input id="f-min" type="number" min="0" step="1" inputmode="numeric"></label>
     </div><p class="sub" id="marg" style="margin-top:12px"></p><datalist id="cats"></datalist></div>
    <div class="card full"><h3>Variações</h3>
-    <p class="sub">Crie variações como Tamanho ou Cor. A soma das quantidades de cada variação não pode passar do estoque do produto. Cada opção pode ter um preço próprio; em branco, vale o preço do produto.</p>
+    <p class="sub">Crie variações como Tamanho ou Cor. A soma das quantidades de cada variação não pode passar do estoque do produto. Cada opção pode ter preço e custo próprios; se ficarem em branco, valem o preço e o custo do produto.</p>
     <div id="vars"></div><div class="vf"><button type="button" class="btn" id="addVar">Adicionar variação</button></div></div>
   </div>
   <div class="bar"><span class="err" id="ferr" hidden></span><button class="btn danger" id="delBtn" hidden>Excluir produto</button><button class="btn" id="cancel2">Cancelar</button><button class="btn main" id="saveP">Salvar produto</button></div>
@@ -295,6 +298,11 @@ dialog .fld{margin:14px 0 0}
    <label class="fld"><span>Buscar</span><input id="saq" type="search" placeholder="Cliente, produto ou forma de pagamento"></label></div>
   <div class="seg" id="saFil"></div>
   <section class="card" id="saList"></section>
+</main>
+<main id="v-clients" hidden>
+  <div class="sec-h"><div><h2>Clientes</h2><p class="sub" id="clsum"></p></div><button class="btn main" id="newClient">Novo cliente</button></div>
+  <div class="tools"><label class="fld"><span>Buscar</span><input id="clq" type="search" placeholder="Nome, telefone, e-mail ou CPF"></label></div>
+  <section class="card" id="clList"></section>
 </main>
 </div>
 </div>
@@ -348,11 +356,22 @@ dialog .fld{margin:14px 0 0}
  </div>
  <label class="fld"><span>Desconto total (R$, opcional)</span><input id="saDesc" type="number" min="0" step="0.01" inputmode="decimal"></label>
  <label class="fld"><span>Forma de pagamento</span><select id="saPay"></select></label>
- <label class="fld"><span>Cliente (opcional)</span><input id="saCli" type="text" maxlength="80"></label>
+ <label class="fld"><span>Cliente (opcional)</span><input id="saCli" type="text" maxlength="80" list="clNames"></label>
+ <datalist id="clNames"></datalist>
  <label class="fld"><span>Observação (opcional)</span><input id="saNote" type="text" maxlength="140"></label>
  <p class="sub" id="saTotal" style="margin-top:14px;font-weight:700;font-size:1.05rem"></p>
  <p id="saErr" hidden style="color:var(--bad);margin:8px 0 0;font-weight:500"></p>
  <div class="dlg-actions"><button type="button" class="btn" data-close>Cancelar</button><button type="button" class="btn main" id="saOk">Finalizar venda</button></div>
+</dialog>
+<dialog id="clientDlg">
+ <h2 id="clT">Novo cliente</h2>
+ <label class="fld"><span>Nome *</span><input id="cl-name" maxlength="120" placeholder="Nome completo"></label>
+ <label class="fld"><span>Telefone (opcional)</span><input id="cl-phone" type="tel" maxlength="30" placeholder="(11) 99999-9999"></label>
+ <label class="fld"><span>WhatsApp (opcional)</span><input id="cl-wpp" type="tel" maxlength="30" placeholder="(11) 99999-9999"></label>
+ <label class="fld"><span>E-mail (opcional)</span><input id="cl-email" type="email" maxlength="120" placeholder="nome@email.com"></label>
+ <label class="fld"><span>CPF (opcional)</span><input id="cl-cpf" maxlength="14" placeholder="000.000.000-00"></label>
+ <p id="clErr" hidden style="color:var(--bad);margin:8px 0 0;font-weight:500"></p>
+ <div class="dlg-actions"><button type="button" class="btn danger" id="clDel" hidden>Excluir cliente</button><button type="button" class="btn" data-close>Cancelar</button><button type="button" class="btn main" id="clOk">Salvar cliente</button></div>
 </dialog>
 <input type="file" id="file" accept="image/*" multiple hidden>
 <div id="toast" role="status" hidden></div>
@@ -465,10 +484,10 @@ function syncStock(){
 }
 /* navegação entre telas */
 function show(v){
-  $('v-home').hidden=v!=='home';$('v-prod').hidden=v!=='products';$('v-stock').hidden=v!=='stock';$('v-sales').hidden=v!=='sales';
-  $('title').textContent={home:'Início',products:'Produtos',stock:'Estoque',sales:'Vendas'}[v];
+  $('v-home').hidden=v!=='home';$('v-prod').hidden=v!=='products';$('v-stock').hidden=v!=='stock';$('v-sales').hidden=v!=='sales';$('v-clients').hidden=v!=='clients';
+  $('title').textContent={home:'Início',products:'Produtos',stock:'Estoque',sales:'Vendas',clients:'Clientes'}[v];
   document.querySelectorAll('.nav[data-view]').forEach(function(b){b.setAttribute('aria-current',b.dataset.view===v?'page':'false')});
-  scrollTo(0,0);if(v==='products')showList();if(v==='stock')drawStock();if(v==='sales')drawSales();
+  scrollTo(0,0);if(v==='products')showList();if(v==='stock')drawStock();if(v==='sales')drawSales();if(v==='clients')drawClients();
 }
 document.querySelectorAll('.nav[data-view]').forEach(function(b){b.addEventListener('click',function(){show(b.dataset.view)})});
 /* lista */
@@ -554,7 +573,11 @@ cv.onwheel=function(e){e.preventDefault();var z=$('zoom');z.value=Math.max(0,Mat
 /* variações */
 function drawVars(){
   $('vars').innerHTML=cur.vars.map(function(g,gi){return '<div class="vg" data-g="'+gi+'"><div class="vh"><label class="fld"><span>Nome da variação</span><input data-k="gn" value="'+esc(g.name)+'" placeholder="Ex.: Tamanho, Cor"></label><button type="button" class="btn" data-a="rg">Remover</button></div>'+
-   g.opts.map(function(o,oi){return '<div class="opt" data-o="'+oi+'"><input class="on" data-k="on" value="'+esc(o.n)+'" placeholder="Opção (ex.: M)" aria-label="Nome da opção"><div class="oline"><input data-k="oq" type="number" min="0" step="1" inputmode="numeric" value="'+o.q+'" aria-label="Quantidade" placeholder="Qtd."><input data-k="op" type="number" min="0" step="0.01" inputmode="decimal" value="'+(o.p==null?'':o.p)+'" placeholder="'+pph()+'" aria-label="Preço da opção (em branco usa o preço do produto)"><input data-k="oc" type="number" min="0" step="0.01" inputmode="decimal" value="'+(o.c==null?'':o.c)+'" placeholder="'+cph()+'" aria-label="Custo da opção (em branco usa o custo do produto)"></div><button type="button" class="ib rm" data-a="ro" aria-label="Remover opção">×</button></div>'}).join('')+
+   g.opts.map(function(o,oi){return '<div class="opt" data-o="'+oi+'"><label class="fld on"><span>Opção</span><input data-k="on" value="'+esc(o.n)+'" placeholder="Ex.: M"></label><div class="oline">'+
+     '<label class="fld"><span>Quantidade</span><input data-k="oq" type="number" min="0" step="1" inputmode="numeric" value="'+o.q+'"></label>'+
+     '<label class="fld"><span>Preço (opcional)</span><input data-k="op" type="number" min="0" step="0.01" inputmode="decimal" value="'+(o.p==null?'':o.p)+'" placeholder="'+pph()+'"></label>'+
+     '<label class="fld full"><span>Custo (opcional)</span><input data-k="oc" type="number" min="0" step="0.01" inputmode="decimal" value="'+(o.c==null?'':o.c)+'" placeholder="'+cph()+'"></label>'+
+     '</div><button type="button" class="ib rm" data-a="ro" aria-label="Remover opção">×</button></div>'}).join('')+
    '<div class="vf"><button type="button" class="btn" data-a="ao">Adicionar opção</button>'+(g.opts.length?'':'<button type="button" class="btn" data-a="pm">Usar P, M, G, GG</button>')+'<span class="cnt" data-c></span></div></div>'}).join('');
   $('addVar').hidden=cur.vars.length>=3;cnt();
 }
@@ -609,13 +632,15 @@ $('delBtn').onclick=async function(){
   delete b.dataset.sure;b.textContent='Excluir produto';
   P=P.filter(function(x){return x.id!==cur.id});await kvSet('products',P);syncStock();render();showList();toast('Produto excluído.');
 };
-idb().then(function(){return Promise.all([kvGet('products'),kvGet('moves'),kvGet('sales')])}).then(function(r){
+idb().then(function(){return Promise.all([kvGet('products'),kvGet('moves'),kvGet('sales'),kvGet('customers')])}).then(function(r){
   if(Array.isArray(r[0]))P=r[0];
   if(Array.isArray(r[1]))M=r[1];
   if(Array.isArray(r[2]))S=r[2];
+  if(Array.isArray(r[3]))C=r[3];
   syncStock();syncSales();render();
   if(!$('v-stock').hidden)drawStock();
   if(!$('v-sales').hidden)drawSales();
+  if(!$('v-clients').hidden)drawClients();
 });
 
 /* ===== Estoque ===== */
@@ -745,7 +770,7 @@ function saleRow(s){
     ?'<button class="btn sm" data-a="cancel" data-id="'+s.id+'">Cancelar venda</button><button class="btn sm danger" data-a="del" data-id="'+s.id+'">Excluir</button>'
     :'<button class="btn sm" data-a="restore" data-id="'+s.id+'">Marcar como vendida novamente</button><button class="btn sm danger" data-a="del" data-id="'+s.id+'">Excluir</button>';
   return'<div class="sale"><div class="sale-head"><div><strong>'+fdt(s.t)+'</strong> '+pill+'<p class="sub">'+meta.join(' · ')+'</p></div><div class="q"><b>'+brl(s.total)+'</b></div></div>'+
-    '<ul class="rows">'+itemsHtml+'</ul><div class="sale-ac">'+actions+'</div></div>';
+    '<ul class="rows">'+itemsHtml+'</ul><div class="row-ac">'+actions+'</div></div>';
 }
 $('saPeriod').onclick=function(e){var b=e.target.closest('button');if(b){sst.period=b.dataset.p;sst.lim=50;drawSales()}};
 $('saFil').onclick=function(e){var b=e.target.closest('button');if(b){sst.status=b.dataset.f;sst.lim=50;drawSales()}};
@@ -816,6 +841,7 @@ function openSale(){
   sale={items:[]};
   $('saP').innerHTML=P.slice().sort(function(a,b){return a.name.localeCompare(b.name,'pt-BR')}).map(function(p){return'<option value="'+p.id+'">'+esc(p.name)+' ('+p.stock+' un.)</option>'}).join('');
   $('saPay').innerHTML=PAYS.map(function(x){return'<option>'+x+'</option>'}).join('');
+  $('clNames').innerHTML=C.map(function(c){return'<option value="'+esc(c.name)+'">'}).join('');
   $('saQ').value=1;$('saDesc').value='';$('saCli').value='';$('saNote').value='';$('saErr').hidden=true;
   drawSaleProd();drawCart();$('saleDlg').showModal();
 }
@@ -859,6 +885,63 @@ $('saOk').onclick=async function(){
   toast('Venda registrada: '+brl(total)+'.');
 };
 $('newSale').onclick=openSale;
+
+/* ===== Clientes ===== */
+var C=[],curClient=null;
+function drawClients(){
+  var q=$('clq').value.trim().toLowerCase();
+  var L=C.filter(function(c){return!q||(c.name+' '+(c.phone||'')+' '+(c.wpp||'')+' '+(c.email||'')+' '+(c.cpf||'')).toLowerCase().indexOf(q)>=0}).sort(function(a,b){return a.name.localeCompare(b.name,'pt-BR')});
+  $('clsum').textContent=C.length+(C.length===1?' cliente cadastrado':' clientes cadastrados');
+  $('clList').innerHTML=L.length?L.map(clientRow).join(''):'<div class="empty">'+(C.length?'Nenhum cliente encontrado para essa busca.':'Você ainda não tem clientes cadastrados. Clique em "Novo cliente" para começar.')+'</div>';
+}
+function clientRow(c){
+  var det=[];
+  if(c.phone)det.push('Telefone: '+esc(c.phone));
+  if(c.wpp)det.push('WhatsApp: '+esc(c.wpp));
+  if(c.email)det.push('E-mail: '+esc(c.email));
+  if(c.cpf)det.push('CPF: '+esc(c.cpf));
+  return'<div class="client"><div class="info"><strong>'+esc(c.name)+'</strong><p class="sub">'+(det.length?det.join(' · '):'Nenhum outro dado cadastrado.')+'</p></div>'+
+    '<div class="row-ac"><button class="btn sm" data-a="edit" data-id="'+c.id+'">Editar</button><button class="btn sm danger" data-a="del" data-id="'+c.id+'">Excluir</button></div></div>';
+}
+function openClient(c){
+  curClient=c||null;
+  $('clT').textContent=c?'Editar cliente':'Novo cliente';
+  $('cl-name').value=c?c.name:'';
+  $('cl-phone').value=c&&c.phone||'';
+  $('cl-wpp').value=c&&c.wpp||'';
+  $('cl-email').value=c&&c.email||'';
+  $('cl-cpf').value=c&&c.cpf||'';
+  $('clDel').hidden=!c;delete $('clDel').dataset.sure;$('clDel').textContent='Excluir cliente';
+  $('clErr').hidden=true;
+  $('clientDlg').showModal();
+}
+$('newClient').onclick=function(){openClient()};
+$('clq').oninput=drawClients;
+$('clList').onclick=function(e){
+  var b=e.target.closest('button');if(!b)return;
+  var c=C.find(function(x){return x.id===b.dataset.id});if(!c)return;
+  if(b.dataset.a==='edit')return openClient(c);
+  if(b.dataset.a==='del'){
+    if(!b.dataset.sure){b.dataset.sure='1';b.textContent='Confirmar exclusão';setTimeout(function(){if(b.isConnected){delete b.dataset.sure;b.textContent='Excluir'}},3500);return}
+    C=C.filter(function(x){return x.id!==c.id});
+    kvSet('customers',C).then(function(){drawClients();toast('Cliente excluído.')});
+  }
+};
+$('clOk').onclick=async function(){
+  var name=$('cl-name').value.trim();
+  if(!name){$('clErr').textContent='Informe o nome do cliente.';$('clErr').hidden=false;return}
+  var c={id:curClient?curClient.id:Date.now().toString(36)+Math.random().toString(36).slice(2,5),
+    name:name,phone:$('cl-phone').value.trim(),wpp:$('cl-wpp').value.trim(),email:$('cl-email').value.trim(),cpf:$('cl-cpf').value.trim()};
+  var i=C.findIndex(function(x){return x.id===c.id});if(i<0)C.unshift(c);else C[i]=c;
+  await kvSet('customers',C);
+  drawClients();$('clientDlg').close();toast('Cliente salvo.');
+};
+$('clDel').onclick=function(){
+  var b=$('clDel');
+  if(!b.dataset.sure){b.dataset.sure='1';b.textContent='Confirmar exclusão';setTimeout(function(){delete b.dataset.sure;b.textContent='Excluir cliente'},3500);return}
+  C=C.filter(function(x){return x.id!==curClient.id});
+  kvSet('customers',C).then(function(){drawClients();$('clientDlg').close();toast('Cliente excluído.')});
+};
 </script>
 </body>
 </html>

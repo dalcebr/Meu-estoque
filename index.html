@@ -333,6 +333,20 @@ body.cart-open #toast{bottom:auto;top:calc(env(safe-area-inset-top,0px) + 66px);
 #catPage,#catPage *,.cdrawer,.cdrawer *{font-family:var(--cat-body-font,inherit)}
 #catPage .cat-hero h1,#catPage .pp h1,#catPage .cat-h1,#catPage .cc-head h2,#catPage .cf-name,
 #catPage .mc strong,#catPage .pp-price,.cdrawer .cd-head h2{font-family:var(--cat-head-font,var(--cat-body-font,inherit))}
+/* seções da aba Catálogo: expandir/recolher */
+.card.clp{padding:0;overflow:hidden}
+.card.clp>.clp-h{display:flex;align-items:center;gap:12px;width:100%;padding:17px 20px;border:0;background:none;border-radius:inherit;text-align:left;min-height:58px;cursor:pointer}
+.card.clp>.clp-h:hover{background:var(--track)}
+.card.clp>.clp-h:focus-visible{outline:2px solid var(--accent);outline-offset:-3px}
+.card.clp .clp-tt{flex:1;min-width:0;font-size:1rem;font-weight:700;letter-spacing:-.01em;color:var(--ink);line-height:1.3}
+.card.clp .clp-ic{width:20px;height:20px;flex:none;fill:none;stroke:var(--muted);stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;transition:transform .3s cubic-bezier(.2,.7,.2,1)}
+.card.clp.open .clp-ic{transform:rotate(180deg)}
+.card.clp .clp-b{display:grid;grid-template-rows:0fr;transition:grid-template-rows .3s cubic-bezier(.2,.7,.2,1)}
+.card.clp.open .clp-b{grid-template-rows:1fr}
+.card.clp .clp-in{overflow:hidden;min-height:0;visibility:hidden;transition:visibility 0s linear .3s}
+.card.clp.open .clp-in{visibility:visible;transition:visibility 0s linear 0s}
+.card.clp .clp-p{padding:0 20px 20px}
+.card.clp .clp-p>*:first-child{margin-top:0}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
@@ -483,7 +497,13 @@ body.cart-open #toast{bottom:auto;top:calc(env(safe-area-inset-top,0px) + 66px);
   </section>
 </main>
 <main id="v-catalog" hidden>
-  <div class="sec-h"><div><h2>Catálogo</h2><p class="sub">Configurações do catálogo online da sua loja.</p></div></div>
+  <div class="sec-h">
+    <div><h2>Catálogo</h2><p class="sub">Configurações do catálogo online da sua loja.</p></div>
+    <div class="acts">
+      <button class="btn sm" id="catExpAll" type="button">Expandir tudo</button>
+      <button class="btn sm" id="catColAll" type="button">Recolher tudo</button>
+    </div>
+  </div>
   <section class="card">
     <h3>Catálogo online</h3>
     <p class="sub">Abra o catálogo para conferir como ele aparece ou envie o link para seus clientes.</p>
@@ -1553,6 +1573,43 @@ $('catImgEdit').onclick=async function(){
   CAT.heroImg=b;saveCat();drawCatalogCfg();
 };
 $('catImgDel').onclick=function(){CAT.heroImg=null;saveCat();drawCatalogCfg()};
+/* ===== seções da aba Catálogo: expandir / recolher ===== */
+var CAT_SECS=(function(){try{return JSON.parse(localStorage.getItem('cat_secs')||'{}')||{}}catch(e){return{}}})();
+function catSecsSave(){try{localStorage.setItem('cat_secs',JSON.stringify(CAT_SECS))}catch(e){}}
+function setCatSec(card,open,save){
+  card.classList.toggle('open',!!open);
+  var b=card.querySelector('.clp-h');
+  if(b)b.setAttribute('aria-expanded',open?'true':'false');
+  if(save!==false){CAT_SECS[card.dataset.clp]=!!open;catSecsSave()}
+}
+function initCatCollapse(){
+  var view=$('v-catalog');if(!view)return;
+  var cards=Array.prototype.slice.call(view.querySelectorAll('section.card'));
+  cards.forEach(function(card,i){
+    if(card.classList.contains('clp'))return;
+    var h=card.querySelector('h3');if(!h)return;
+    var key=i+':'+h.textContent.trim();
+    var btn=document.createElement('button');
+    btn.type='button';btn.className='clp-h';
+    btn.innerHTML='<span class="clp-tt">'+esc(h.textContent.trim())+'</span>'+
+      '<svg class="clp-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>';
+    var body=document.createElement('div');body.className='clp-b';
+    var inner=document.createElement('div');inner.className='clp-in';
+    var pad=document.createElement('div');pad.className='clp-p';
+    while(h.nextSibling)pad.appendChild(h.nextSibling);
+    inner.appendChild(pad);body.appendChild(inner);
+    h.remove();
+    card.insertBefore(btn,card.firstChild);
+    card.insertBefore(body,btn.nextSibling);
+    card.classList.add('clp');card.dataset.clp=key;
+    btn.addEventListener('click',function(){setCatSec(card,!card.classList.contains('open'))});
+    setCatSec(card,CAT_SECS[key]!==false,false); /* padrão: aberta */
+  });
+  var all=function(o){cards.forEach(function(c){setCatSec(c,o)})};
+  if($('catExpAll'))$('catExpAll').onclick=function(){all(true)};
+  if($('catColAll'))$('catColAll').onclick=function(){all(false)};
+}
+initCatCollapse();
 $('catTheme').onclick=function(){var t=root.getAttribute('data-theme')==='dark'?'light':'dark';root.setAttribute('data-theme',t);set('tema_cat',t);applyCatTheme(t)};
 function saveCat(now){
   clearTimeout(catT);

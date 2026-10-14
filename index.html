@@ -23,7 +23,7 @@ box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:en
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font:400 15px/1.5 "Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",sans-serif;-webkit-text-size-adjust:100%}
-button,input{font:inherit;color:inherit}button{cursor:pointer}
+button,input,textarea,select{font:inherit;color:inherit}button{cursor:pointer}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .shell{min-height:100vh}
 .col{min-width:0}
@@ -177,6 +177,15 @@ dialog .fld{margin:14px 0 0}
 .linerm:hover{background:var(--track)}
 .cart li{align-items:flex-start}
 .cart .q{text-align:right}
+/* catálogo online (página pública, aberta com ?catalogo) */
+body.cat-mode .shell{display:none}
+.cat-head{position:sticky;top:0;z-index:5;background:var(--surface);border-bottom:1px solid var(--line);padding:14px 20px}
+.cat-head>div{max-width:1180px;margin:0 auto;font-weight:800;font-size:1.15rem;letter-spacing:-.01em}
+.cat-hero{background:var(--accent);color:var(--accent-ink);padding:48px 20px;text-align:center}
+.cat-hero h1{margin:0;font-size:clamp(1.8rem,6vw,2.9rem);line-height:1.1;font-weight:800;letter-spacing:-.03em}
+.cat-hero p{margin:14px auto 0;max-width:600px;font-size:1.05rem;opacity:.92;white-space:pre-line}
+.cat-body{max-width:1180px;margin:0 auto;padding:24px 16px 56px}
+.cat-body .pc strong{white-space:normal}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
@@ -190,6 +199,7 @@ dialog .fld{margin:14px 0 0}
   <button class="nav" data-view="sales">Vendas</button>
   <button class="nav" data-view="clients">Clientes</button>
   <button class="nav" data-view="reports">Relatórios</button>
+  <button class="nav" data-view="catalog">Catálogo</button>
   <div class="grow"></div>
   <button class="nav" id="navCfg">Configurações</button>
 </nav>
@@ -325,7 +335,35 @@ dialog .fld{margin:14px 0 0}
     </div>
   </section>
 </main>
+<main id="v-catalog" hidden>
+  <div class="sec-h"><div><h2>Catálogo</h2><p class="sub">Configurações do catálogo online da sua loja.</p></div></div>
+  <section class="card">
+    <h3>Catálogo online</h3>
+    <p class="sub">Abra o catálogo para conferir como ele aparece ou envie o link para seus clientes.</p>
+    <label class="fld" style="margin-top:14px"><span>Link do catálogo online</span><input id="catUrl" readonly></label>
+    <div class="acts" style="margin-top:14px">
+      <button class="btn main" id="catOpen">Acessar catálogo online</button>
+      <button class="btn" id="catCopy">Copiar link</button>
+      <button class="btn" id="catShare">Compartilhar link</button>
+    </div>
+  </section>
+  <section class="card">
+    <h3>Cabeçalho e seção inicial</h3>
+    <div class="ff">
+      <label class="fld w"><span>Nome da loja (aparece no cabeçalho do catálogo)</span><input id="cat-store" maxlength="80" placeholder="Ex.: Farmácia Vida"></label>
+      <label class="fld w"><span>Título da seção inicial</span><input id="cat-title" maxlength="80" placeholder="Ex.: Quem ama cuida"></label>
+      <label class="fld w"><span>Descrição da seção inicial</span><textarea id="cat-desc" rows="3" maxlength="240" placeholder="Ex.: Produtos que cuidam da saúde da sua família"></textarea></label>
+    </div>
+    <p class="sub" id="catSaved" style="margin-top:12px">As alterações são salvas automaticamente.</p>
+  </section>
+</main>
 </div>
+</div>
+
+<div id="catPage" hidden>
+  <header class="cat-head"><div id="catStore"></div></header>
+  <section class="cat-hero" id="catHero"><h1 id="catTitle"></h1><p id="catDesc"></p></section>
+  <div class="cat-body"><div class="pgrid" id="catGrid"></div></div>
 </div>
 
 <dialog id="goalDlg">
@@ -525,10 +563,10 @@ function syncStock(){
 }
 /* navegação entre telas */
 function show(v){
-  $('v-home').hidden=v!=='home';$('v-prod').hidden=v!=='products';$('v-stock').hidden=v!=='stock';$('v-sales').hidden=v!=='sales';$('v-clients').hidden=v!=='clients';$('v-reports').hidden=v!=='reports';
-  $('title').textContent={home:'Início',products:'Produtos',stock:'Estoque',sales:'Vendas',clients:'Clientes',reports:'Relatórios'}[v];
+  $('v-home').hidden=v!=='home';$('v-prod').hidden=v!=='products';$('v-stock').hidden=v!=='stock';$('v-sales').hidden=v!=='sales';$('v-clients').hidden=v!=='clients';$('v-reports').hidden=v!=='reports';$('v-catalog').hidden=v!=='catalog';
+  $('title').textContent={home:'Início',products:'Produtos',stock:'Estoque',sales:'Vendas',clients:'Clientes',reports:'Relatórios',catalog:'Catálogo'}[v];
   document.querySelectorAll('.nav[data-view]').forEach(function(b){b.setAttribute('aria-current',b.dataset.view===v?'page':'false')});
-  scrollTo(0,0);if(v==='products')showList();if(v==='stock')drawStock();if(v==='sales')drawSales();if(v==='clients')drawClients();if(v==='reports')drawReports();
+  scrollTo(0,0);if(v==='products')showList();if(v==='stock')drawStock();if(v==='sales')drawSales();if(v==='clients')drawClients();if(v==='reports')drawReports();if(v==='catalog')drawCatalogCfg();
 }
 document.querySelectorAll('.nav[data-view]').forEach(function(b){b.addEventListener('click',function(){show(b.dataset.view)})});
 /* lista */
@@ -682,16 +720,19 @@ $('delBtn').onclick=async function(){
   delete b.dataset.sure;b.textContent='Excluir produto';
   P=P.filter(function(x){return x.id!==cur.id});await kvSet('products',P);syncStock();render();showList();drawReports();toast('Produto excluído.');
 };
-idb().then(function(){return Promise.all([kvGet('products'),kvGet('moves'),kvGet('sales'),kvGet('customers')])}).then(function(r){
+idb().then(function(){return Promise.all([kvGet('products'),kvGet('moves'),kvGet('sales'),kvGet('customers'),kvGet('catalog')])}).then(function(r){
   if(Array.isArray(r[0]))P=r[0];
   if(Array.isArray(r[1]))M=r[1];
   if(Array.isArray(r[2]))S=r[2];
   if(Array.isArray(r[3]))CLI=r[3];
+  if(r[4]&&typeof r[4]==='object')CAT=Object.assign({store:'',title:'',desc:''},r[4]);
   syncStock();syncSales();render();
   if(!$('v-stock').hidden)drawStock();
   if(!$('v-sales').hidden)drawSales();
   if(!$('v-clients').hidden)drawClients();
   if(!$('v-reports').hidden)drawReports();
+  if(!$('v-catalog').hidden)drawCatalogCfg();
+  if(CATALOG)drawCatalogPage();
 });
 
 /* ===== Estoque ===== */
@@ -1133,6 +1174,42 @@ function downloadReport(key){
   toast('Relatório baixado.');
 }
 document.querySelectorAll('#v-reports [data-dl]').forEach(function(b){b.onclick=function(){downloadReport(b.dataset.dl)}});
+
+/* ===== Catálogo ===== */
+var CAT={store:'',title:'',desc:''},CATALOG=/[?&]catalogo(=|&|$)/.test(location.search),catT;
+function catalogUrl(){return location.href.split('#')[0].split('?')[0]+'?catalogo'}
+function catName(){return(CAT.store||'').trim()||'Catálogo'}
+function drawCatalogCfg(){
+  $('catUrl').value=catalogUrl();$('cat-store').value=CAT.store||'';$('cat-title').value=CAT.title||'';$('cat-desc').value=CAT.desc||'';
+}
+function saveCat(now){
+  clearTimeout(catT);
+  var go=function(){return kvSet('catalog',CAT).then(function(){$('catSaved').textContent='Alterações salvas.'})};
+  if(now)return go();catT=setTimeout(go,150);
+}
+['store','title','desc'].forEach(function(k){$('cat-'+k).oninput=function(){CAT[k]=this.value;$('catSaved').textContent='Salvando…';saveCat()}});
+$('catOpen').onclick=function(){saveCat(true);window.open(catalogUrl(),'_blank','noopener')};
+function legacyCopy(){var i=$('catUrl');i.focus();i.select();try{return document.execCommand('copy')}catch(e){return false}}
+$('catCopy').onclick=function(){
+  var done=function(ok){toast(ok?'Link do catálogo copiado.':'Não foi possível copiar. Selecione o link e copie manualmente.')};
+  if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(catalogUrl()).then(function(){done(true)},function(){done(legacyCopy())});
+  else done(legacyCopy());
+};
+$('catShare').onclick=function(){
+  var url=catalogUrl(),msg='Conheça o catálogo de '+catName();
+  if(navigator.share)navigator.share({title:catName(),text:msg,url:url}).catch(function(){});
+  else window.open('https://wa.me/?text='+encodeURIComponent(msg+': '+url),'_blank','noopener');
+};
+/* página pública do catálogo */
+function drawCatalogPage(){
+  document.body.classList.add('cat-mode');$('catPage').hidden=false;
+  $('catStore').textContent=catName();document.title=catName();
+  $('catTitle').textContent=CAT.title||'';$('catDesc').textContent=CAT.desc||'';
+  $('catTitle').hidden=!CAT.title;$('catDesc').hidden=!CAT.desc;$('catHero').hidden=!(CAT.title||CAT.desc);
+  var L=P.filter(function(p){return p.stock>0}).sort(function(a,b){return a.name.localeCompare(b.name,'pt-BR')});
+  $('catGrid').innerHTML=L.length?L.map(function(p){return'<div class="card pc">'+(p.imgs[0]?'<img alt="'+esc(p.name)+'" src="'+blobUrl(p.imgs[0])+'">':'<div class="noimg">Sem foto</div>')+'<div class="b"><strong>'+esc(p.name)+'</strong><div class="pr">'+pr(p)+'</div></div></div>'}).join(''):'<div class="card empty" style="grid-column:1/-1">Em breve, novos produtos por aqui.</div>';
+}
+if(CATALOG)drawCatalogPage();
 </script>
 </body>
 </html>

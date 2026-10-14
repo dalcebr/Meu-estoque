@@ -159,6 +159,17 @@ dialog .fld{margin:14px 0 0}
 .srow .q{text-align:right}.srow .q b{font-size:1.5rem;font-weight:800;font-variant-numeric:tabular-nums}
 .srow .ac{grid-column:1/-1;display:flex;gap:8px;flex-wrap:wrap}
 .srow strong{display:block}
+.sale{padding:16px 0;border-top:1px solid var(--line)}
+.sale:first-child{padding-top:2px}
+.sale-head{display:flex;justify-content:space-between;gap:12px 20px;flex-wrap:wrap;align-items:flex-start}
+.sale-head .q{text-align:right;white-space:nowrap}
+.sale-head .q b{font-size:1.25rem;font-weight:800;font-variant-numeric:tabular-nums}
+.sale .rows{margin-top:10px}
+.sale-ac{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.linerm{border:0;background:none;color:var(--bad);font-weight:700;font-size:.8rem;padding:4px 8px;border-radius:8px;min-height:30px}
+.linerm:hover{background:var(--track)}
+.cart li{align-items:flex-start}
+.cart .q{text-align:right}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
@@ -169,9 +180,7 @@ dialog .fld{margin:14px 0 0}
   <button class="nav" data-view="home" aria-current="page">Início</button>
   <button class="nav" data-view="products">Produtos</button>
   <button class="nav" data-view="stock">Estoque</button>
-  <button class="nav">Vendas</button>
-  <button class="nav">Compras</button>
-  <button class="nav">Fornecedores</button>
+  <button class="nav" data-view="sales">Vendas</button>
   <button class="nav">Clientes</button>
   <button class="nav">Relatórios</button>
   <div class="grow"></div>
@@ -193,7 +202,7 @@ dialog .fld{margin:14px 0 0}
 <main id="v-home">
   <section class="hero-row">
     <div><h2 id="greet">Olá, Lacerda</h2><p class="when"><b id="date"></b><b id="time"></b></p></div>
-    <div class="acts"><button class="btn">Cadastrar produto</button><button class="btn main">Nova venda</button></div>
+    <div class="acts"><button class="btn" id="goProd">Cadastrar produto</button><button class="btn main" id="goSale">Nova venda</button></div>
   </section>
 
   <section class="card goal c-goal" aria-labelledby="goalT">
@@ -233,7 +242,7 @@ dialog .fld{margin:14px 0 0}
   </section>
 
   <section class="card c-half"><div class="sech"><h3>Repor em breve</h3><span class="pill" id="lowCount"></span></div><ul class="rows" id="low"></ul></section>
-  <section class="card c-half"><h3>Últimas vendas</h3><ul class="rows" id="recent"></ul></section>
+  <section class="card c-half"><div class="sech"><h3>Últimas vendas</h3><button class="btn sm" id="goSales">Ver tudo</button></div><ul class="rows" id="recent"></ul></section>
 </main>
 <main id="v-stock" hidden>
   <div class="sec-h"><div><h2>Estoque</h2><p class="sub">Entradas, saídas e contagem de cada produto, com motivo e histórico.</p></div>
@@ -274,6 +283,17 @@ dialog .fld{margin:14px 0 0}
   <div class="bar"><span class="err" id="ferr" hidden></span><button class="btn danger" id="delBtn" hidden>Excluir produto</button><button class="btn" id="cancel2">Cancelar</button><button class="btn main" id="saveP">Salvar produto</button></div>
  </section>
 </main>
+<main id="v-sales" hidden>
+  <div class="sec-h"><div><h2>Vendas</h2><p class="sub">Histórico detalhado de cada venda, com cancelamento, reativação e exclusão.</p></div>
+   <button class="btn main" id="newSale">Nova venda</button></div>
+  <div class="tiles" id="saTiles"></div>
+  <div class="tools"><div class="seg" id="saPeriod">
+    <button data-p="today">Hoje</button><button data-p="7">7 dias</button><button data-p="30">30 dias</button><button data-p="all">Tudo</button>
+   </div>
+   <label class="fld"><span>Buscar</span><input id="saq" type="search" placeholder="Cliente, produto ou forma de pagamento"></label></div>
+  <div class="seg" id="saFil"></div>
+  <section class="card" id="saList"></section>
+</main>
 </div>
 </div>
 
@@ -307,6 +327,30 @@ dialog .fld{margin:14px 0 0}
  <p class="sub" id="mvPrev" style="margin-top:12px;font-weight:700"></p>
  <p id="mvErr" hidden style="color:var(--bad);margin:8px 0 0;font-weight:500"></p>
  <div class="dlg-actions"><button type="button" class="btn" data-close>Cancelar</button><button type="button" class="btn main" id="mvOk">Registrar</button></div>
+</dialog>
+<dialog id="saleDlg">
+ <h2>Nova venda</h2>
+ <label class="fld"><span>Produto</span><select id="saP"></select></label>
+ <div id="saVars"></div>
+ <div class="ff">
+  <label class="fld"><span>Quantidade</span><input id="saQ" type="number" min="1" step="1" value="1" inputmode="numeric"></label>
+  <label class="fld"><span>Preço unitário (R$)</span><input id="saPrice" type="number" min="0" step="0.01" inputmode="decimal"></label>
+ </div>
+ <p class="sub" id="saStock" style="margin-top:4px"></p>
+ <div class="dlg-actions" style="justify-content:flex-start;margin:14px 0 0">
+  <button type="button" class="btn" id="saAdd">Adicionar à venda</button>
+ </div>
+ <div class="card cart" id="saCartWrap" style="margin-top:16px;padding:14px" hidden>
+  <h3>Itens desta venda</h3>
+  <ul class="rows" id="saCart"></ul>
+ </div>
+ <label class="fld"><span>Desconto total (R$, opcional)</span><input id="saDesc" type="number" min="0" step="0.01" inputmode="decimal"></label>
+ <label class="fld"><span>Forma de pagamento</span><select id="saPay"></select></label>
+ <label class="fld"><span>Cliente (opcional)</span><input id="saCli" type="text" maxlength="80"></label>
+ <label class="fld"><span>Observação (opcional)</span><input id="saNote" type="text" maxlength="140"></label>
+ <p class="sub" id="saTotal" style="margin-top:14px;font-weight:700;font-size:1.05rem"></p>
+ <p id="saErr" hidden style="color:var(--bad);margin:8px 0 0;font-weight:500"></p>
+ <div class="dlg-actions"><button type="button" class="btn" data-close>Cancelar</button><button type="button" class="btn main" id="saOk">Finalizar venda</button></div>
 </dialog>
 <input type="file" id="file" accept="image/*" multiple hidden>
 <div id="toast" role="status" hidden></div>
@@ -360,6 +404,9 @@ function render(){
     return '<div class="'+(i==6?'hoje':'')+'" title="'+brl(v)+'"><i style="height:'+Math.round(v/mx*100*.78)+'%"></i>'+dt.toLocaleDateString('pt-BR',{weekday:'short'}).replace('.','')+'</div>'}).join('');
 }
 tick();setInterval(tick,1000);render();
+$('goProd').onclick=function(){show('products');openForm()};
+$('goSale').onclick=function(){openSale()};
+$('goSales').onclick=function(){show('sales')};
 
 // Menu: gaveta no celular, barra lateral recolhível no computador
 var wide=function(){return matchMedia('(min-width:1024px)').matches};
@@ -399,7 +446,8 @@ $('goalForm').onsubmit=function(){
 
 /* ===== Produtos ===== */
 var P=[],db,cur,MAXF=5,URLS=new WeakMap(),FIELDS=['name','desc','cat','sku','price','cost','stock','min'];
-var D0={items:D.items,units:D.units,sCost:D.sCost,sSale:D.sSale,low:D.low};
+var D0={items:D.items,units:D.units,sCost:D.sCost,sSale:D.sSale,low:D.low,
+ today:D.today,todayN:D.todayN,month:D.month,cost:D.cost,week:D.week.slice(),recent:D.recent};
 var esc=function(s){return String(s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})};
 var sum=function(g){return g.opts.reduce(function(a,o){return a+o.q},0)};
 function idb(){return new Promise(function(r){try{var q=indexedDB.open('estoque',1);q.onupgradeneeded=function(){q.result.createObjectStore('kv')};q.onsuccess=function(){db=q.result;r()};q.onerror=function(){r()}}catch(e){r()}})}
@@ -415,9 +463,10 @@ function syncStock(){
 }
 /* navegação entre telas */
 function show(v){
-  $('v-home').hidden=v!=='home';$('v-prod').hidden=v!=='products';$('v-stock').hidden=v!=='stock';$('title').textContent={home:'Início',products:'Produtos',stock:'Estoque'}[v];
+  $('v-home').hidden=v!=='home';$('v-prod').hidden=v!=='products';$('v-stock').hidden=v!=='stock';$('v-sales').hidden=v!=='sales';
+  $('title').textContent={home:'Início',products:'Produtos',stock:'Estoque',sales:'Vendas'}[v];
   document.querySelectorAll('.nav[data-view]').forEach(function(b){b.setAttribute('aria-current',b.dataset.view===v?'page':'false')});
-  scrollTo(0,0);if(v==='products')showList();if(v==='stock')drawStock();
+  scrollTo(0,0);if(v==='products')showList();if(v==='stock')drawStock();if(v==='sales')drawSales();
 }
 document.querySelectorAll('.nav[data-view]').forEach(function(b){b.addEventListener('click',function(){show(b.dataset.view)})});
 /* lista */
@@ -556,7 +605,14 @@ $('delBtn').onclick=async function(){
   delete b.dataset.sure;b.textContent='Excluir produto';
   P=P.filter(function(x){return x.id!==cur.id});await kvSet('products',P);syncStock();render();showList();toast('Produto excluído.');
 };
-idb().then(function(){return Promise.all([kvGet('products'),kvGet('moves')])}).then(function(r){if(Array.isArray(r[0])){P=r[0];syncStock();render()}if(Array.isArray(r[1]))M=r[1];if(!$('v-stock').hidden)drawStock()});
+idb().then(function(){return Promise.all([kvGet('products'),kvGet('moves'),kvGet('sales')])}).then(function(r){
+  if(Array.isArray(r[0]))P=r[0];
+  if(Array.isArray(r[1]))M=r[1];
+  if(Array.isArray(r[2]))S=r[2];
+  syncStock();syncSales();render();
+  if(!$('v-stock').hidden)drawStock();
+  if(!$('v-sales').hidden)drawSales();
+});
 
 /* ===== Estoque ===== */
 var M=[],mv={t:'in',pid:null},st={tab:'p',fp:'all',fh:'all',lim:50};
@@ -641,6 +697,164 @@ $('mvOk').onclick=async function(){
   syncStock();render();drawStock();$('mvDlg').close();
   toast('Movimentação registrada. Novo estoque de '+p.name+': '+p.stock+' un.');
 };
+
+/* ===== Vendas ===== */
+var S=[],sale=null,PAYS=['Dinheiro','Cartão de crédito','Cartão de débito','Pix','Outro'],sst={period:'all',status:'all',lim:50};
+function relTime(t){
+  var diff=Date.now()-t,m=Math.round(diff/60000);
+  if(m<1)return'agora';if(m<60)return'há '+m+' min';var h=Math.round(m/60);if(h<24)return'há '+h+' h';return'há '+Math.round(h/24)+' d';
+}
+function syncSales(){
+  if(!S.length){D.today=D0.today;D.todayN=D0.todayN;D.month=D0.month;D.cost=D0.cost;D.week=D0.week.slice();D.recent=D0.recent;return}
+  var ok=S.filter(function(s){return s.status==='ok'}),n=new Date(),y=n.getFullYear(),mo=n.getMonth(),d=n.getDate();
+  var startDay=new Date(y,mo,d).getTime(),startMonth=new Date(y,mo,1).getTime();
+  var td=ok.filter(function(s){return s.t>=startDay}),mt=ok.filter(function(s){return s.t>=startMonth});
+  D.today=td.reduce(function(a,s){return a+s.total},0);D.todayN=td.length;
+  D.month=mt.reduce(function(a,s){return a+s.total},0);D.cost=mt.reduce(function(a,s){return a+s.cost},0);
+  D.week=[];
+  for(var i=6;i>=0;i--){var d0=new Date(y,mo,d-i).getTime(),d1=d0+86400000;
+    D.week.push(ok.filter(function(s){return s.t>=d0&&s.t<d1}).reduce(function(a,s){return a+s.total},0));}
+  D.recent=ok.slice(0,6).map(function(s){return[s.items.map(function(it){return it.name}).join(', ')||'Venda',relTime(s.t),s.total]});
+}
+/* listagem e filtros */
+function drawSales(){
+  document.querySelectorAll('#saPeriod button').forEach(function(b){b.setAttribute('aria-pressed',b.dataset.p===sst.period)});
+  var cutoff=sst.period==='today'?new Date(new Date().setHours(0,0,0,0)).getTime():sst.period==='all'?0:Date.now()-(+sst.period)*86400000;
+  var base=S.filter(function(s){return s.t>=cutoff});
+  var q=$('saq').value.trim().toLowerCase();
+  var searched=base.filter(function(s){return!q||(s.cliente+' '+s.pay+' '+s.items.map(function(it){return it.name}).join(' ')).toLowerCase().indexOf(q)>=0});
+  var cOk=searched.filter(function(s){return s.status==='ok'}),cCan=searched.filter(function(s){return s.status==='cancel'});
+  var F=[['all','Tudo',searched.length],['ok','Concluídas',cOk.length],['cancel','Canceladas',cCan.length]];
+  $('saFil').innerHTML=F.map(function(f){return'<button data-f="'+f[0]+'" aria-pressed="'+(f[0]===sst.status)+'">'+f[1]+' ('+f[2]+')</button>'}).join('');
+  var rev=cOk.reduce(function(a,s){return a+s.total},0),cost=cOk.reduce(function(a,s){return a+s.cost},0);
+  $('saTiles').innerHTML=[['Vendas concluídas',cOk.length],['Faturamento',brl(rev)],['Lucro',brl(rev-cost)],['Ticket médio',cOk.length?brl(rev/cOk.length):brl(0)],['Canceladas',cCan.length]]
+    .map(function(x){return'<div class="card"><h3>'+x[0]+'</h3><div class="num">'+x[1]+'</div></div>'}).join('');
+  var L=sst.status==='all'?searched:(sst.status==='ok'?cOk:cCan);
+  $('saList').innerHTML=L.length?L.slice(0,sst.lim).map(saleRow).join('')+(L.length>sst.lim?'<div style="text-align:center;padding:14px 0"><button class="btn sm" id="saMore">Ver mais</button></div>':'')
+   :'<div class="empty">'+(S.length?'Nenhuma venda encontrada para esse filtro.':'Nenhuma venda registrada ainda. Clique em "Nova venda" para começar.')+'</div>';
+}
+function saleRow(s){
+  var itemsHtml=s.items.map(function(it){return'<li><span>'+esc(it.name)+(it.varTxt?'<small>'+esc(it.varTxt)+'</small>':'')+'<small>'+it.qty+' un. × '+brl(it.price)+'</small></span><span>'+brl(it.qty*it.price)+'</span></li>'}).join('');
+  var pill=s.status==='ok'?'<span class="pill">Concluída</span>':'<span class="pill bad">Cancelada</span>';
+  var meta=[];if(s.cliente)meta.push('Cliente: '+esc(s.cliente));meta.push('Pagamento: '+esc(s.pay));if(s.desconto)meta.push('Desconto: '+brl(s.desconto));if(s.note)meta.push(esc(s.note));
+  var actions=s.status==='ok'
+    ?'<button class="btn sm" data-a="cancel" data-id="'+s.id+'">Cancelar venda</button><button class="btn sm danger" data-a="del" data-id="'+s.id+'">Excluir</button>'
+    :'<button class="btn sm" data-a="restore" data-id="'+s.id+'">Marcar como vendida novamente</button><button class="btn sm danger" data-a="del" data-id="'+s.id+'">Excluir</button>';
+  return'<div class="sale"><div class="sale-head"><div><strong>'+fdt(s.t)+'</strong> '+pill+'<p class="sub">'+meta.join(' · ')+'</p></div><div class="q"><b>'+brl(s.total)+'</b></div></div>'+
+    '<ul class="rows">'+itemsHtml+'</ul><div class="sale-ac">'+actions+'</div></div>';
+}
+$('saPeriod').onclick=function(e){var b=e.target.closest('button');if(b){sst.period=b.dataset.p;sst.lim=50;drawSales()}};
+$('saFil').onclick=function(e){var b=e.target.closest('button');if(b){sst.status=b.dataset.f;sst.lim=50;drawSales()}};
+$('saq').oninput=function(){sst.lim=50;drawSales()};
+$('saList').onclick=function(e){
+  var b=e.target.closest('button');if(!b)return;if(b.id==='saMore'){sst.lim+=50;return drawSales()}
+  var s=S.find(function(x){return x.id===b.dataset.id});if(!s)return;
+  if(b.dataset.a==='cancel')return cancelSale(s);
+  if(b.dataset.a==='restore')return restoreSale(s);
+  if(b.dataset.a==='del')return delSale(s,b);
+};
+/* cancelar, reativar e excluir */
+function applyStockDelta(s,sign){
+  var byProd={};s.items.forEach(function(it){(byProd[it.pid]=byProd[it.pid]||[]).push(it)});
+  var er='',plan={};
+  Object.keys(byProd).some(function(pid){
+    var p=P.find(function(x){return x.id===pid});if(!p)return false;
+    var totalQ=byProd[pid].reduce(function(a,it){return a+it.qty},0);
+    if(sign<0&&totalQ>p.stock){er='Estoque insuficiente para reativar "'+p.name+'": disponível '+p.stock+' un.';return true}
+    var vars=p.vars.map(function(g){return{name:g.name,opts:g.opts.map(function(o){return{n:o.n,q:o.q,p:o.p}})}});
+    var bad=byProd[pid].some(function(it){return it.vars.some(function(v){var g=vars[v.gi];if(!g)return false;var o=g.opts[v.oi];if(!o)return false;o.q+=it.qty*sign;return o.q<0})});
+    if(bad){er='Estoque da variação ficou insuficiente ao reverter "'+p.name+'".';return true}
+    plan[pid]={p:p,stock:p.stock+totalQ*sign,vars:vars,totalQ:totalQ};return false;
+  });
+  if(er)return er;
+  Object.keys(plan).forEach(function(pid){var pl=plan[pid];pl.p.stock=pl.stock;pl.p.vars=pl.vars;
+    logMv(pl.p,pl.totalQ*sign,sign>0?'in':'out',sign>0?'Cancelamento de venda':'Venda reativada','Venda de '+fdt(s.t));});
+  return'';
+}
+function persistAndRefreshSales(msg){
+  return Promise.all([kvSet('products',P),kvSet('moves',M),kvSet('sales',S)]).then(function(){
+    syncStock();syncSales();render();drawStock();drawSales();if(msg)toast(msg);
+  });
+}
+function cancelSale(s){var er=applyStockDelta(s,1);if(er)return toast(er);s.status='cancel';persistAndRefreshSales('Venda cancelada e itens devolvidos ao estoque.')}
+function restoreSale(s){var er=applyStockDelta(s,-1);if(er)return toast(er);s.status='ok';persistAndRefreshSales('Venda marcada como vendida novamente.')}
+function delSale(s,b){
+  if(!b.dataset.sure){b.dataset.sure='1';b.textContent='Confirmar exclusão';setTimeout(function(){if(b.isConnected){delete b.dataset.sure;b.textContent='Excluir'}},3500);return}
+  if(s.status==='ok')applyStockDelta(s,1);
+  S=S.filter(function(x){return x.id!==s.id});
+  persistAndRefreshSales('Venda excluída.');
+}
+/* nova venda */
+function cartReserved(pid){return sale.items.filter(function(it){return it.pid===pid}).reduce(function(a,it){return a+it.qty},0)}
+function saleProd(){return P.find(function(x){return x.id===$('saP').value})}
+function recalcPrice(){
+  var p=saleProd();if(!p)return;var price=p.price;
+  document.querySelectorAll('#saVars select').forEach(function(sel){if(sel.value==='')return;var g=p.vars[+sel.dataset.gi],o=g.opts[+sel.value];if(o.p!=null)price=o.p});
+  $('saPrice').value=price.toFixed(2);
+}
+function saleStockMsg(){var p=saleProd();if(p)$('saStock').textContent='Estoque disponível: '+Math.max(0,p.stock-cartReserved(p.id))+' un.'}
+function drawSaleProd(){
+  var p=saleProd();if(!p)return;
+  $('saVars').innerHTML=p.vars.map(function(g,i){return'<label class="fld"><span>'+esc(g.name)+' (opcional)</span><select data-gi="'+i+'"><option value="">Não especificar</option>'+g.opts.map(function(o,j){return'<option value="'+j+'">'+esc(o.n)+' ('+o.q+' un.)</option>'}).join('')+'</select></label>'}).join('');
+  recalcPrice();saleStockMsg();
+}
+function drawCart(){
+  $('saCartWrap').hidden=!sale.items.length;
+  $('saCart').innerHTML=sale.items.map(function(it,i){return'<li><span><strong>'+esc(it.name)+'</strong>'+(it.varTxt?'<small>'+esc(it.varTxt)+'</small>':'')+'<small>'+it.qty+' un. × '+brl(it.price)+'</small></span><span class="q">'+brl(it.qty*it.price)+'<br><button type="button" class="linerm" data-i="'+i+'">Remover</button></span></li>'}).join('');
+  saleCalc();
+}
+function saleCalc(){
+  var sub=sale.items.reduce(function(a,it){return a+it.qty*it.price},0),desc=Math.max(0,+$('saDesc').value||0);
+  $('saTotal').textContent='Total: '+brl(Math.max(0,sub-desc))+(desc?' (desconto de '+brl(desc)+' sobre '+brl(sub)+')':'');
+}
+function openSale(){
+  if(!P.length)return toast('Cadastre um produto antes de registrar uma venda.');
+  sale={items:[]};
+  $('saP').innerHTML=P.slice().sort(function(a,b){return a.name.localeCompare(b.name,'pt-BR')}).map(function(p){return'<option value="'+p.id+'">'+esc(p.name)+' ('+p.stock+' un.)</option>'}).join('');
+  $('saPay').innerHTML=PAYS.map(function(x){return'<option>'+x+'</option>'}).join('');
+  $('saQ').value=1;$('saDesc').value='';$('saCli').value='';$('saNote').value='';$('saErr').hidden=true;
+  drawSaleProd();drawCart();$('saleDlg').showModal();
+}
+$('saP').onchange=drawSaleProd;
+$('saVars').onchange=function(){recalcPrice();saleStockMsg()};
+$('saDesc').oninput=saleCalc;
+$('saCart').onclick=function(e){var b=e.target.closest('button');if(!b)return;sale.items.splice(+b.dataset.i,1);drawCart();saleStockMsg()};
+$('saAdd').onclick=function(){
+  var p=saleProd();if(!p)return;
+  var q=parseInt($('saQ').value)||0;if(q<1)return toast('Informe uma quantidade válida.');
+  var avail=p.stock-cartReserved(p.id);if(q>avail)return toast('Estoque insuficiente. Disponível: '+Math.max(0,avail)+' un.');
+  var price=parseFloat($('saPrice').value);if(isNaN(price)||price<0)price=p.price;
+  var vars=[],varTxt=[];
+  document.querySelectorAll('#saVars select').forEach(function(sel){if(sel.value==='')return;var gi=+sel.dataset.gi,oi=+sel.value,g=p.vars[gi],o=g.opts[oi];vars.push({gi:gi,oi:oi});varTxt.push(g.name+': '+o.n)});
+  sale.items.push({pid:p.id,name:p.name,varTxt:varTxt.join(', '),vars:vars,qty:q,price:price,cost:p.cost||0});
+  $('saQ').value=1;drawCart();saleStockMsg();
+};
+$('saOk').onclick=async function(){
+  if(!sale.items.length){$('saErr').textContent='Adicione ao menos um produto à venda.';$('saErr').hidden=false;return}
+  var desc=Math.max(0,+$('saDesc').value||0),pay=$('saPay').value,cli=$('saCli').value.trim(),note=$('saNote').value.trim();
+  var byProd={};sale.items.forEach(function(it){(byProd[it.pid]=byProd[it.pid]||[]).push(it)});
+  var er='',plan={};
+  Object.keys(byProd).some(function(pid){
+    var p=P.find(function(x){return x.id===pid}),totalQ=byProd[pid].reduce(function(a,it){return a+it.qty},0);
+    if(totalQ>p.stock){er='Estoque insuficiente para "'+p.name+'": disponível '+p.stock+' un.';return true}
+    var vars=p.vars.map(function(g){return{name:g.name,opts:g.opts.map(function(o){return{n:o.n,q:o.q,p:o.p}})}});
+    var bad=byProd[pid].some(function(it){return it.vars.some(function(v){var o=vars[v.gi].opts[v.oi];o.q-=it.qty;return o.q<0})});
+    if(bad){er='Uma das opções escolhidas para "'+p.name+'" não tem estoque suficiente.';return true}
+    if(vars.some(function(g){return sum(g)>p.stock-totalQ})){er='Com essa venda, as quantidades de variação de "'+p.name+'" passariam do estoque.';return true}
+    plan[pid]={p:p,stock:p.stock-totalQ,vars:vars,totalQ:totalQ};return false;
+  });
+  $('saErr').textContent=er;$('saErr').hidden=!er;if(er)return;
+  var subtotal=sale.items.reduce(function(a,it){return a+it.qty*it.price},0),cost=sale.items.reduce(function(a,it){return a+it.qty*it.cost},0);
+  var total=Math.max(0,subtotal-desc);
+  var rec={id:Date.now().toString(36)+Math.random().toString(36).slice(2,4),t:Date.now(),items:sale.items,subtotal:subtotal,desconto:desc,total:total,cost:cost,pay:pay,cliente:cli,note:note,status:'ok'};
+  S.unshift(rec);
+  Object.keys(plan).forEach(function(pid){var pl=plan[pid],vt=byProd[pid].map(function(it){return it.varTxt}).filter(Boolean).join('; ');
+    pl.p.stock=pl.stock;pl.p.vars=pl.vars;logMv(pl.p,-pl.totalQ,'out','Venda no balcão','Venda #'+rec.id,vt);});
+  await Promise.all([kvSet('products',P),kvSet('moves',M),kvSet('sales',S)]);
+  syncStock();syncSales();render();drawStock();drawSales();$('saleDlg').close();
+  toast('Venda registrada: '+brl(total)+'.');
+};
+$('newSale').onclick=openSale;
 </script>
 </body>
 </html>

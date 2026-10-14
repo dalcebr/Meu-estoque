@@ -347,6 +347,24 @@ body.cart-open #toast{bottom:auto;top:calc(env(safe-area-inset-top,0px) + 66px);
 .card.clp.open .clp-in{visibility:visible;transition:visibility 0s linear 0s}
 .card.clp .clp-p{padding:0 20px 20px}
 .card.clp .clp-p>*:first-child{margin-top:0}
+/* seletor de fontes com prévia ao vivo */
+.fpick{position:relative}
+.fp-sel{display:none}
+.fp-btn{display:flex;align-items:center;gap:10px;width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:14px;background:var(--bg);min-height:46px;text-align:left;color:var(--ink);font-weight:500}
+.fp-btn:hover{border-color:var(--accent)}
+.fp-btn .fp-txt{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fp-btn>svg{width:18px;height:18px;flex:none;fill:none;stroke:var(--muted);stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;transition:transform .25s}
+.fp-btn[aria-expanded="true"]>svg{transform:rotate(180deg)}
+.fp-pop{position:absolute;z-index:45;top:calc(100% + 6px);left:0;right:0;max-height:min(56vh,340px);overflow:auto;background:var(--surface);border:1px solid var(--line);border-radius:16px;box-shadow:0 18px 40px -18px rgba(18,20,29,.45);padding:6px;overscroll-behavior:contain}
+.fp-o{display:flex;align-items:center;gap:10px;width:100%;padding:11px 12px;border:0;background:none;border-radius:11px;text-align:left;color:var(--ink);font-size:1.02rem;min-height:46px}
+.fp-o:hover{background:var(--track)}
+.fp-o>span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fp-o .fp-c{width:18px;height:18px;flex:none;fill:none;stroke:var(--accent);stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;opacity:0}
+.fp-o[aria-selected="true"]{background:var(--soft);font-weight:700}
+.fp-o[aria-selected="true"] .fp-c{opacity:1}
+.fp-prev{margin-top:8px;padding:12px 14px;border:1px dashed var(--line);border-radius:14px;background:var(--bg);color:var(--ink);font-size:1.05rem;line-height:1.4;overflow-wrap:anywhere}
+.fp-prev .fp-lb{display:block;font-size:.74rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:4px;font-family:inherit}
+.card.clp.ov,.card.ov{overflow:visible}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
@@ -545,11 +563,25 @@ body.cart-open #toast{bottom:auto;top:calc(env(safe-area-inset-top,0px) + 66px);
     <h3>Aparência do catálogo</h3>
     <p class="sub">Personalize fontes, cores e estilo. As mudanças aparecem no catálogo em tempo real.</p>
     <div class="ff" style="margin-top:14px">
-      <label class="fld"><span>Fonte dos títulos</span><select id="ct-hf"></select></label>
-      <label class="fld"><span>Fonte do corpo</span><select id="ct-bf"></select></label>
+      <div class="fld"><span>Fonte dos títulos</span>
+        <div class="fpick" data-for="ct-hf">
+          <button type="button" class="fp-btn" aria-haspopup="listbox" aria-expanded="false"><span class="fp-txt">Sistema (padrão)</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+          <select id="ct-hf" class="fp-sel" tabindex="-1" aria-hidden="true"></select>
+          <div class="fp-pop" role="listbox" aria-label="Fonte dos títulos" hidden></div>
+        </div>
+        <div class="fp-prev"><span class="fp-lb">Prévia</span><span class="fp-t">Títulos e destaques · AaBbCc 123</span></div>
+      </div>
+      <div class="fld"><span>Fonte do corpo</span>
+        <div class="fpick" data-for="ct-bf">
+          <button type="button" class="fp-btn" aria-haspopup="listbox" aria-expanded="false"><span class="fp-txt">Sistema (padrão)</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+          <select id="ct-bf" class="fp-sel" tabindex="-1" aria-hidden="true"></select>
+          <div class="fp-pop" role="listbox" aria-label="Fonte do corpo" hidden></div>
+        </div>
+        <div class="fp-prev"><span class="fp-lb">Prévia</span><span class="fp-t">Preço R$ 49,90 · texto do catálogo 123</span></div>
+      </div>
       <div class="w">
         <span class="lbl" style="margin:4px 0 8px">Estilo dos cantos</span>
-        <div class="seg" id="ctRadius"><button type="button" data-r="sharp" style="border-radius:2px">Reto</button><button type="button" data-r="rounded">Arredondado</button><button type="button" data-r="pill" style="border-radius:99px">Pílula</button></div>
+        <div class="seg" id="ctRadius"><button type="button" data-r="sharp" style="border-radius:2px">Reto</button><button type="button" data-r="rounded">Arredondado</button></div>
       </div>
       <div class="w">
         <span class="lbl" style="margin:4px 0 8px">Cores do modo claro</span>
@@ -1991,7 +2023,7 @@ function applyCatTheme(darkOverride){
   });
   var cp=document.getElementById('catPage');
   if(!cp)return;
-  var r=th.radius||'rounded';cp.style.setProperty('--cat-radius',r==='sharp'?'4px':r==='pill'?'99px':'14px');
+  var r=th.radius==='sharp'?'sharp':'rounded'; /* só reto ou arredondado */cp.style.setProperty('--cat-radius',r==='sharp'?'4px':'14px');
   if(th.headFont){loadFont(th.headFont);cp.style.setProperty('--cat-head-font','"'+th.headFont+'",system-ui,sans-serif')}else cp.style.removeProperty('--cat-head-font');
   if(th.bodyFont){loadFont(th.bodyFont);cp.style.setProperty('--cat-body-font','"'+th.bodyFont+'",system-ui,sans-serif')}else cp.style.removeProperty('--cat-body-font');
   /* also apply fonts to drawer */
@@ -2004,11 +2036,59 @@ function applyCatTheme(darkOverride){
 }
 /* admin UI */
 function fontOpts(){return FONTS.map(function(f){return'<option value="'+f[0]+'"'+(f[0]?'style="font-family:\''+f[0]+'\',sans-serif"':'')+ '>'+f[1]+'</option>'}).join('')}
+/* ===== seletor de fontes com prévia (cada opção escrita na própria fonte) ===== */
+function fontCss(v){return(v?'"'+v+'",':'')+'system-ui,-apple-system,"Segoe UI",sans-serif'}
+function syncFontPickers(){
+  document.querySelectorAll('#v-catalog .fpick').forEach(function(w){
+    var sel=w.querySelector('.fp-sel');if(!sel)return;
+    var v=sel.value||'',row=FONTS.filter(function(f){return f[0]===v})[0],ff=fontCss(v);
+    var t=w.querySelector('.fp-txt');if(t){t.textContent=row?row[1]:'Sistema (padrão)';t.style.fontFamily=ff}
+    var pv=w.parentElement&&w.parentElement.querySelector('.fp-prev .fp-t');if(pv)pv.style.fontFamily=ff;
+    w.querySelectorAll('.fp-o').forEach(function(o){o.setAttribute('aria-selected',o.dataset.v===v)});
+  });
+}
+function buildFontPickers(){
+  function closeAll(){
+    document.querySelectorAll('#v-catalog .fp-pop:not([hidden])').forEach(function(p){
+      p.hidden=true;
+      var b=p.parentElement.querySelector('.fp-btn');if(b)b.setAttribute('aria-expanded','false');
+      var c=p.closest('.card');if(c)c.classList.remove('ov');
+    });
+  }
+  document.querySelectorAll('#v-catalog .fpick').forEach(function(w){
+    var sel=w.querySelector('.fp-sel'),btn=w.querySelector('.fp-btn'),pop=w.querySelector('.fp-pop');
+    if(!sel||!btn||!pop)return;
+    pop.innerHTML=FONTS.map(function(f){
+      return '<button type="button" class="fp-o" role="option" data-v="'+esc(f[0])+'" aria-selected="false" style="font-family:'+fontCss(f[0])+'">'+
+        '<span>'+esc(f[1])+'</span><svg class="fp-c" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.6 4.6 4.6L19 7.2"/></svg></button>';
+    }).join('');
+    btn.addEventListener('click',function(e){
+      e.preventDefault();e.stopPropagation();
+      if(!pop.hidden){closeAll();return}
+      closeAll();
+      FONTS.forEach(function(f){if(f[0])loadFont(f[0])}); /* pré-carrega p/ a lista exibir cada fonte */
+      var card=w.closest('.card');if(card)card.classList.add('ov');
+      pop.hidden=false;btn.setAttribute('aria-expanded','true');
+      syncFontPickers();
+    });
+    pop.addEventListener('click',function(e){
+      var o=e.target.closest('.fp-o');if(!o)return;
+      var mudou=sel.value!==o.dataset.v;
+      sel.value=o.dataset.v;
+      sel.dispatchEvent(new Event('change',{bubbles:true}));
+      syncFontPickers();closeAll();
+      if(mudou)toast('Fonte selecionada: '+o.querySelector('span').textContent);
+    });
+  });
+  document.addEventListener('click',function(e){if(!e.target.closest('.fpick'))closeAll()});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape')closeAll()});
+}
+buildFontPickers();
 function drawThemeCfg(){
   var th=thm();
   $('ct-hf').innerHTML=fontOpts();$('ct-hf').value=th.headFont||'';
   $('ct-bf').innerHTML=fontOpts();$('ct-bf').value=th.bodyFont||'';
-  document.querySelectorAll('#ctRadius button').forEach(function(b){b.setAttribute('aria-pressed',b.dataset.r===(th.radius||'rounded'))});
+  document.querySelectorAll('#ctRadius button').forEach(function(b){b.setAttribute('aria-pressed',b.dataset.r===(th.radius==='sharp'?'sharp':'rounded'))});
   ['light','dark'].forEach(function(mode){
     var pal=Object.assign({},THEME_DEF[mode],(th[mode]||{}));
     document.querySelectorAll('#ct'+(mode==='light'?'Light':'Dark')+' input').forEach(function(inp){
@@ -2018,6 +2098,7 @@ function drawThemeCfg(){
   // preload selected fonts
   if(th.headFont)loadFont(th.headFont);
   if(th.bodyFont)loadFont(th.bodyFont);
+  syncFontPickers();
 }
 $('ct-hf').onchange=function(){ensureTheme();CAT.theme.headFont=this.value;loadFont(this.value);saveCat();applyCatTheme()};
 $('ct-bf').onchange=function(){ensureTheme();CAT.theme.bodyFont=this.value;loadFont(this.value);saveCat();applyCatTheme()};

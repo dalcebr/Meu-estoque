@@ -208,6 +208,24 @@ body.cat-mode .shell{display:none}
 @media (min-width:640px){.cat-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}}
 @media (min-width:960px){.cat-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
 @media (min-width:1400px){.cat-bar,#catList,#catFav{max-width:1280px}.cat-grid{grid-template-columns:repeat(5,minmax(0,1fr))}}
+/* carrossel de categorias (entre o hero e a busca) */
+.cat-cats{margin:2px 0 16px}
+.cc-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}
+.cc-head h2{margin:0;font-size:1.02rem;font-weight:800;letter-spacing:-.01em}
+.cc-nav{display:flex;gap:6px}
+.cc-nav button[disabled]{opacity:.35;cursor:default}
+.cc-track{display:flex;gap:12px;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scroll-behavior:smooth;padding:2px 2px 12px;margin:0 -2px -6px;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;scrollbar-width:none}
+.cc-track::-webkit-scrollbar{display:none}
+.cc-card{flex:0 0 auto;width:clamp(124px,34vw,178px);scroll-snap-align:start;display:flex;flex-direction:column;gap:8px;padding:0 0 10px;border:1px solid var(--line);border-radius:16px;background:var(--surface);color:inherit;font:inherit;text-align:left;overflow:hidden;transition:border-color .15s,box-shadow .15s}
+.cc-ph{display:flex;align-items:center;justify-content:center;width:100%;aspect-ratio:4/3;background:var(--track);overflow:hidden}
+.cc-ph img{display:block;width:100%;height:100%;object-fit:cover}
+.cc-ph span{font-size:1.6rem;font-weight:800;color:var(--muted);letter-spacing:.02em;text-transform:uppercase}
+.cc-card strong{padding:0 10px;font-size:.88rem;font-weight:700;line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere}
+.cc-card[aria-pressed="true"]{border-color:var(--accent);box-shadow:0 0 0 3px var(--soft)}
+.cc-card[aria-pressed="true"] strong{color:var(--accent-text)}
+@media (hover:hover){.cc-card:hover{border-color:color-mix(in srgb,var(--accent) 45%,var(--line))}}
+@media (max-width:420px){.cc-track{gap:10px}.cc-card{width:134px}}
+@media (prefers-reduced-motion:reduce){.cc-track{scroll-behavior:auto}}
 .mc{display:flex;flex-direction:column;border-radius:20px}
 .mc a{color:inherit;text-decoration:none;display:block}
 .mc .b{display:flex;flex-direction:column;gap:6px;flex:1;padding:10px 12px 12px}
@@ -464,6 +482,15 @@ body.cart-open #toast{bottom:auto;top:calc(env(safe-area-inset-top,0px) + 16px)}
   </div></header>
   <section class="cat-hero" id="catHero"><h1 id="catTitle"></h1><p id="catDesc"></p></section>
   <div class="cat-body" id="catList">
+    <section class="cat-cats" id="catCats" aria-label="Categorias" hidden>
+      <div class="cc-head"><h2>Categorias</h2>
+        <div class="cc-nav">
+          <button type="button" class="ib sm" id="ccPrev" aria-label="Ver categorias anteriores" title="Anterior"><svg viewBox="0 0 24 24"><path d="m15 6-6 6 6 6"/></svg></button>
+          <button type="button" class="ib sm" id="ccNext" aria-label="Ver mais categorias" title="Próximo"><svg viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg></button>
+        </div>
+      </div>
+      <div class="cc-track" id="ccTrack"></div>
+    </section>
     <div class="cat-search">
       <label class="cat-sb"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg><input id="catQ" type="search" placeholder="Pesquisar produtos" aria-label="Pesquisar produtos"></label>
       <button class="ib" id="catFilterBtn" type="button" aria-label="Filtros" aria-expanded="false" title="Filtros"><svg viewBox="0 0 24 24"><path d="M22 3H2l8 9.46V19l4 2v-8.54z"/></svg><i class="dot" id="catDot" hidden></i></button>
@@ -1363,7 +1390,7 @@ $('catShare').onclick=function(){
   else window.open('https://wa.me/?text='+encodeURIComponent(msg+': '+url),'_blank','noopener');
 };
 /* página pública do catálogo: vitrine, favoritos, página do produto e carrinho lateral */
-var catSt={q:'',cat:'',sort:''},pp={id:null,sel:{},qty:1,img:0},cdFocus=null;
+var catSt={q:'',cat:'',sort:'',cats:[]},pp={id:null,sel:{},qty:1,img:0},cdFocus=null;
 function jget(k,d){try{return JSON.parse(get(k))||d}catch(e){return d}}
 var FAV=jget('cat_fav',[]),CART=jget('cat_cart',[]);
 var ICON_HEART='<svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>';
@@ -1399,7 +1426,9 @@ function drawCatList(){
   var all=P.filter(function(p){return p.stock>0});
   var cats=Array.from(new Set(all.map(function(p){return(p.cat||'').trim()}).filter(Boolean))).sort(function(a,b){return a.localeCompare(b,'pt-BR')});
   if(catSt.cat&&cats.indexOf(catSt.cat)<0)catSt.cat='';
+  catSt.cats=cats;
   $('catCat').innerHTML='<option value="">Todas as categorias</option>'+cats.map(function(c){return'<option value="'+esc(c)+'">'+esc(c)+'</option>'}).join('');$('catCat').value=catSt.cat;$('catSort').value=catSt.sort;
+  markCatCar();
   $('catDot').hidden=!(catSt.cat||catSt.sort);
   var q=catSt.q.trim().toLowerCase();
   var L=all.filter(function(p){return(!catSt.cat||(p.cat||'').trim()===catSt.cat)&&(!q||(p.name+' '+(p.cat||'')+' '+(p.desc||'')).toLowerCase().indexOf(q)>=0)});
@@ -1415,6 +1444,38 @@ $('catFilterBtn').onclick=function(){var f=$('catFilters');f.hidden=!f.hidden;th
 $('catCat').onchange=function(){catSt.cat=this.value;drawCatList()};
 $('catSort').onchange=function(){catSt.sort=this.value;drawCatList()};
 $('catClear').onclick=function(){catSt.cat='';catSt.sort='';catSt.q='';$('catQ').value='';drawCatList()};
+/* carrossel de categorias: capa = foto de um produto da categoria */
+function catCover(cat){
+  var L=P.filter(function(p){return(p.cat||'').trim()===cat});
+  return L.filter(function(p){return p.imgs&&p.imgs.length})[0]||L[0]||null;
+}
+function drawCatCar(){
+  var cats=catSt.cats||[],box=$('catCats');
+  box.hidden=!cats.length;
+  $('ccTrack').innerHTML=cats.map(function(c){
+    var p=catCover(c),ph=p&&p.imgs&&p.imgs.length?'<img alt="" loading="lazy" src="'+blobUrl(p.imgs[0])+'">':'<span aria-hidden="true">'+esc((c.trim()[0]||'?').toUpperCase())+'</span>';
+    return'<button type="button" class="cc-card" data-cat="'+esc(c)+'" aria-pressed="'+(catSt.cat===c)+'"><span class="cc-ph">'+ph+'</span><strong>'+esc(c)+'</strong></button>';
+  }).join('');
+  markCatCar();ccNav();
+}
+function markCatCar(){
+  Array.prototype.forEach.call(document.querySelectorAll('#ccTrack .cc-card'),function(b){b.setAttribute('aria-pressed',b.dataset.cat===catSt.cat)});
+}
+function ccNav(){
+  var t=$('ccTrack'),over=t.scrollWidth-t.clientWidth>4;
+  $('ccPrev').hidden=!over;$('ccNext').hidden=!over;if(!over)return;
+  $('ccPrev').disabled=t.scrollLeft<=2;$('ccNext').disabled=t.scrollLeft>=t.scrollWidth-t.clientWidth-2;
+}
+function ccGo(dir){$('ccTrack').scrollBy({left:dir*Math.max(180,$('ccTrack').clientWidth*.85),behavior:'smooth'})}
+$('ccPrev').onclick=function(){ccGo(-1)};
+$('ccNext').onclick=function(){ccGo(1)};
+$('ccTrack').addEventListener('scroll',ccNav,{passive:true});
+window.addEventListener('resize',function(){if(CATALOG)ccNav()});
+$('ccTrack').onclick=function(e){
+  var b=e.target.closest('[data-cat]');if(!b)return;
+  catSt.cat=catSt.cat===b.dataset.cat?'':b.dataset.cat;   // tocar de novo na categoria ativa limpa o filtro
+  $('catCat').value=catSt.cat;drawCatList();
+};
 function toggleFav(id){var i=FAV.indexOf(id);if(i>=0)FAV.splice(i,1);else FAV.push(id);saveFav()}
 $('catGrid').onclick=gridClick;
 /* página de favoritos (isolada, rota #favoritos) */
@@ -1556,6 +1617,7 @@ function catRoute(){
   $('catList').hidden=!!m||fav;$('catProd').hidden=!m;$('catFav').hidden=!fav;
   $('catHero').hidden=!!m||fav||!(CAT.title||CAT.desc);
   if(m||fav||was)scrollTo(0,0);
+  if(!$('catList').hidden)ccNav();
   updateBadges();
 }
 window.addEventListener('hashchange',function(){if(CATALOG){closeCart();if(!/^#produto\//.test(location.hash))drawCatList();catRoute()}});
@@ -1568,7 +1630,7 @@ function drawCatalogPage(){
   hero.classList.toggle('has-img',!!isImg);
   if(isImg){hero.style.background='linear-gradient(rgba(10,12,20,.5),rgba(10,12,20,.5)),url('+blobUrl(CAT.heroImg)+') center/cover no-repeat';hero.style.color='#fff'}
   else{var hc=heroColor();hero.style.background=hc;hero.style.color=inkFor(hc)}
-  drawCatList();catRoute();
+  drawCatList();drawCatCar();catRoute();
 }
 if(CATALOG)drawCatalogPage();
 </script>

@@ -201,9 +201,14 @@ body.cat-mode .shell{display:none}
 .cat-sb svg{position:absolute;left:14px;top:50%;transform:translateY(-50%);width:18px;height:18px;stroke:var(--muted);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .cat-sb input{width:100%;padding:12px 14px 12px 42px;border:1px solid var(--line);border-radius:14px;background:var(--surface);min-height:46px;font-size:16px;-webkit-appearance:none;appearance:none}
 #catPage select,#catPage textarea{font-size:16px}
-.cat-filters{margin-top:12px;display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));align-items:end}
-.cat-filters .btn{grid-column:1/-1;justify-self:start}
-@media (max-width:639px){.cat-filters{padding:16px}.cat-filters .btn{width:100%}}
+.cat-search-c{margin-top:12px}
+#catCount,#catCCount{margin-top:12px}
+/* popup de filtro/ordenação */
+.fopts{display:grid;gap:8px;margin-top:16px}
+.fopt{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;padding:13px 14px;min-height:50px;text-align:left;border:1px solid var(--line);border-radius:14px;background:var(--surface);color:inherit;font:inherit;font-weight:600}
+.fopt svg{width:18px;height:18px;flex:none;stroke:currentColor;fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;opacity:0}
+.fopt[aria-pressed="true"]{border-color:var(--accent);background:var(--soft);color:var(--accent-text);font-weight:700}
+.fopt[aria-pressed="true"] svg{opacity:1}
 .cat-grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin-top:12px}
 @media (min-width:640px){.cat-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}}
 @media (min-width:960px){.cat-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
@@ -221,8 +226,6 @@ body.cat-mode .shell{display:none}
 .cc-ph img{display:block;width:100%;height:100%;object-fit:cover}
 .cc-ph span{font-size:1.6rem;font-weight:800;color:var(--muted);letter-spacing:.02em;text-transform:uppercase}
 .cc-card strong{padding:0 10px;font-size:.88rem;font-weight:700;line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere}
-.cc-card[aria-pressed="true"]{border-color:var(--accent);box-shadow:0 0 0 3px var(--soft)}
-.cc-card[aria-pressed="true"] strong{color:var(--accent-text)}
 @media (hover:hover){.cc-card:hover{border-color:color-mix(in srgb,var(--accent) 45%,var(--line))}}
 @media (max-width:420px){.cc-track{gap:10px}.cc-card{width:134px}}
 @media (prefers-reduced-motion:reduce){.cc-track{scroll-behavior:auto}}
@@ -493,15 +496,20 @@ body.cart-open #toast{bottom:auto;top:calc(env(safe-area-inset-top,0px) + 16px)}
     </section>
     <div class="cat-search">
       <label class="cat-sb"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg><input id="catQ" type="search" placeholder="Pesquisar produtos" aria-label="Pesquisar produtos"></label>
-      <button class="ib" id="catFilterBtn" type="button" aria-label="Filtros" aria-expanded="false" title="Filtros"><svg viewBox="0 0 24 24"><path d="M22 3H2l8 9.46V19l4 2v-8.54z"/></svg><i class="dot" id="catDot" hidden></i></button>
-    </div>
-    <div class="cat-filters card" id="catFilters" hidden>
-      <label class="fld"><span>Categoria</span><select id="catCat"></select></label>
-      <label class="fld"><span>Ordenar por</span><select id="catSort"><option value="">Padrão</option><option value="name">Nome (A–Z)</option><option value="low">Menor preço</option><option value="high">Maior preço</option></select></label>
-      <button class="btn sm" id="catClear" type="button">Limpar filtros</button>
+      <button class="ib" id="catFilterBtn" type="button" aria-label="Filtrar e ordenar" aria-expanded="false" title="Filtrar e ordenar"><svg viewBox="0 0 24 24"><path d="M22 3H2l8 9.46V19l4 2v-8.54z"/></svg><i class="dot" id="catDot" hidden></i></button>
     </div>
     <p class="sub" id="catCount"></p>
     <div class="pgrid cat-grid" id="catGrid"></div>
+  </div>
+  <div class="cat-body" id="catCatPage" hidden>
+    <div class="pp-top"><button class="btn sm" data-a="back" type="button">← Voltar</button></div>
+    <h1 class="cat-h1" id="catCatTitle" tabindex="-1"></h1>
+    <div class="cat-search cat-search-c">
+      <label class="cat-sb"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg><input id="catCq" type="search" placeholder="Pesquisar nesta categoria" aria-label="Pesquisar nesta categoria"></label>
+      <button class="ib" id="catCfilterBtn" type="button" aria-label="Filtrar e ordenar" aria-expanded="false" title="Filtrar e ordenar"><svg viewBox="0 0 24 24"><path d="M22 3H2l8 9.46V19l4 2v-8.54z"/></svg><i class="dot" id="catCdot" hidden></i></button>
+    </div>
+    <p class="sub" id="catCCount"></p>
+    <div class="pgrid cat-grid" id="catCatGrid"></div>
   </div>
   <div class="cat-body" id="catProd" hidden></div>
   <div class="cat-body" id="catFav" hidden>
@@ -523,6 +531,15 @@ body.cart-open #toast{bottom:auto;top:calc(env(safe-area-inset-top,0px) + 16px)}
     <button type="button" class="btn" id="catCartClear">Esvaziar carrinho</button>
   </div>
 </aside>
+
+<dialog id="catFiltDlg">
+  <form method="dialog">
+    <h2>Filtrar e ordenar</h2>
+    <p class="sub" style="margin:6px 0 0">Escolha como os produtos aparecem na lista.</p>
+    <div class="fopts" id="catFiltOpts"></div>
+    <div class="dlg-actions"><button type="button" class="btn" data-clear>Limpar filtro</button><button type="button" class="btn main" data-close>Fechar</button></div>
+  </form>
+</dialog>
 
 <dialog id="goalDlg">
   <form method="dialog" id="goalForm">
@@ -1390,7 +1407,8 @@ $('catShare').onclick=function(){
   else window.open('https://wa.me/?text='+encodeURIComponent(msg+': '+url),'_blank','noopener');
 };
 /* página pública do catálogo: vitrine, favoritos, página do produto e carrinho lateral */
-var catSt={q:'',cat:'',sort:'',cats:[]},pp={id:null,sel:{},qty:1,img:0},cdFocus=null;
+var catSt={q:'',cq:'',cat:'',sort:''},pp={id:null,sel:{},qty:1,img:0},cdFocus=null;
+var SORTS=[['','Padrão'],['low','Menor preço'],['high','Maior preço'],['sold','Mais vendidos'],['new','Novidades']];
 function jget(k,d){try{return JSON.parse(get(k))||d}catch(e){return d}}
 var FAV=jget('cat_fav',[]),CART=jget('cat_cart',[]);
 var ICON_HEART='<svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>';
@@ -1417,49 +1435,86 @@ function cardHtml(p){
 }
 function gridClick(e){
   var b=e.target.closest('button[data-a]');if(!b)return;var p=P.find(function(x){return x.id===b.dataset.id});if(!p)return;
-  if(b.dataset.a==='fav'){toggleFav(p.id);drawCatList();drawCatFav()}
+  if(b.dataset.a==='fav'){toggleFav(p.id);redrawCat();drawCatFav()}
   else if(p.vars.some(needsPick)){toast('Escolha uma opção na página do produto.');location.hash='#produto/'+p.id}
   else if(addCart(p,[],1))toast('Adicionado ao carrinho.');
 }
 /* vitrine */
 function drawCatList(){
   var all=P.filter(function(p){return p.stock>0});
-  var cats=Array.from(new Set(all.map(function(p){return(p.cat||'').trim()}).filter(Boolean))).sort(function(a,b){return a.localeCompare(b,'pt-BR')});
-  if(catSt.cat&&cats.indexOf(catSt.cat)<0)catSt.cat='';
-  catSt.cats=cats;
-  $('catCat').innerHTML='<option value="">Todas as categorias</option>'+cats.map(function(c){return'<option value="'+esc(c)+'">'+esc(c)+'</option>'}).join('');$('catCat').value=catSt.cat;$('catSort').value=catSt.sort;
-  markCatCar();
-  $('catDot').hidden=!(catSt.cat||catSt.sort);
+  catSt.cats=Array.from(new Set(all.map(function(p){return(p.cat||'').trim()}).filter(Boolean))).sort(function(a,b){return a.localeCompare(b,'pt-BR')});
+  $('catDot').hidden=!catSt.sort;
   var q=catSt.q.trim().toLowerCase();
-  var L=all.filter(function(p){return(!catSt.cat||(p.cat||'').trim()===catSt.cat)&&(!q||(p.name+' '+(p.cat||'')+' '+(p.desc||'')).toLowerCase().indexOf(q)>=0)});
-  if(catSt.sort==='name')L.sort(function(a,b){return a.name.localeCompare(b.name,'pt-BR')});
-  else if(catSt.sort==='low')L.sort(function(a,b){return minPrice(a)-minPrice(b)});
-  else if(catSt.sort==='high')L.sort(function(a,b){return minPrice(b)-minPrice(a)});
+  var L=sortList(all.filter(function(p){return!q||(p.name+' '+(p.cat||'')+' '+(p.desc||'')).toLowerCase().indexOf(q)>=0}),catSt.sort);
   $('catCount').textContent=plural(L.length,'produto','produtos');
   $('catGrid').innerHTML=L.length?L.map(cardHtml).join(''):'<div class="card empty" style="grid-column:1/-1">'+(all.length?'Nenhum produto encontrado.':'Em breve, novos produtos por aqui.')+'</div>';
   updateBadges();
 }
+/* aba da categoria: só os produtos dela, com busca e filtro próprios */
+function drawCatPage(){
+  var cat=catSt.cat,all=P.filter(function(p){return p.stock>0&&(p.cat||'').trim()===cat});
+  $('catCatTitle').textContent=cat||'Categoria';
+  $('catCdot').hidden=!catSt.sort;
+  var q=catSt.cq.trim().toLowerCase();
+  var L=sortList(all.filter(function(p){return!q||(p.name+' '+(p.sku||'')+' '+(p.desc||'')).toLowerCase().indexOf(q)>=0}),catSt.sort);
+  $('catCCount').textContent=plural(L.length,'produto','produtos');
+  $('catCatGrid').innerHTML=L.length?L.map(cardHtml).join(''):'<div class="card empty" style="grid-column:1/-1">'+(all.length?'Nenhum produto encontrado.':'Em breve, novos produtos por aqui.')+'</div>';
+  updateBadges();
+}
 $('catQ').oninput=function(){catSt.q=this.value;drawCatList()};
-$('catFilterBtn').onclick=function(){var f=$('catFilters');f.hidden=!f.hidden;this.setAttribute('aria-expanded',!f.hidden)};
-$('catCat').onchange=function(){catSt.cat=this.value;drawCatList()};
-$('catSort').onchange=function(){catSt.sort=this.value;drawCatList()};
-$('catClear').onclick=function(){catSt.cat='';catSt.sort='';catSt.q='';$('catQ').value='';drawCatList()};
+$('catCq').oninput=function(){catSt.cq=this.value;drawCatPage()};
+$('catCatGrid').onclick=gridClick;
+$('catCatPage').onclick=function(e){if(e.target.closest('[data-a="back"]'))location.hash=''};
 /* carrossel de categorias: capa = foto de um produto da categoria */
 function catCover(cat){
   var L=P.filter(function(p){return(p.cat||'').trim()===cat});
   return L.filter(function(p){return p.imgs&&p.imgs.length})[0]||L[0]||null;
 }
+/* filtro/ordenação: um popup único usado pela vitrine e pela aba de categoria */
+function soldUnits(){
+  var m={};S.filter(function(s){return s.status==='ok'}).forEach(function(s){s.items.forEach(function(it){m[it.pid]=(m[it.pid]||0)+it.qty})});
+  return m;
+}
+function regTime(p){var t=parseInt(p.id,36);return isFinite(t)&&t>1e11?t:0}   // o id é o Date.now() em base36
+function sortList(L,sort){
+  if(sort==='low')L.sort(function(a,b){return minPrice(a)-minPrice(b)});
+  else if(sort==='high')L.sort(function(a,b){return minPrice(b)-minPrice(a)});
+  else if(sort==='sold'){var m=soldUnits();L.sort(function(a,b){return(m[b.id]||0)-(m[a.id]||0)})}
+  else if(sort==='new')L.sort(function(a,b){return regTime(b)-regTime(a)});
+  return L;
+}
+function redrawCat(){
+  drawCatList();if(catSt.cat)drawCatPage();
+  $('catDot').hidden=!catSt.sort;$('catCdot').hidden=!catSt.sort;
+}
+var filtFocus=null;
+var ICON_CHECK='<svg viewBox="0 0 24 24"><path d="m5 13 4 4L19 7"/></svg>';
+function openFilt(btn){
+  filtFocus=btn||document.activeElement;
+  if(filtFocus&&filtFocus.setAttribute)filtFocus.setAttribute('aria-expanded','true');
+  $('catFiltOpts').innerHTML=SORTS.map(function(s){return'<button type="button" class="fopt" data-sort="'+s[0]+'" aria-pressed="'+(catSt.sort===s[0])+'"><span>'+s[1]+'</span>'+ICON_CHECK+'</button>'}).join('');
+  $('catFiltDlg').showModal();
+}
+$('catFilterBtn').onclick=function(){openFilt(this)};
+$('catCfilterBtn').onclick=function(){openFilt(this)};
+$('catFiltDlg').onclick=function(e){
+  var b=e.target.closest('[data-sort]');
+  if(b){catSt.sort=b.dataset.sort;this.close();redrawCat();return}
+  if(e.target.closest('[data-clear]')){catSt.sort='';this.close();redrawCat();return}
+  if(e.target.closest('[data-close]'))this.close();
+};
+$('catFiltDlg').addEventListener('close',function(){
+  ['catFilterBtn','catCfilterBtn'].forEach(function(id){$(id).setAttribute('aria-expanded','false')});
+  if(filtFocus&&filtFocus.focus)filtFocus.focus();
+});
 function drawCatCar(){
   var cats=catSt.cats||[],box=$('catCats');
   box.hidden=!cats.length;
   $('ccTrack').innerHTML=cats.map(function(c){
     var p=catCover(c),ph=p&&p.imgs&&p.imgs.length?'<img alt="" loading="lazy" src="'+blobUrl(p.imgs[0])+'">':'<span aria-hidden="true">'+esc((c.trim()[0]||'?').toUpperCase())+'</span>';
-    return'<button type="button" class="cc-card" data-cat="'+esc(c)+'" aria-pressed="'+(catSt.cat===c)+'"><span class="cc-ph">'+ph+'</span><strong>'+esc(c)+'</strong></button>';
+    return'<button type="button" class="cc-card" data-cat="'+esc(c)+'"><span class="cc-ph">'+ph+'</span><strong>'+esc(c)+'</strong></button>';
   }).join('');
-  markCatCar();ccNav();
-}
-function markCatCar(){
-  Array.prototype.forEach.call(document.querySelectorAll('#ccTrack .cc-card'),function(b){b.setAttribute('aria-pressed',b.dataset.cat===catSt.cat)});
+  ccNav();
 }
 function ccNav(){
   var t=$('ccTrack'),over=t.scrollWidth-t.clientWidth>4;
@@ -1473,8 +1528,7 @@ $('ccTrack').addEventListener('scroll',ccNav,{passive:true});
 window.addEventListener('resize',function(){if(CATALOG)ccNav()});
 $('ccTrack').onclick=function(e){
   var b=e.target.closest('[data-cat]');if(!b)return;
-  catSt.cat=catSt.cat===b.dataset.cat?'':b.dataset.cat;   // tocar de novo na categoria ativa limpa o filtro
-  $('catCat').value=catSt.cat;drawCatList();
+  location.hash='#categoria/'+encodeURIComponent(b.dataset.cat);   // abre a aba com os produtos da categoria
 };
 function toggleFav(id){var i=FAV.indexOf(id);if(i>=0)FAV.splice(i,1);else FAV.push(id);saveFav()}
 $('catGrid').onclick=gridClick;
@@ -1593,7 +1647,7 @@ function drawProd(){
 }
 $('catProd').onclick=function(e){
   var b=e.target.closest('[data-a]');if(!b)return;var a=b.dataset.a,p=P.find(function(x){return x.id===pp.id});
-  if(a==='back'){location.hash='';return}
+  if(a==='back'){location.hash=ppFrom?'#categoria/'+encodeURIComponent(ppFrom):'';return}
   if(!p)return;
   if(a==='fav')toggleFav(p.id);
   else if(a==='th')pp.img=+b.dataset.i;
@@ -1609,18 +1663,24 @@ $('catProd').onclick=function(e){
   }
   drawProd();updateBadges();
 };
-/* rotas: #produto/ID = página do produto, #favoritos = página de favoritos, sem hash = vitrine */
+/* rotas: #produto/ID = página do produto, #categoria/NOME = aba da categoria, #favoritos = favoritos, sem hash = vitrine */
+var ppFrom='';
 function catRoute(){
-  var h=location.hash,m=/^#produto\/(.+)$/.exec(h),fav=h==='#favoritos',was=pp.id;
-  if(m){var id=decodeURIComponent(m[1]);if(id!==pp.id)pp={id:id,sel:{},qty:1,img:0};drawProd()}else pp.id=null;
+  var prev=catRoute.prev||'';catRoute.prev=location.hash;
+  var h=location.hash,m=/^#produto\/(.+)$/.exec(h),fav=h==='#favoritos',cm=/^#categoria\/(.+)$/.exec(h),cat=cm?decodeURIComponent(cm[1]):'',was=pp.id;
+  if(m){
+    var pm=/^#categoria\/(.+)$/.exec(prev);if(pm)ppFrom=decodeURIComponent(pm[1]);   // voltar do produto leva de volta à categoria
+    var id=decodeURIComponent(m[1]);if(id!==pp.id)pp={id:id,sel:{},qty:1,img:0};drawProd();
+  }else{pp.id=null;if(!fav&&!cm)ppFrom='';}
   if(fav)drawCatFav();
-  $('catList').hidden=!!m||fav;$('catProd').hidden=!m;$('catFav').hidden=!fav;
-  $('catHero').hidden=!!m||fav||!(CAT.title||CAT.desc);
-  if(m||fav||was)scrollTo(0,0);
+  if(cm){if(catSt.cat!==cat){catSt.cat=cat;catSt.cq='';$('catCq').value=''}drawCatPage();if(prev!==location.hash)$('catCatTitle').focus({preventScroll:true})}else catSt.cat='';
+  $('catList').hidden=!!m||fav||!!cm;$('catProd').hidden=!m;$('catFav').hidden=!fav;$('catCatPage').hidden=!cm;
+  $('catHero').hidden=!!m||fav||!!cm||!(CAT.title||CAT.desc);
+  if(m||fav||cm||was)scrollTo(0,0);
   if(!$('catList').hidden)ccNav();
   updateBadges();
 }
-window.addEventListener('hashchange',function(){if(CATALOG){closeCart();if(!/^#produto\//.test(location.hash))drawCatList();catRoute()}});
+window.addEventListener('hashchange',function(){if(CATALOG){closeCart();catRoute();if(!$('catList').hidden)drawCatList()}});
 function drawCatalogPage(){
   document.body.classList.add('cat-mode');$('catPage').hidden=false;
   $('catStore').textContent=catName();document.title=catName();

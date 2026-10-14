@@ -8,7 +8,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
 <script>
 (function(){var g=function(k){try{return localStorage.getItem(k)}catch(e){return null}};
-var t=g('tema');if(t!=='light'&&t!=='dark')t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';
+var t=g(/[?&]catalogo(=|&|$)/.test(location.search)?'tema_cat':'tema');if(t!=='light'&&t!=='dark')t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';
 var r=document.documentElement;r.setAttribute('data-theme',t);
 var a=g('cor')||'#4F46E5';r.style.setProperty('--accent',a);
 var n=parseInt(a.slice(1),16),l=(0.299*(n>>16)+0.587*(n>>8&255)+0.114*(n&255))/255;
@@ -180,8 +180,10 @@ dialog .fld{margin:14px 0 0}
 /* catálogo online (página pública, aberta com ?catalogo) */
 body.cat-mode .shell{display:none}
 .cat-head{position:sticky;top:0;z-index:5;background:var(--surface);border-bottom:1px solid var(--line);padding:14px 20px}
-.cat-head>div{max-width:1180px;margin:0 auto;font-weight:800;font-size:1.15rem;letter-spacing:-.01em}
-.cat-hero{background:var(--accent);color:var(--accent-ink);padding:48px 20px;text-align:center}
+.cat-bar{max-width:1180px;margin:0 auto;display:flex;align-items:center;gap:10px}
+.cat-bar #catStore{flex:1;min-width:0;font-weight:800;font-size:1.15rem;letter-spacing:-.01em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cat-prev{display:block;width:100%;max-width:420px;aspect-ratio:16/6;border-radius:16px;border:1px solid var(--line);object-fit:cover;background:var(--track);margin-bottom:10px}
+.cat-hero{background:var(--accent);color:var(--accent-ink);padding:64px 20px;min-height:240px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
 .cat-hero h1{margin:0;font-size:clamp(1.8rem,6vw,2.9rem);line-height:1.1;font-weight:800;letter-spacing:-.03em}
 .cat-hero p{margin:14px auto 0;max-width:600px;font-size:1.05rem;opacity:.92;white-space:pre-line}
 .cat-body{max-width:1180px;margin:0 auto;padding:24px 16px 56px}
@@ -353,6 +355,19 @@ body.cat-mode .shell{display:none}
       <label class="fld w"><span>Nome da loja (aparece no cabeçalho do catálogo)</span><input id="cat-store" maxlength="80" placeholder="Ex.: Farmácia Vida"></label>
       <label class="fld w"><span>Título da seção inicial</span><input id="cat-title" maxlength="80" placeholder="Ex.: Quem ama cuida"></label>
       <label class="fld w"><span>Descrição da seção inicial</span><textarea id="cat-desc" rows="3" maxlength="240" placeholder="Ex.: Produtos que cuidam da saúde da sua família"></textarea></label>
+      <div class="w">
+        <span class="lbl" style="margin:4px 0 8px">Fundo da seção inicial</span>
+        <div class="seg" id="catBgMode"><button type="button" data-m="color">Cor sólida</button><button type="button" data-m="image">Imagem</button></div>
+        <div id="catBgColor" style="margin-top:14px"><span class="lbl" style="margin:0 0 8px">Cor de fundo</span><div class="sw" id="catSw"></div></div>
+        <div id="catBgImage" style="margin-top:14px" hidden>
+          <span class="lbl" style="margin:0 0 8px">Imagem de fundo</span>
+          <img class="cat-prev" id="catImgPrev" alt="Prévia da imagem de fundo" hidden>
+          <p class="sub" id="catImgNone">Nenhuma imagem escolhida. Enquanto isso, o fundo usa a cor sólida.</p>
+          <div class="acts" style="margin-top:10px"><button type="button" class="btn" id="catImgPick">Escolher imagem</button><button type="button" class="btn danger" id="catImgDel" hidden>Remover imagem</button></div>
+          <p class="sub" style="margin-top:8px">Use uma imagem larga (paisagem). O texto ganha uma camada escura por cima para continuar legível.</p>
+          <input type="file" id="catImgFile" accept="image/*" hidden>
+        </div>
+      </div>
     </div>
     <p class="sub" id="catSaved" style="margin-top:12px">As alterações são salvas automaticamente.</p>
   </section>
@@ -361,7 +376,15 @@ body.cat-mode .shell{display:none}
 </div>
 
 <div id="catPage" hidden>
-  <header class="cat-head"><div id="catStore"></div></header>
+  <header class="cat-head"><div class="cat-bar">
+    <span id="catStore"></span>
+    <button class="ib" id="catCart" type="button" aria-label="Carrinho" title="Carrinho"><svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg></button>
+    <button class="ib" id="catWish" type="button" aria-label="Lista de desejos" title="Lista de desejos"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></button>
+    <button class="ib" id="catTheme" type="button" aria-label="Alternar modo claro e escuro" title="Alternar modo claro e escuro">
+      <svg class="moon" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5z"/></svg>
+      <svg class="sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5 19 19M5 19l1.5-1.5M17.5 6.5 19 5"/></svg>
+    </button>
+  </div></header>
   <section class="cat-hero" id="catHero"><h1 id="catTitle"></h1><p id="catDesc"></p></section>
   <div class="cat-body"><div class="pgrid" id="catGrid"></div></div>
 </div>
@@ -725,7 +748,7 @@ idb().then(function(){return Promise.all([kvGet('products'),kvGet('moves'),kvGet
   if(Array.isArray(r[1]))M=r[1];
   if(Array.isArray(r[2]))S=r[2];
   if(Array.isArray(r[3]))CLI=r[3];
-  if(r[4]&&typeof r[4]==='object')CAT=Object.assign({store:'',title:'',desc:''},r[4]);
+  if(r[4]&&typeof r[4]==='object')CAT=Object.assign({store:'',title:'',desc:'',heroMode:'color',heroColor:null,heroImg:null},r[4]);
   syncStock();syncSales();render();
   if(!$('v-stock').hidden)drawStock();
   if(!$('v-sales').hidden)drawSales();
@@ -1176,12 +1199,38 @@ function downloadReport(key){
 document.querySelectorAll('#v-reports [data-dl]').forEach(function(b){b.onclick=function(){downloadReport(b.dataset.dl)}});
 
 /* ===== Catálogo ===== */
-var CAT={store:'',title:'',desc:''},CATALOG=/[?&]catalogo(=|&|$)/.test(location.search),catT;
+var CAT={store:'',title:'',desc:'',heroMode:'color',heroColor:null,heroImg:null},CATALOG=/[?&]catalogo(=|&|$)/.test(location.search),catT;
 function catalogUrl(){return location.href.split('#')[0].split('?')[0]+'?catalogo'}
 function catName(){return(CAT.store||'').trim()||'Catálogo'}
+function inkFor(c){var n=parseInt(c.slice(1),16),l=(0.299*(n>>16)+0.587*(n>>8&255)+0.114*(n&255))/255;return l>0.62?'#10131C':'#fff'}
+function heroColor(){return CAT.heroColor||get('cor')||'#4F46E5'}
+function markCatSw(){var c=heroColor().toLowerCase();document.querySelectorAll('#catSw button').forEach(function(b){b.setAttribute('aria-pressed',b.dataset.c.toLowerCase()===c)})}
 function drawCatalogCfg(){
   $('catUrl').value=catalogUrl();$('cat-store').value=CAT.store||'';$('cat-title').value=CAT.title||'';$('cat-desc').value=CAT.desc||'';
+  document.querySelectorAll('#catBgMode button').forEach(function(b){b.setAttribute('aria-pressed',b.dataset.m===CAT.heroMode)});
+  $('catBgColor').hidden=CAT.heroMode==='image';$('catBgImage').hidden=CAT.heroMode!=='image';
+  $('catSw').innerHTML=COLORS.map(function(c){return'<button type="button" data-c="'+c[0]+'" aria-label="'+c[1]+'" aria-pressed="false" style="background:'+c[0]+'"></button>'}).join('')+'<input type="color" id="catColor" aria-label="Escolher outra cor" value="'+heroColor()+'">';
+  markCatSw();
+  $('catImgPrev').hidden=!CAT.heroImg;$('catImgNone').hidden=!!CAT.heroImg;$('catImgDel').hidden=!CAT.heroImg;
+  if(CAT.heroImg)$('catImgPrev').src=blobUrl(CAT.heroImg);
 }
+$('catBgMode').onclick=function(e){var b=e.target.closest('button');if(!b)return;CAT.heroMode=b.dataset.m;saveCat();drawCatalogCfg()};
+$('catSw').onclick=function(e){var b=e.target.closest('button');if(!b)return;CAT.heroColor=b.dataset.c;$('catColor').value=b.dataset.c;markCatSw();saveCat()};
+$('catSw').oninput=function(e){if(e.target.id==='catColor'){CAT.heroColor=e.target.value;markCatSw();saveCat()}};
+$('catImgPick').onclick=function(){$('catImgFile').click()};
+$('catImgFile').onchange=function(e){
+  var f=e.target.files[0];e.target.value='';if(!f)return;
+  var im=new Image(),u=URL.createObjectURL(f);
+  im.onerror=function(){URL.revokeObjectURL(u);toast('Não foi possível abrir essa imagem. Tente converter para JPG ou PNG.')};
+  im.onload=function(){
+    var k=Math.min(1,1600/im.naturalWidth),c=document.createElement('canvas');c.width=Math.round(im.naturalWidth*k);c.height=Math.round(im.naturalHeight*k);
+    c.getContext('2d').drawImage(im,0,0,c.width,c.height);URL.revokeObjectURL(u);
+    c.toBlob(function(b){if(!b)return toast('Não foi possível processar essa imagem.');CAT.heroImg=b;CAT.heroMode='image';saveCat();drawCatalogCfg();toast('Imagem de fundo definida.')},'image/webp',.85);
+  };
+  im.src=u;
+};
+$('catImgDel').onclick=function(){CAT.heroImg=null;saveCat();drawCatalogCfg()};
+$('catTheme').onclick=function(){var t=root.getAttribute('data-theme')==='dark'?'light':'dark';root.setAttribute('data-theme',t);set('tema_cat',t)};
 function saveCat(now){
   clearTimeout(catT);
   var go=function(){return kvSet('catalog',CAT).then(function(){$('catSaved').textContent='Alterações salvas.'})};
@@ -1206,6 +1255,9 @@ function drawCatalogPage(){
   $('catStore').textContent=catName();document.title=catName();
   $('catTitle').textContent=CAT.title||'';$('catDesc').textContent=CAT.desc||'';
   $('catTitle').hidden=!CAT.title;$('catDesc').hidden=!CAT.desc;$('catHero').hidden=!(CAT.title||CAT.desc);
+  var hero=$('catHero');
+  if(CAT.heroMode==='image'&&CAT.heroImg){hero.style.background='linear-gradient(rgba(10,12,20,.5),rgba(10,12,20,.5)),url('+blobUrl(CAT.heroImg)+') center/cover no-repeat';hero.style.color='#fff'}
+  else{var hc=heroColor();hero.style.background=hc;hero.style.color=inkFor(hc)}
   var L=P.filter(function(p){return p.stock>0}).sort(function(a,b){return a.name.localeCompare(b.name,'pt-BR')});
   $('catGrid').innerHTML=L.length?L.map(function(p){return'<div class="card pc">'+(p.imgs[0]?'<img alt="'+esc(p.name)+'" src="'+blobUrl(p.imgs[0])+'">':'<div class="noimg">Sem foto</div>')+'<div class="b"><strong>'+esc(p.name)+'</strong><div class="pr">'+pr(p)+'</div></div></div>'}).join(''):'<div class="card empty" style="grid-column:1/-1">Em breve, novos produtos por aqui.</div>';
 }

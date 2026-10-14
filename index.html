@@ -1698,7 +1698,7 @@ function drawProd(){
     (p.desc?'<p class="pp-desc">'+esc(p.desc)+'</p>':'')+
     p.vars.map(function(g,gi){return'<span class="vlabel">'+esc(g.name)+(needsPick(g)?' *':'')+'</span><div class="chips">'+g.opts.map(function(o,oi){return'<button type="button" class="chip" data-a="opt" data-gi="'+gi+'" data-oi="'+oi+'" aria-pressed="'+(pp.sel[gi]===oi)+'"'+(o.q<=0?' disabled title="Esgotado"':'')+'>'+esc(o.n)+'</button>'}).join('')+'</div>'}).join('')+
     '<span class="vlabel">Quantidade <span style="font-weight:400">('+plural(avail,'disponível','disponíveis')+')</span></span><div class="qty"><button type="button" data-a="qm" aria-label="Diminuir">−</button><b>'+pp.qty+'</b><button type="button" data-a="qp" aria-label="Aumentar">+</button></div>'+
-    '<div class="pp-acts"><button type="button" class="btn" data-a="add">Adicionar ao carrinho</button><button type="button" class="btn main" data-a="buy">Comprar</button></div></div></div>';
+    '<div class="pp-acts"><button type="button" class="btn main" data-a="add">Adicionar ao carrinho</button></div></div></div>';
 }
 $('catProd').onclick=function(e){
   var b=e.target.closest('[data-a]');if(!b)return;var a=b.dataset.a,p=P.find(function(x){return x.id===pp.id});
@@ -1710,10 +1710,9 @@ $('catProd').onclick=function(e){
   else if(a==='opt'){var gi=b.dataset.gi,oi=+b.dataset.oi;if(pp.sel[gi]===oi)delete pp.sel[gi];else pp.sel[gi]=oi}
   else if(a==='qm')pp.qty=Math.max(1,pp.qty-1);
   else if(a==='qp')pp.qty++;
-  else if(a==='add'||a==='buy'){
+  else if(a==='add'){
     var sel=selArr(p),er=checkAdd(p,sel,pp.qty);
-    if(!er){addCart(p,sel,pp.qty);openCart();if(a==='buy')$('catCheckout').focus();else toast('Adicionado ao carrinho.')}
-    else if(a==='buy'&&er.avail&&CART.some(function(l){return l.pid===p.id&&l.key===selKey(sel)}))openCart();   // já está no carrinho no limite do estoque
+    if(!er){addCart(p,sel,pp.qty);openCart();toast('Adicionado ao carrinho.')}
     else toast(er.msg);
     return;
   }

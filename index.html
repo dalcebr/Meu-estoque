@@ -149,6 +149,8 @@ dialog{max-height:92vh;overflow:auto}
 #toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 20px);transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:12px 18px;border-radius:14px;z-index:30;max-width:90vw;font-weight:500}
 .fld select{width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:14px;background:var(--bg);min-height:46px}
 dialog .fld{margin:14px 0 0}
+.account{display:flex;align-items:center;gap:12px;margin-bottom:6px}
+.avatar{width:44px;height:44px;border-radius:50%;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-weight:800;font-size:1.1rem;flex:none}
 .seg{display:flex;flex-wrap:wrap;gap:4px;padding:4px;background:var(--track);border-radius:14px;width:fit-content;max-width:100%}
 .seg button{border:0;background:transparent;padding:8px 14px;border-radius:10px;min-height:40px;font-weight:700;color:var(--muted)}
 .seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.12)}
@@ -201,7 +203,7 @@ dialog .fld{margin:14px 0 0}
     <svg class="moon" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5z"/></svg>
     <svg class="sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5 19 19M5 19l1.5-1.5M17.5 6.5 19 5"/></svg>
   </button>
-  <button class="ib" id="cfgBtn" aria-label="Configurações"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 0 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 0 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 0 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 0 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button>
+
 </header>
 
 <main id="v-home">
@@ -337,11 +339,18 @@ dialog .fld{margin:14px 0 0}
 
 <dialog id="cfgDlg">
   <h2>Configurações</h2>
+  <div class="account">
+    <span class="avatar" id="cfgAvatar"></span>
+    <div><p class="sub" style="margin:0">Logado como</p><strong id="cfgName"></strong></div>
+  </div>
   <label for="nameIn">Seu nome</label>
   <input type="text" id="nameIn" autocomplete="off">
   <span class="lbl">Cor principal do estoque</span>
   <div class="sw" id="sw"></div>
-  <div class="dlg-actions"><button type="button" class="btn main" data-close>Concluir</button></div>
+  <div class="dlg-actions" style="justify-content:space-between">
+    <button type="button" class="btn danger" id="logoutBtn">Sair</button>
+    <button type="button" class="btn main" data-close>Concluir</button>
+  </div>
 </dialog>
 
 <dialog id="mvDlg">
@@ -474,9 +483,14 @@ markSw();
 
 // Configurações e meta
 var cfg=$('cfgDlg'),gd=$('goalDlg');
-function openCfg(){$('nameIn').value=nome;cfg.showModal()}
-$('cfgBtn').onclick=openCfg;$('navCfg').onclick=openCfg;
-$('nameIn').oninput=function(e){nome=e.target.value.trim()||'Lacerda';set('nome',nome);tick()};
+function updateAccountCard(){$('cfgName').textContent=nome;$('cfgAvatar').textContent=(nome.trim()[0]||'?').toUpperCase()}
+function openCfg(){$('nameIn').value=nome;updateAccountCard();cfg.showModal()}
+$('navCfg').onclick=openCfg;
+$('nameIn').oninput=function(e){nome=e.target.value.trim()||'Lacerda';set('nome',nome);tick();updateAccountCard()};
+$('logoutBtn').onclick=function(){
+  nome='Lacerda';set('nome',nome);$('nameIn').value=nome;updateAccountCard();tick();
+  cfg.close();toast('Você saiu.');
+};
 document.querySelectorAll('[data-close]').forEach(function(b){b.onclick=function(){b.closest('dialog').close()}});
 $('goalBtn').onclick=function(){$('goalIn').value=goal.toLocaleString('pt-BR',{minimumFractionDigits:2});gd.showModal();$('goalIn').select()};
 $('goalForm').onsubmit=function(){

@@ -211,20 +211,27 @@ body.cat-mode .shell{display:none}
 .cat-search-c{margin-top:12px}
 #catCount,#catCCount{margin-top:12px}
 /* rodapé do catálogo */
-#catPage:not([hidden]){display:flex;flex-direction:column;min-height:100vh;min-height:100dvh}
-.cat-foot{margin-top:auto;border-top:1px solid var(--line);background:var(--surface);padding:24px calc(clamp(14px,4vw,20px) + env(safe-area-inset-right,0px)) calc(24px + env(safe-area-inset-bottom,0px)) calc(clamp(14px,4vw,20px) + env(safe-area-inset-left,0px))}
-.cf-in{max-width:1180px;margin:0 auto;display:grid;gap:14px;justify-items:center;text-align:center}
-.cf-name{display:flex;align-items:center;gap:9px;font-weight:800;font-size:1.05rem;letter-spacing:-.01em;overflow-wrap:anywhere}
-.cf-name::before{content:"";width:9px;height:9px;border-radius:3px;background:var(--accent);flex:none}
-.cf-social{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+#catPage:not([hidden]){display:flex;flex-direction:column;align-items:stretch;min-height:100vh;min-height:100dvh}
+#catPage:not([hidden])>.cat-body{width:100%}   /* sem isto o flex ignora o stretch por causa do margin:auto e o catálogo encolhe */
+.cat-foot{margin-top:auto;border-top:1px solid var(--line);background:var(--surface);padding:26px calc(clamp(14px,4vw,20px) + env(safe-area-inset-right,0px)) calc(22px + env(safe-area-inset-bottom,0px)) calc(clamp(14px,4vw,20px) + env(safe-area-inset-left,0px))}
+.cf-in{max-width:1180px;margin:0 auto;width:100%}
+.cf-main{display:grid;gap:20px;justify-items:start;text-align:left}
+.cf-name{font-weight:800;font-size:1.05rem;letter-spacing:-.01em;overflow-wrap:anywhere}
+.cf-list{list-style:none;margin:12px 0 0;padding:0;display:grid;gap:9px}
+.cf-list li{display:flex;align-items:center;gap:9px;min-width:0;font-size:.9rem;color:var(--muted)}
+.cf-list li[hidden]{display:none}
+.cf-list svg{width:17px;height:17px;flex:none;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.cf-list a{color:var(--ink);font-weight:500;text-decoration:none;overflow-wrap:anywhere}
+.cf-list a:hover,.cf-list a:focus-visible{color:var(--accent-text);text-decoration:underline}
+.cf-social{display:flex;flex-wrap:wrap;gap:10px}
 /* os ícones usam a mesma linguagem dos botões do cabeçalho (.ib) */
 .cf-ic{background:var(--track);color:var(--ink);text-decoration:none;transition:background .16s ease,color .16s ease,border-color .16s ease,transform .16s ease}
 .cf-ic:hover,.cf-ic:focus-visible{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
 .cf-ic:active{transform:scale(.94)}
-.cf-legal{margin:0;font-size:.82rem;color:var(--muted);line-height:1.5}
-@media (min-width:700px){
-  .cf-in{grid-template-columns:1fr auto;grid-template-areas:"nome social" "legal social";align-items:center;column-gap:28px;row-gap:6px;justify-items:start;text-align:left}
-  .cf-name{grid-area:nome}.cf-legal{grid-area:legal}.cf-social{grid-area:social;justify-content:flex-end}
+.cf-legal{margin:22px 0 0;padding-top:18px;border-top:1px solid var(--line);font-size:.82rem;color:var(--muted);line-height:1.5}
+@media (min-width:760px){
+  .cf-main{gap:22px}
+  .cf-name{font-size:1.15rem}
 }
 @media (prefers-reduced-motion:reduce){.cf-ic{transition:none}.cf-ic:active{transform:none}}
 /* popup de filtro/ordenação */
@@ -501,6 +508,8 @@ body.cart-open #toast{bottom:auto;top:calc(env(safe-area-inset-top,0px) + 66px);
     <h3>Redes sociais e rodapé</h3>
     <p class="sub">O rodapé do catálogo mostra o nome da loja, o aviso de direitos reservados e as redes que você preencher. Deixe em branco as que não usar. Aceita usuário (@minhaloja) ou o link completo.</p>
     <div class="ff">
+      <label class="fld w"><span>E-mail da loja</span><input id="cat-email" type="email" maxlength="120" placeholder="contato@minhaloja.com"></label>
+      <label class="fld w"><span>Telefone da loja (se ficar em branco, usa o WhatsApp)</span><input id="cat-tel" type="tel" maxlength="20" placeholder="(11) 3333-0000"></label>
       <label class="fld w"><span>Instagram</span><input id="cat-insta" maxlength="120" placeholder="@minhaloja"></label>
       <label class="fld w"><span>Facebook</span><input id="cat-face" maxlength="120" placeholder="minhaloja"></label>
       <label class="fld w"><span>TikTok</span><input id="cat-tiktok" maxlength="120" placeholder="@minhaloja"></label>
@@ -558,8 +567,16 @@ body.cart-open #toast{bottom:auto;top:calc(env(safe-area-inset-top,0px) + 66px);
   </div>
   <footer class="cat-foot" id="catFoot">
     <div class="cf-in">
-      <div class="cf-name" id="cfName"></div>
-      <div class="cf-social" id="cfSocial"></div>
+      <div class="cf-main">
+        <div class="cf-brand">
+          <div class="cf-name" id="cfName"></div>
+          <ul class="cf-list">
+            <li id="cfMailItem" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="4.5" width="19" height="15" rx="3"/><path d="M3.5 7l8.5 6 8.5-6"/></svg><a id="cfMail" href="#"></a></li>
+            <li id="cfTelItem" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.2 3.5h3l1.4 3.6-2 1.4a11 11 0 0 0 5.9 5.9l1.4-2 3.6 1.4v3c0 .9-.8 1.7-1.7 1.6A15.5 15.5 0 0 1 4.6 5.2c-.1-.9.7-1.7 1.6-1.7z"/></svg><a id="cfTel" href="#"></a></li>
+          </ul>
+        </div>
+        <div class="cf-social" id="cfSocial"></div>
+      </div>
       <p class="cf-legal" id="cfLegal"></p>
     </div>
   </footer>
@@ -970,7 +987,7 @@ idb().then(function(){return Promise.all([kvGet('products'),kvGet('moves'),kvGet
   if(Array.isArray(r[1]))M=r[1];
   if(Array.isArray(r[2]))S=r[2];
   if(Array.isArray(r[3]))CLI=r[3];
-  if(r[4]&&typeof r[4]==='object')CAT=Object.assign({store:'',title:'',desc:'',heroMode:'color',heroColor:null,heroImg:null,whats:'',insta:'',face:'',tiktok:''},r[4]);
+  if(r[4]&&typeof r[4]==='object')CAT=Object.assign({store:'',title:'',desc:'',heroMode:'color',heroColor:null,heroImg:null,whats:'',email:'',tel:'',insta:'',face:'',tiktok:''},r[4]);
   syncStock();syncSales();render();
   if(!$('v-stock').hidden)drawStock();
   if(!$('v-sales').hidden)drawSales();
@@ -1421,7 +1438,7 @@ function downloadReport(key){
 document.querySelectorAll('#v-reports [data-dl]').forEach(function(b){b.onclick=function(){downloadReport(b.dataset.dl)}});
 
 /* ===== Catálogo ===== */
-var CAT={store:'',title:'',desc:'',heroMode:'color',heroColor:null,heroImg:null,whats:'',insta:'',face:'',tiktok:''},CATALOG=/[?&]catalogo(=|&|$)/.test(location.search),catT;
+var CAT={store:'',title:'',desc:'',heroMode:'color',heroColor:null,heroImg:null,whats:'',email:'',tel:'',insta:'',face:'',tiktok:''},CATALOG=/[?&]catalogo(=|&|$)/.test(location.search),catT;
 function catalogUrl(){return location.href.split('#')[0].split('?')[0]+'?catalogo'}
 function catName(){return(CAT.store||'').trim()||'Catálogo'}
 function inkFor(c){var n=parseInt(c.slice(1),16),l=(0.299*(n>>16)+0.587*(n>>8&255)+0.114*(n&255))/255;return l>0.62?'#10131C':'#fff'}
@@ -1441,12 +1458,21 @@ function snUser(v,tipo){
   return 'https://'+d+'/'+v.replace(/^@/,'').replace(/\s+/g,'');
 }
 function snWhats(v){var n=(v||'').replace(/\D/g,'');if(!n)return '';if(n.length<=11)n='55'+n;return 'https://wa.me/'+n}
-/* rodapé do catálogo: nome da loja, redes sociais e direitos reservados */
+/* rodapé do catálogo: nome da loja, contatos, redes sociais e direitos reservados */
 function drawCatFoot(){
   if(!$('catFoot'))return;
   var nome=(CAT.store||'').trim()||'Catálogo';
   $('cfName').textContent=nome;
   $('cfLegal').textContent='\u00a9 '+new Date().getFullYear()+' '+nome+'. Todos os direitos reservados.';
+  var mail=(CAT.email||'').trim();
+  $('cfMailItem').hidden=!mail;
+  if(mail){$('cfMail').textContent=mail;$('cfMail').href='mailto:'+mail}
+  var tel=(CAT.tel||'').trim()||(CAT.whats||'').trim(),telN=tel.replace(/\D/g,'');
+  $('cfTelItem').hidden=!tel;
+  if(tel){
+    $('cfTel').textContent=tel;
+    $('cfTel').href='tel:'+(telN.length<=11?'+55'+telN:'+'+telN);
+  }
   var links=[['instagram',snUser(CAT.insta,'instagram'),'Instagram'],['facebook',snUser(CAT.face,'facebook'),'Facebook'],['tiktok',snUser(CAT.tiktok,'tiktok'),'TikTok'],['whatsapp',snWhats(CAT.whats),'WhatsApp']];
   $('cfSocial').innerHTML=links.filter(function(l){return l[1]}).map(function(l){
     return'<a class="ib cf-ic" href="'+l[1]+'" target="_blank" rel="noopener noreferrer" aria-label="'+l[2]+' da loja" title="'+l[2]+'">'+SN_ICONS[l[0]]+'</a>';
@@ -1456,7 +1482,7 @@ function heroColor(){return CAT.heroColor||get('cor')||'#4F46E5'}
 function markCatSw(){var c=heroColor().toLowerCase();document.querySelectorAll('#catSw button').forEach(function(b){b.setAttribute('aria-pressed',b.dataset.c.toLowerCase()===c)})}
 function drawCatalogCfg(){
   $('catUrl').value=catalogUrl();$('cat-store').value=CAT.store||'';$('cat-title').value=CAT.title||'';$('cat-desc').value=CAT.desc||'';$('cat-whats').value=CAT.whats||'';
-  $('cat-insta').value=CAT.insta||'';$('cat-face').value=CAT.face||'';$('cat-tiktok').value=CAT.tiktok||'';
+  $('cat-insta').value=CAT.insta||'';$('cat-face').value=CAT.face||'';$('cat-tiktok').value=CAT.tiktok||'';$('cat-email').value=CAT.email||'';$('cat-tel').value=CAT.tel||'';
   document.querySelectorAll('#catBgMode button').forEach(function(b){b.setAttribute('aria-pressed',b.dataset.m===CAT.heroMode)});
   $('catBgColor').hidden=CAT.heroMode==='image';$('catBgImage').hidden=CAT.heroMode!=='image';
   $('catSw').innerHTML=COLORS.map(function(c){return'<button type="button" data-c="'+c[0]+'" aria-label="'+c[1]+'" aria-pressed="false" style="background:'+c[0]+'"></button>'}).join('')+'<input type="color" id="catColor" aria-label="Escolher outra cor" value="'+heroColor()+'">';
@@ -1484,7 +1510,7 @@ function saveCat(now){
   var go=function(){return kvSet('catalog',CAT).then(function(){$('catSaved').textContent='Alterações salvas.'})};
   if(now)return go();catT=setTimeout(go,150);
 }
-['store','title','desc','whats','insta','face','tiktok'].forEach(function(k){$('cat-'+k).oninput=function(){CAT[k]=this.value;$('catSaved').textContent='Salvando…';saveCat();if(k==='store'||k==='insta'||k==='face'||k==='tiktok')drawCatFoot()}});
+['store','title','desc','whats','email','tel','insta','face','tiktok'].forEach(function(k){$('cat-'+k).oninput=function(){CAT[k]=this.value;$('catSaved').textContent='Salvando…';saveCat();if(k!=='title'&&k!=='desc')drawCatFoot()}});
 $('catOpen').onclick=function(){saveCat(true);window.open(catalogUrl(),'_blank','noopener')};
 function legacyCopy(){var i=$('catUrl');i.focus();i.select();try{return document.execCommand('copy')}catch(e){return false}}
 $('catCopy').onclick=function(){

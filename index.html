@@ -16,7 +16,7 @@ r.style.setProperty('--accent-ink',l>0.62?'#10131C':'#fff')})();
 </script>
 <style>
 :root{--bg:#F3F4F9;--surface:#fff;--ink:#12141D;--muted:#646B7D;--line:#E4E7EF;--track:#E9ECF4;--bad:#D92D20;--accent:#4F46E5;--accent-ink:#fff;
---soft:color-mix(in srgb,var(--accent) 11%,var(--surface));--accent-text:color-mix(in srgb,var(--accent) 82%,#000);--shadow:0 1px 2px rgba(18,20,29,.04),0 12px 28px -16px rgba(18,20,29,.18);color-scheme:light;
+--soft:color-mix(in srgb,var(--accent) 11%,var(--surface));--accent-text:color-mix(in srgb,var(--accent) 82%,#000);--shadow:0 1px 2px rgba(18,20,29,.04),0 12px 28px -16px rgba(18,20,29,.18);--drawer:min(420px,92vw);color-scheme:light;
 box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0B0D13;--surface:#14171F;--ink:#ECEEF5;--muted:#9AA1B4;--line:#232734;--track:#232734;--bad:#FF7A70;--accent-text:color-mix(in srgb,var(--accent) 58%,#fff);--shadow:none;color-scheme:dark}}
 :root[data-theme="dark"]{--bg:#0B0D13;--surface:#14171F;--ink:#ECEEF5;--muted:#9AA1B4;--line:#232734;--track:#232734;--bad:#FF7A70;--accent-text:color-mix(in srgb,var(--accent) 58%,#fff);--shadow:none;color-scheme:dark}
@@ -146,7 +146,14 @@ dialog{max-height:92vh;overflow:auto}
 .btn.danger{color:var(--bad)}
 .cv canvas{display:block;width:100%;max-width:360px;aspect-ratio:1/1;margin:12px auto;border-radius:14px;border:1px solid var(--line);touch-action:none;cursor:grab;background:#fff}
 #zoom{width:100%;accent-color:var(--accent)}
-#toast{z-index:60;position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 20px);transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:12px 18px;border-radius:14px;max-width:90vw;font-weight:500}
+#toast{inset:auto;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 20px);z-index:60;position:fixed;margin:0;border:0;
+transform:translateX(-50%) translateY(10px);opacity:0;visibility:hidden;transition:opacity .18s ease,transform .18s ease,visibility .18s;
+background:var(--ink);color:var(--bg);padding:12px 16px;border-radius:14px;font-weight:500;font-size:.95rem;
+text-align:center;line-height:1.4;overflow-wrap:anywhere;word-break:break-word;
+width:max-content;max-width:calc(100vw - 24px - env(safe-area-inset-left,0px) - env(safe-area-inset-right,0px));
+max-height:min(50vh,320px);overflow:auto;box-shadow:0 12px 32px -12px rgba(0,0,0,.5)}
+#toast.on{opacity:1;visibility:visible;transform:translateX(-50%)}
+@media (prefers-reduced-motion:reduce){#toast{transition:none}}
 .fld select{width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:14px;background:var(--bg);min-height:46px}
 dialog .fld{margin:14px 0 0}
 .account{display:flex;align-items:center;gap:12px;margin-bottom:6px}
@@ -264,7 +271,7 @@ body.cat-mode .shell{display:none}
 /* carrinho lateral (esquerda) */
 body.cart-open{overflow:hidden}
 .cscrim{position:fixed;inset:0;background:rgba(5,7,12,.55);opacity:0;visibility:hidden;transition:opacity .2s,visibility .2s;z-index:40}
-.cdrawer{position:fixed;top:0;bottom:0;left:0;width:min(420px,92vw);padding-left:env(safe-area-inset-left,0px);background:var(--surface);color:var(--ink);z-index:41;transform:translateX(-102%);visibility:hidden;transition:transform .25s,visibility .25s;display:flex;flex-direction:column;box-shadow:0 0 40px rgba(0,0,0,.25)}
+.cdrawer{position:fixed;top:0;bottom:0;left:0;width:var(--drawer);padding-left:env(safe-area-inset-left,0px);background:var(--surface);color:var(--ink);z-index:41;transform:translateX(-102%);visibility:hidden;transition:transform .25s,visibility .25s;display:flex;flex-direction:column;box-shadow:0 0 40px rgba(0,0,0,.25)}
 body.cart-open .cdrawer{transform:none;visibility:visible}body.cart-open .cscrim{opacity:1;visibility:visible}
 .cd-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:calc(env(safe-area-inset-top,0px) + 14px) 18px 14px;border-bottom:1px solid var(--line)}
 .cd-head h2{margin:0;font-size:1.25rem;font-weight:800}
@@ -277,13 +284,14 @@ body.cart-open .cdrawer{transform:none;visibility:visible}body.cart-open .cscrim
 .cd-ctl{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:8px}
 .cd-ctl .qty button{width:40px;height:40px}.cd-ctl .qty b{min-width:32px}
 .cd-line{font-variant-numeric:tabular-nums;white-space:nowrap}
-body.cart-open #toast{bottom:auto;top:calc(env(safe-area-inset-top,0px) + 16px)}
+body.cart-open #toast{bottom:auto;top:calc(env(safe-area-inset-top,0px) + 66px);left:calc(var(--drawer)/2);max-width:calc(var(--drawer) - 28px)}
+@media (max-height:520px){body:not(.cart-open) #toast{bottom:auto;top:calc(env(safe-area-inset-top,0px) + 10px)}}
 .cd-ctl .linerm{padding:4px 8px;min-height:40px}
 .cd-foot{padding:16px 18px calc(env(safe-area-inset-bottom,0px) + 16px);border-top:1px solid var(--line);display:grid;gap:10px}
 .cd-total{display:flex;justify-content:space-between;align-items:baseline;font-size:1.05rem}.cd-total b{font-size:1.4rem;font-weight:800;font-variant-numeric:tabular-nums}
 .cd-note{color:var(--muted);font-size:.82rem;line-height:1.35}
 @media (max-width:380px){.cd-item{grid-template-columns:56px minmax(0,1fr)}.cd-img{width:56px;height:56px}.cd-line{grid-column:2;justify-self:start}}
-@media (max-height:540px) and (orientation:landscape){.cdrawer{width:min(380px,80vw)}.cd-head{padding:calc(env(safe-area-inset-top,0px) + 10px) 16px 10px}.cd-foot{padding:10px 16px calc(env(safe-area-inset-bottom,0px) + 10px)}}
+@media (max-height:540px) and (orientation:landscape){:root{--drawer:min(380px,80vw)}.cd-head{padding:calc(env(safe-area-inset-top,0px) + 10px) 16px 10px}.cd-foot{padding:10px 16px calc(env(safe-area-inset-bottom,0px) + 10px)}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
@@ -621,7 +629,7 @@ body.cart-open #toast{bottom:auto;top:calc(env(safe-area-inset-top,0px) + 16px)}
  <div class="dlg-actions"><button type="button" class="btn danger" id="clDel" hidden>Excluir cliente</button><button type="button" class="btn" data-close>Cancelar</button><button type="button" class="btn main" id="clOk">Salvar cliente</button></div>
 </dialog>
 <input type="file" id="file" accept="image/*" multiple hidden>
-<div id="toast" role="status" hidden></div>
+<div id="toast" role="status" aria-live="polite" popover="manual" hidden></div>
 <dialog id="cropDlg">
   <h2 id="cropT">Editar foto</h2>
   <p class="sub" id="cropInfo">Arraste para posicionar e use o zoom. O resultado é um quadrado de 1000 × 1000 px.</p>
@@ -725,7 +733,23 @@ function idb(){return new Promise(function(r){try{var q=indexedDB.open('estoque'
 function kvGet(k){return new Promise(function(r){if(!db)return r(null);var q=db.transaction('kv').objectStore('kv').get(k);q.onsuccess=function(){r(q.result||null)};q.onerror=function(){r(null)}})}
 function kvSet(k,v){return new Promise(function(r){if(!db)return r();var t=db.transaction('kv','readwrite');t.objectStore('kv').put(v,k);t.oncomplete=r;t.onerror=r})}
 function blobUrl(b){var u=URLS.get(b);if(!u){u=URL.createObjectURL(b);URLS.set(b,u)}return u}
-function toast(m){var t=$('toast');t.textContent=m;t.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(function(){t.hidden=true},4000)}
+/* aviso em popup: entra na camada de cima (popover), então aparece também sobre diálogos e sobre o carrinho */
+function toast(m){
+  var t=$('toast');
+  t.textContent=m;t.hidden=false;
+  if(t.showPopover&&!toast.shown){try{t.showPopover();toast.shown=true}catch(e){}}
+  t.classList.remove('on');void t.offsetWidth;t.classList.add('on');
+  clearTimeout(toast.t);clearTimeout(toast.h);
+  toast.t=setTimeout(hideToast,4000);
+}
+function hideToast(){
+  var t=$('toast');t.classList.remove('on');
+  clearTimeout(toast.h);
+  toast.h=setTimeout(function(){
+    if(toast.shown){try{t.hidePopover()}catch(e){}toast.shown=false}
+    t.hidden=true;
+  },220);
+}
 /* Valor do estoque de um produto (k = 'cost' ou 'price'). As unidades de cada opção valem o custo/preço da
    própria opção; opção sem valor próprio, e unidades sem opção definida, valem o do produto principal. */
 function stockVal(p,k){

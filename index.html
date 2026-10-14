@@ -187,7 +187,7 @@ dialog .fld{margin:14px 0 0}
   <button class="nav" data-view="stock">Estoque</button>
   <button class="nav" data-view="sales">Vendas</button>
   <button class="nav" data-view="clients">Clientes</button>
-  <button class="nav">Relatórios</button>
+  <button class="nav" data-view="reports">Relatórios</button>
   <div class="grow"></div>
   <button class="nav" id="navCfg">Configurações</button>
 </nav>
@@ -303,6 +303,25 @@ dialog .fld{margin:14px 0 0}
   <div class="sec-h"><div><h2>Clientes</h2><p class="sub" id="clsum"></p></div><button class="btn main" id="newClient">Novo cliente</button></div>
   <div class="tools"><label class="fld"><span>Buscar</span><input id="clq" type="search" placeholder="Nome, telefone, e-mail ou CPF"></label></div>
   <section class="card" id="clList"></section>
+</main>
+<main id="v-reports" hidden>
+  <div class="sec-h"><div><h2>Relatórios</h2><p class="sub">Visão geral de vendas, estoque, produtos e clientes.</p></div></div>
+  <div class="tools"><div class="seg" id="rpPeriod"><button data-p="today">Hoje</button><button data-p="week">Semana</button><button data-p="month">Mês</button><button data-p="year">Ano</button></div></div>
+  <p class="sub" id="rpSub"></p>
+  <div class="tiles" id="rpTiles"></div>
+  <section class="card"><h3>Estoque no período</h3><ul class="rows" id="rpStock"></ul></section>
+  <section class="card"><h3>Produtos (situação atual)</h3><ul class="rows" id="rpProd"></ul></section>
+  <section class="card"><h3>Clientes</h3><ul class="rows" id="rpCli"></ul></section>
+  <section class="card">
+    <h3>Baixar relatório detalhado</h3>
+    <p class="sub">O arquivo baixado traz a lista completa de vendas, movimentações, produtos e clientes do período escolhido, pronta para abrir ou imprimir.</p>
+    <div class="acts" style="margin-top:14px">
+      <button class="btn" data-dl="today">Baixar do dia</button>
+      <button class="btn" data-dl="week">Baixar da semana</button>
+      <button class="btn" data-dl="month">Baixar do mês</button>
+      <button class="btn main" data-dl="year">Baixar do ano</button>
+    </div>
+  </section>
 </main>
 </div>
 </div>
@@ -484,10 +503,10 @@ function syncStock(){
 }
 /* navegação entre telas */
 function show(v){
-  $('v-home').hidden=v!=='home';$('v-prod').hidden=v!=='products';$('v-stock').hidden=v!=='stock';$('v-sales').hidden=v!=='sales';$('v-clients').hidden=v!=='clients';
-  $('title').textContent={home:'Início',products:'Produtos',stock:'Estoque',sales:'Vendas',clients:'Clientes'}[v];
+  $('v-home').hidden=v!=='home';$('v-prod').hidden=v!=='products';$('v-stock').hidden=v!=='stock';$('v-sales').hidden=v!=='sales';$('v-clients').hidden=v!=='clients';$('v-reports').hidden=v!=='reports';
+  $('title').textContent={home:'Início',products:'Produtos',stock:'Estoque',sales:'Vendas',clients:'Clientes',reports:'Relatórios'}[v];
   document.querySelectorAll('.nav[data-view]').forEach(function(b){b.setAttribute('aria-current',b.dataset.view===v?'page':'false')});
-  scrollTo(0,0);if(v==='products')showList();if(v==='stock')drawStock();if(v==='sales')drawSales();if(v==='clients')drawClients();
+  scrollTo(0,0);if(v==='products')showList();if(v==='stock')drawStock();if(v==='sales')drawSales();if(v==='clients')drawClients();if(v==='reports')drawReports();
 }
 document.querySelectorAll('.nav[data-view]').forEach(function(b){b.addEventListener('click',function(){show(b.dataset.view)})});
 /* lista */
@@ -624,13 +643,13 @@ $('saveP').onclick=async function(){
   var p={id:cur.id||Date.now().toString(36),name:cur.name,desc:cur.desc,cat:cur.cat,sku:cur.sku,price:+cur.price,cost:+cur.cost||0,stock:parseInt(cur.stock),min:parseInt(cur.min)||0,imgs:cur.imgs,
     vars:cur.vars.map(function(g){return{name:g.name.trim(),opts:g.opts.map(function(o){return{n:o.n.trim(),q:o.q,p:o.p==null?null:o.p,c:o.c==null?null:o.c}})}})};
   var i=P.findIndex(function(x){return x.id===p.id});var old=P[i];if(i<0)P.unshift(p);else P[i]=p;if(!old&&p.stock>0)logMv(p,p.stock,'in','Estoque inicial');else if(old&&old.stock!==p.stock)logMv(p,p.stock-old.stock,'adj','Ajuste no cadastro do produto');
-  await Promise.all([kvSet('products',P),kvSet('moves',M)]);syncStock();render();showList();toast('Produto salvo.');
+  await Promise.all([kvSet('products',P),kvSet('moves',M)]);syncStock();render();showList();drawReports();toast('Produto salvo.');
 };
 $('delBtn').onclick=async function(){
   var b=$('delBtn');
   if(!b.dataset.sure){b.dataset.sure=1;b.textContent='Confirmar exclusão';setTimeout(function(){delete b.dataset.sure;b.textContent='Excluir produto'},3500);return}
   delete b.dataset.sure;b.textContent='Excluir produto';
-  P=P.filter(function(x){return x.id!==cur.id});await kvSet('products',P);syncStock();render();showList();toast('Produto excluído.');
+  P=P.filter(function(x){return x.id!==cur.id});await kvSet('products',P);syncStock();render();showList();drawReports();toast('Produto excluído.');
 };
 idb().then(function(){return Promise.all([kvGet('products'),kvGet('moves'),kvGet('sales'),kvGet('customers')])}).then(function(r){
   if(Array.isArray(r[0]))P=r[0];
@@ -641,6 +660,7 @@ idb().then(function(){return Promise.all([kvGet('products'),kvGet('moves'),kvGet
   if(!$('v-stock').hidden)drawStock();
   if(!$('v-sales').hidden)drawSales();
   if(!$('v-clients').hidden)drawClients();
+  if(!$('v-reports').hidden)drawReports();
 });
 
 /* ===== Estoque ===== */
@@ -723,7 +743,7 @@ $('mvOk').onclick=async function(){
   $('mvErr').textContent=er;$('mvErr').hidden=!er;if(er)return;
   p.stock+=d;p.vars=vars;logMv(p,d,mv.t,reason,note,parts.join(', '));
   await Promise.all([kvSet('products',P),kvSet('moves',M)]);
-  syncStock();render();drawStock();$('mvDlg').close();
+  syncStock();render();drawStock();drawReports();$('mvDlg').close();
   toast('Movimentação registrada. Novo estoque de '+p.name+': '+p.stock+' un.');
 };
 
@@ -802,7 +822,7 @@ function applyStockDelta(s,sign){
 }
 function persistAndRefreshSales(msg){
   return Promise.all([kvSet('products',P),kvSet('moves',M),kvSet('sales',S)]).then(function(){
-    syncStock();syncSales();render();drawStock();drawSales();if(msg)toast(msg);
+    syncStock();syncSales();render();drawStock();drawSales();drawReports();if(msg)toast(msg);
   });
 }
 function cancelSale(s){var er=applyStockDelta(s,1);if(er)return toast(er);s.status='cancel';persistAndRefreshSales('Venda cancelada e itens devolvidos ao estoque.')}
@@ -881,7 +901,7 @@ $('saOk').onclick=async function(){
   Object.keys(plan).forEach(function(pid){var pl=plan[pid],vt=byProd[pid].map(function(it){return it.varTxt}).filter(Boolean).join('; ');
     pl.p.stock=pl.stock;pl.p.vars=pl.vars;logMv(pl.p,-pl.totalQ,'out','Venda no balcão','Venda #'+rec.id,vt);});
   await Promise.all([kvSet('products',P),kvSet('moves',M),kvSet('sales',S)]);
-  syncStock();syncSales();render();drawStock();drawSales();$('saleDlg').close();
+  syncStock();syncSales();render();drawStock();drawSales();drawReports();$('saleDlg').close();
   toast('Venda registrada: '+brl(total)+'.');
 };
 $('newSale').onclick=openSale;
@@ -924,24 +944,115 @@ $('clList').onclick=function(e){
   if(b.dataset.a==='del'){
     if(!b.dataset.sure){b.dataset.sure='1';b.textContent='Confirmar exclusão';setTimeout(function(){if(b.isConnected){delete b.dataset.sure;b.textContent='Excluir'}},3500);return}
     C=C.filter(function(x){return x.id!==c.id});
-    kvSet('customers',C).then(function(){drawClients();toast('Cliente excluído.')});
+    kvSet('customers',C).then(function(){drawClients();drawReports();toast('Cliente excluído.')});
   }
 };
 $('clOk').onclick=async function(){
   var name=$('cl-name').value.trim();
   if(!name){$('clErr').textContent='Informe o nome do cliente.';$('clErr').hidden=false;return}
-  var c={id:curClient?curClient.id:Date.now().toString(36)+Math.random().toString(36).slice(2,5),
+  var c={id:curClient?curClient.id:Date.now().toString(36)+Math.random().toString(36).slice(2,5),t:curClient?curClient.t:Date.now(),
     name:name,phone:$('cl-phone').value.trim(),wpp:$('cl-wpp').value.trim(),email:$('cl-email').value.trim(),cpf:$('cl-cpf').value.trim()};
   var i=C.findIndex(function(x){return x.id===c.id});if(i<0)C.unshift(c);else C[i]=c;
   await kvSet('customers',C);
-  drawClients();$('clientDlg').close();toast('Cliente salvo.');
+  drawClients();drawReports();$('clientDlg').close();toast('Cliente salvo.');
 };
 $('clDel').onclick=function(){
   var b=$('clDel');
   if(!b.dataset.sure){b.dataset.sure='1';b.textContent='Confirmar exclusão';setTimeout(function(){delete b.dataset.sure;b.textContent='Excluir cliente'},3500);return}
   C=C.filter(function(x){return x.id!==curClient.id});
-  kvSet('customers',C).then(function(){drawClients();$('clientDlg').close();toast('Cliente excluído.')});
+  kvSet('customers',C).then(function(){drawClients();drawReports();$('clientDlg').close();toast('Cliente excluído.')});
 };
+
+/* ===== Relatórios ===== */
+var rpState={period:'month'},MESES=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+var fdate=function(ms){return new Date(ms).toLocaleDateString('pt-BR')};
+function periodRange(key){
+  var now=new Date();
+  if(key==='today'){var start=new Date(now.getFullYear(),now.getMonth(),now.getDate());return{start:start.getTime(),label:'Hoje',sub:fdate(start.getTime())}}
+  if(key==='week'){var start=new Date(now.getTime()-6*86400000);start.setHours(0,0,0,0);return{start:start.getTime(),label:'Últimos 7 dias',sub:fdate(start.getTime())+' a '+fdate(now.getTime())}}
+  if(key==='month'){var start=new Date(now.getFullYear(),now.getMonth(),1);return{start:start.getTime(),label:'Mês atual',sub:MESES[now.getMonth()]+' de '+now.getFullYear()}}
+  var start=new Date(now.getFullYear(),0,1);return{start:start.getTime(),label:'Ano atual',sub:String(now.getFullYear())};
+}
+function reportData(key){
+  var r=periodRange(key),start=r.start;
+  var sales=S.filter(function(s){return s.t>=start}),ok=sales.filter(function(s){return s.status==='ok'}),can=sales.filter(function(s){return s.status==='cancel'});
+  var rev=ok.reduce(function(a,s){return a+s.total},0),cost=ok.reduce(function(a,s){return a+s.cost},0);
+  var moves=M.filter(function(m){return m.t>=start});
+  var movIn=moves.filter(function(m){return m.type==='in'}),movOut=moves.filter(function(m){return m.type==='out'}),movAdj=moves.filter(function(m){return m.type==='adj'});
+  var qIn=movIn.reduce(function(a,m){return a+m.d},0),qOut=movOut.reduce(function(a,m){return a+Math.abs(m.d)},0);
+  var low=P.filter(function(p){return p.stock>0&&p.stock<=p.min}),out=P.filter(function(p){return p.stock<=0});
+  var units=P.reduce(function(a,p){return a+p.stock},0),sCost=P.reduce(function(a,p){return a+p.cost*p.stock},0),sSale=P.reduce(function(a,p){return a+p.price*p.stock},0);
+  var newCli=C.filter(function(c){return(c.t||0)>=start});
+  return{range:r,sales:sales,ok:ok,can:can,rev:rev,cost:cost,profit:rev-cost,ticket:ok.length?rev/ok.length:0,
+    moves:moves,movIn:movIn,movOut:movOut,movAdj:movAdj,qIn:qIn,qOut:qOut,
+    low:low,out:out,units:units,sCost:sCost,sSale:sSale,newCli:newCli};
+}
+function drawReports(){
+  document.querySelectorAll('#rpPeriod button').forEach(function(b){b.setAttribute('aria-pressed',b.dataset.p===rpState.period)});
+  var d=reportData(rpState.period);
+  $('rpSub').textContent=d.range.label+' · '+d.range.sub;
+  $('rpTiles').innerHTML=[['Vendas concluídas',d.ok.length],['Faturamento',brl(d.rev)],['Lucro',brl(d.profit)],['Ticket médio',d.ok.length?brl(d.ticket):brl(0)],['Canceladas',d.can.length],['Novos clientes',d.newCli.length]]
+    .map(function(x){return'<div class="card"><h3>'+x[0]+'</h3><div class="num">'+x[1]+'</div></div>'}).join('');
+  $('rpStock').innerHTML='<li><span>Entradas de estoque</span><span>'+d.movIn.length+'<small>+'+d.qIn+' un.</small></span></li>'+
+    '<li><span>Saídas de estoque</span><span>'+d.movOut.length+'<small>-'+d.qOut+' un.</small></span></li>'+
+    '<li><span>Ajustes de contagem</span><span>'+d.movAdj.length+'</span></li>';
+  $('rpProd').innerHTML='<li><span>Produtos cadastrados</span><span>'+P.length+'</span></li>'+
+    '<li><span>Unidades em estoque</span><span>'+d.units.toLocaleString('pt-BR')+'</span></li>'+
+    '<li><span>Custo do estoque</span><span>'+brl(d.sCost)+'</span></li>'+
+    '<li><span>Valor de venda do estoque</span><span>'+brl(d.sSale)+'</span></li>'+
+    '<li><span>Estoque baixo</span><span>'+d.low.length+'</span></li>'+
+    '<li><span>Esgotados</span><span>'+d.out.length+'</span></li>';
+  $('rpCli').innerHTML='<li><span>Clientes cadastrados</span><span>'+C.length+'</span></li>'+
+    '<li><span>Novos no período</span><span>'+d.newCli.length+'</span></li>';
+}
+$('rpPeriod').onclick=function(e){var b=e.target.closest('button');if(b){rpState.period=b.dataset.p;drawReports()}};
+/* download do relatório detalhado */
+function kpi(label,val){return'<div class="kpi"><span>'+label+'</span><b>'+val+'</b></div>'}
+function renderReportHTML(d){
+  var r=d.range,gen=Date.now();
+  var salesRows=d.sales.slice().sort(function(a,b){return b.t-a.t}).map(function(s){
+    var items=s.items.map(function(it){return esc(it.name)+(it.varTxt?' ('+esc(it.varTxt)+')':'')+' — '+it.qty+' un. × '+brl(it.price)+' = '+brl(it.qty*it.price)}).join('<br>');
+    return'<tr><td>'+fdt(s.t)+'</td><td>'+(s.status==='ok'?'Concluída':'Cancelada')+'</td><td>'+esc(s.cliente||'—')+'</td><td>'+esc(s.pay)+'</td><td>'+items+'</td><td style="text-align:right">'+brl(s.total)+'</td></tr>';
+  }).join('');
+  var movRows=d.moves.slice().sort(function(a,b){return b.t-a.t}).map(function(m){
+    return'<tr><td>'+fdt(m.t)+'</td><td>'+esc(m.name)+'</td><td>'+TL[m.type]+'</td><td>'+esc(m.reason)+(m.note?' ('+esc(m.note)+')':'')+'</td><td style="text-align:right">'+(m.d>0?'+':'')+m.d+'</td><td style="text-align:right">'+m.after+'</td></tr>';
+  }).join('');
+  var prodRows=P.slice().sort(function(a,b){return a.name.localeCompare(b.name,'pt-BR')}).map(function(p){
+    return'<tr><td>'+esc(p.name)+'</td><td>'+esc(p.cat||'—')+'</td><td style="text-align:right">'+p.stock+'</td><td style="text-align:right">'+brl(p.cost||0)+'</td><td style="text-align:right">'+brl(p.price)+'</td><td style="text-align:right">'+brl((p.cost||0)*p.stock)+'</td></tr>';
+  }).join('');
+  var cliRows=C.slice().sort(function(a,b){return a.name.localeCompare(b.name,'pt-BR')}).map(function(c){
+    return'<tr><td>'+esc(c.name)+'</td><td>'+esc(c.phone||'—')+'</td><td>'+esc(c.wpp||'—')+'</td><td>'+esc(c.email||'—')+'</td><td>'+esc(c.cpf||'—')+'</td></tr>';
+  }).join('');
+  return'<!DOCTYPE html><html lang="pt-BR"><head><meta charset="utf-8"><title>Relatório — '+r.label+'</title><style>'+
+   'body{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;max-width:920px;margin:32px auto;padding:0 20px;color:#12141D}'+
+   'h1{font-size:1.4rem;margin:0 0 4px}h2{font-size:1.1rem;margin:32px 0 8px;border-bottom:2px solid #4F46E5;padding-bottom:6px}'+
+   'table{width:100%;border-collapse:collapse;margin-top:8px;font-size:.86rem}th,td{padding:6px 8px;border-bottom:1px solid #E4E7EF;text-align:left;vertical-align:top}'+
+   'th{background:#F3F4F9}.muted{color:#646B7D}.kpis{display:flex;flex-wrap:wrap;gap:12px;margin-top:12px}'+
+   '.kpi{background:#F3F4F9;border-radius:12px;padding:10px 16px;min-width:140px}.kpi span{display:block;font-size:.8rem;color:#646B7D}.kpi b{display:block;font-size:1.2rem}'+
+   '@media print{body{margin:0}}</style></head><body>'+
+   '<h1>Relatório — Estoque da Loja</h1><p class="muted">Período: '+r.label+' ('+r.sub+') · Gerado em '+fdt(gen)+'</p>'+
+   '<h2>Vendas</h2><div class="kpis">'+kpi('Concluídas',d.ok.length)+kpi('Canceladas',d.can.length)+kpi('Faturamento',brl(d.rev))+kpi('Custo',brl(d.cost))+kpi('Lucro',brl(d.profit))+kpi('Ticket médio',d.ok.length?brl(d.ticket):brl(0))+'</div>'+
+   (d.sales.length?'<table><thead><tr><th>Data</th><th>Status</th><th>Cliente</th><th>Pagamento</th><th>Itens</th><th>Total</th></tr></thead><tbody>'+salesRows+'</tbody></table>':'<p class="muted">Nenhuma venda neste período.</p>')+
+   '<h2>Movimentações de estoque</h2><div class="kpis">'+kpi('Entradas',d.movIn.length+' (+'+d.qIn+' un.)')+kpi('Saídas',d.movOut.length+' (-'+d.qOut+' un.)')+kpi('Ajustes',d.movAdj.length)+'</div>'+
+   (d.moves.length?'<table><thead><tr><th>Data</th><th>Produto</th><th>Tipo</th><th>Motivo</th><th>Qtd.</th><th>Saldo</th></tr></thead><tbody>'+movRows+'</tbody></table>':'<p class="muted">Nenhuma movimentação neste período.</p>')+
+   '<h2>Produtos e estoque (situação atual)</h2><div class="kpis">'+kpi('Produtos',P.length)+kpi('Unidades',d.units)+kpi('Custo do estoque',brl(d.sCost))+kpi('Valor de venda',brl(d.sSale))+kpi('Estoque baixo',d.low.length)+kpi('Esgotados',d.out.length)+'</div>'+
+   (P.length?'<table><thead><tr><th>Produto</th><th>Categoria</th><th>Estoque</th><th>Custo</th><th>Preço</th><th>Valor em custo</th></tr></thead><tbody>'+prodRows+'</tbody></table>':'<p class="muted">Nenhum produto cadastrado.</p>')+
+   '<h2>Clientes</h2><div class="kpis">'+kpi('Cadastrados',C.length)+kpi('Novos no período',d.newCli.length)+'</div>'+
+   (C.length?'<table><thead><tr><th>Nome</th><th>Telefone</th><th>WhatsApp</th><th>E-mail</th><th>CPF</th></tr></thead><tbody>'+cliRows+'</tbody></table>':'<p class="muted">Nenhum cliente cadastrado.</p>')+
+   '</body></html>';
+}
+function reportFilename(key){
+  var now=new Date(),pad=function(n){return String(n).padStart(2,'0')},names={today:'dia',week:'semana',month:'mes',year:'ano'};
+  return'relatorio-'+names[key]+'-'+now.getFullYear()+'-'+pad(now.getMonth()+1)+'-'+pad(now.getDate())+'.html';
+}
+function downloadReport(key){
+  var html=renderReportHTML(reportData(key));
+  var blob=new Blob([html],{type:'text/html;charset=utf-8'}),url=URL.createObjectURL(blob);
+  var a=document.createElement('a');a.href=url;a.download=reportFilename(key);document.body.appendChild(a);a.click();a.remove();
+  setTimeout(function(){URL.revokeObjectURL(url)},2000);
+  toast('Relatório baixado.');
+}
+document.querySelectorAll('#v-reports [data-dl]').forEach(function(b){b.onclick=function(){downloadReport(b.dataset.dl)}});
 </script>
 </body>
 </html>

@@ -151,6 +151,13 @@ dialog{max-height:92vh;overflow:auto}
 .pt .tp{color:var(--muted)}
 .pt .rm{width:28px;height:28px;border:0;background:transparent;border-radius:999px;color:var(--muted);font-size:1.05rem;line-height:1}
 .pt .rm:hover{background:var(--track);color:var(--bad)}
+/* código do pedido (WhatsApp → venda) */
+.pcode{border:1px solid var(--line);border-radius:20px;padding:14px;margin:4px 0 0;background:color-mix(in srgb,var(--accent) 5%,var(--surface))}
+.pcode h3{margin:0 0 4px}
+.pcode .vf{margin-top:10px}
+.pcode .vf .fld{flex:1;min-width:180px}
+.pcode .cmsg{margin:10px 0 0;font-size:.86rem;font-weight:600;white-space:pre-line}
+.pcode .cmsg.warn{color:var(--bad);font-weight:500}
 .bar{display:flex;flex-wrap:wrap;gap:10px;justify-content:flex-end;align-items:center}
 .bar .err{margin-right:auto;color:var(--bad);font-weight:500}
 .btn.danger{color:var(--bad)}
@@ -806,6 +813,12 @@ body.cart-open #toast{bottom:auto;top:calc(env(safe-area-inset-top,0px) + 66px);
 </dialog>
 <dialog id="saleDlg">
  <h2>Nova venda</h2>
+ <div class="pcode">
+  <h3>Pedido do WhatsApp</h3>
+  <p class="sub">Cole o código que veio na mensagem do cliente (ou a mensagem inteira). Os produtos, valores e quantidades entram sozinhos na venda.</p>
+  <div class="vf pre"><label class="fld"><span>Código do pedido</span><input id="saCode" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Ex.: ESTQ1.eyJ2IjoxLC…"></label><button type="button" class="btn" id="saCodePaste">Colar</button><button type="button" class="btn main" id="saCodeGo">Preencher venda</button></div>
+  <p class="sub cmsg" id="saCodeMsg" hidden></p>
+ </div>
  <label class="fld"><span>Produto</span><select id="saP"></select></label>
  <div id="saVars"></div>
  <div class="ff">
@@ -1416,9 +1429,80 @@ function saleCalc(){
   var sub=sale.items.reduce(function(a,it){return a+it.qty*it.price},0),cost=sale.items.reduce(function(a,it){return a+it.qty*it.cost},0),desc=Math.max(0,+$('saDesc').value||0),tot=Math.max(0,sub-desc);
   $('saTotal').textContent='Total: '+brl(tot)+(desc?' (desconto de '+brl(desc)+' sobre '+brl(sub)+')':'')+(sale.items.length?' · Lucro: '+brl(tot-cost):'');
 }
+/* ===== código único do pedido (catálogo → WhatsApp → venda) ===== */
+var PCODE='ESTQ1.';
+function b64e(s){return btoa(unescape(encodeURIComponent(s))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'')}
+function b64d(s){s=String(s).replace(/-/g,'+').replace(/_/g,'/');while(s.length%4)s+='=';return decodeURIComponent(escape(atob(s)))}
+// gera o código com os itens do carrinho: [id, nome, [[variação,opção],…], quantidade, preço]
+function orderCode(list){
+  var it=list.map(function(l){var p=P.find(function(x){return x.id===l.pid});return[l.pid,p?p.name:'Produto',l.vars.map(function(v){return[v.g,v.o]}),l.qty,p?+unitFor(p,l.vars).price.toFixed(2):0]});
+  var id=(Date.now().toString(36)+Math.random().toString(36).slice(2,4)).toUpperCase();
+  return{id:id,code:PCODE+b64e(JSON.stringify({v:1,id:id,t:Date.now(),nm:catName(),it:it}))};
+}
+// aceita o código puro ou a mensagem inteira do cliente
+function readOrder(raw){
+  var m=String(raw||'').match(/ESTQ1\.[A-Za-z0-9_-]+/);
+  if(!m)return{e:'Código do pedido não encontrado. Copie a mensagem do cliente inteira — o código começa com ESTQ1.'};
+  var o;try{o=JSON.parse(b64d(m[0].slice(PCODE.length)))}catch(err){o=null}
+  if(!o||o.v!==1||!Array.isArray(o.it)||!o.it.length)return{e:'Não entendi este código. Confira se copiou a mensagem completa.'};
+  return{o:o};
+}
+var lastCode='';
+function codeMsg(t,warn){var el=$('saCodeMsg');el.hidden=false;el.className='sub cmsg'+(warn?' warn':'');el.textContent=t}
+// preenche a venda com os produtos, variações, quantidades e valores do pedido
+function fillFromOrder(raw){
+  var rd=readOrder(raw);if(rd.e)return{e:rd.e};
+  var o=rd.o;
+  if(lastCode===o.id&&sale.items.length)return{e:'O pedido '+o.id+' já foi preenchido nesta venda.'};
+  var add=0,warn=[];
+  o.it.forEach(function(it){
+    if(!Array.isArray(it)||it.length<4)return;
+    var nome=String(it[1]||''),vs=Array.isArray(it[2])?it[2]:[],q=Math.max(1,Math.round(+it[3])||1),pr=+it[4];
+    var p=P.find(function(x){return x.id===it[0]})||P.find(function(x){return x.name.trim().toLowerCase()===nome.trim().toLowerCase()});
+    if(!p){warn.push('• '+nome+': não encontrado no seu catálogo.');return}
+    var sel=[],vtxt=[],vOk=true;
+    vs.forEach(function(v){
+      var gn=String(v[0]||'').trim().toLowerCase(),on=String(v[1]||'').trim().toLowerCase(),gi=-1;
+      p.vars.forEach(function(g,j){if(g.name.trim().toLowerCase()===gn)gi=j});
+      var oi=gi<0?-1:p.vars[gi].opts.findIndex(function(x){return x.n.trim().toLowerCase()===on});
+      if(gi<0||oi<0){vOk=false;warn.push('• '+p.name+' — variação "'+v[0]+': '+v[1]+'" não existe no cadastro: escolha a opção na venda.');return}
+      sel.push({gi:gi,oi:oi,g:p.vars[gi].name,o:p.vars[gi].opts[oi].n});vtxt.push(p.vars[gi].name+': '+p.vars[gi].opts[oi].n);
+    });
+    var u=unitFor(p,sel),price=isFinite(pr)&&pr>=0?pr:u.price;
+    if(isFinite(pr)&&Math.abs(pr-u.price)>0.004)warn.push('• '+p.name+': no pedido '+brl(pr)+', no catálogo '+brl(u.price)+' — mantido o valor do pedido.');
+    var disp=Math.min.apply(null,[p.stock].concat(sel.map(function(v){return p.vars[v.gi].opts[v.oi].q})));
+    if(q>disp)warn.push('• '+p.name+': pedido de '+q+' un., disponível '+disp+' un.');
+    var varTxt=vtxt.join(', '),same=sale.items.find(function(x){return x.pid===p.id&&x.varTxt===varTxt&&x.price===price&&x.cost===u.cost});
+    if(same)same.qty+=q;else sale.items.push({pid:p.id,name:p.name,varTxt:varTxt,vars:sel,qty:q,price:price,cost:u.cost});
+    if(!vOk)warn.push('• '+p.name+': revise as variações antes de finalizar.');
+    add++;
+  });
+  if(!add)return{e:'Nenhum produto do pedido pôde ser preenchido.'+(warn.length?'\n'+warn.join('\n'):'')};
+  lastCode=o.id;
+  if(!$('saNote').value.trim())$('saNote').value='Pedido WhatsApp '+o.id;
+  var total=o.it.reduce(function(a,it){return a+(+it[3]||0)*(+it[4]||0)},0);
+  var msg='Pedido '+o.id+(o.nm?' · '+o.nm:'')+': '+plural(add,'produto preenchido','produtos preenchidos')+(isFinite(total)&&total>0?' · total do pedido '+brl(total):'')+'.';
+  return{msg:msg,warn:warn};
+}
+function applyOrderCode(raw){
+  var r=fillFromOrder(raw);
+  if(r.e)return codeMsg(r.e,true);
+  drawCart();saleInfo();
+  codeMsg(r.msg+(r.warn.length?'\n'+r.warn.join('\n'):''),r.warn.length>0);
+  toast(r.warn.length?'Pedido preenchido com avisos — confira os itens.':'Pedido preenchido. Confirme os itens com o cliente.');
+}
+$('saCodeGo').onclick=function(){var v=$('saCode').value.trim();if(!v)return codeMsg('Cole o código do pedido para preencher a venda.',true);applyOrderCode(v)};
+$('saCodePaste').onclick=function(){
+  if(!navigator.clipboard||!navigator.clipboard.readText)return codeMsg('Seu navegador não deixa colar automaticamente: toque no campo acima e cole com o dedo.',true);
+  navigator.clipboard.readText().then(function(t){$('saCode').value=t.trim();applyOrderCode(t)},
+    function(){codeMsg('Não consegui ler a área de transferência: toque no campo acima e cole com o dedo.',true)});
+};
+$('saCode').onkeydown=function(e){if(e.key==='Enter'){e.preventDefault();$('saCodeGo').onclick()}};
+$('saCode').onpaste=function(){var el=this;setTimeout(function(){if(el.value.trim())applyOrderCode(el.value)},0)};
 function openSale(){
   if(!P.length)return toast('Cadastre um produto antes de registrar uma venda.');
-  sale={items:[]};
+  sale={items:[]};lastCode='';
+  $('saCode').value='';$('saCodeMsg').hidden=true;$('saCodeMsg').textContent='';
   $('saP').innerHTML=P.slice().sort(function(a,b){return a.name.localeCompare(b.name,'pt-BR')}).map(function(p){return'<option value="'+p.id+'">'+esc(p.name)+' ('+p.stock+' un.)</option>'}).join('');
   $('saPay').innerHTML=PAYS.map(function(x){return'<option>'+x+'</option>'}).join('');
   $('clNames').innerHTML=CLI.map(function(c){return'<option value="'+esc(c.name)+'">'}).join('');
@@ -1996,9 +2080,11 @@ $('catCheckout').onclick=function(){
   var money=function(v){return brl(v).replace(/\u00a0/g,' ')};
   var lines=CART.map(function(l){var p=P.find(function(x){return x.id===l.pid}),u=unitFor(p,l.vars),vt=l.vars.map(function(v){return v.g+': '+v.o}).join(', ');
     return'• '+l.qty+'x '+p.name+(vt?' ('+vt+')':'')+' — '+money(u.price*l.qty)});
-  var msg='Olá, '+catName()+'! Gostaria de fazer este pedido:\n\n'+lines.join('\n')+'\n\nTotal dos produtos: '+money(cartTotal())+'\nFrete: a combinar com a loja';
+  var co=orderCode(CART);
+  var msg='Olá, '+catName()+'! Gostaria de fazer este pedido:\n\n'+lines.join('\n')+'\n\nTotal dos produtos: '+money(cartTotal())+'\nFrete: a combinar com a loja'+
+    '\n\nPedido '+co.id+'\nCódigo do pedido: '+co.code+'\n(loja: copie o código acima e cole em Nova venda → Pedido do WhatsApp)';
   window.open('https://wa.me/'+num+'?text='+encodeURIComponent(msg),'_blank','noopener');
-  toast('Abrindo o WhatsApp da loja. Envie a mensagem para concluir o pedido.');
+  toast('Abrindo o WhatsApp da loja. O pedido '+co.id+' vai com o código para o vendedor.');
 };
 /* página do produto */
 function selArr(p){var out=[];Object.keys(pp.sel).forEach(function(gi){var oi=pp.sel[gi];if(p.vars[gi]&&p.vars[gi].opts[oi])out.push({gi:+gi,oi:oi,g:p.vars[gi].name,o:p.vars[gi].opts[oi].n})});return out}

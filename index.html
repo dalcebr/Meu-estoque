@@ -731,7 +731,7 @@ body.cart-open #btt{right:calc(var(--drawer) + 20px)}
         <div class="seg" id="ctRadius"><button type="button" data-r="sharp" style="border-radius:2px">Reto</button><button type="button" data-r="rounded">Arredondado</button></div>
       </div>
       <div class="w">
-        <p class="sub thm-note">Aqui você personaliza <b>cada detalhe</b> do catálogo, separado em <b>Modo claro</b> e <b>Modo escuro</b>, em 12 áreas com 106 campos por modo: <b>Base</b> (Fundo, Cartões, Texto, Destaque, Linhas, Texto secundário), <b>Cabeçalho</b> (fundo, título/nome da loja, ícones, fundo e borda dos ícones, quantidade), <b>Seção inicial</b> (as duas cores do gradiente, cor e opacidade da sombra sobre a imagem de fundo, cor, alinhamento e tamanho do título e da descrição), <b>Busca e filtro</b>, <b>Categorias</b>, <b>Produtos</b>, <b>Página do produto</b> (fotos, opções, quantidade), <b>Rodapé</b>, <b>Carrinho</b>, <b>Botões comuns</b>, <b>Janela de filtros</b> e <b>Avisos</b>. Toque no nome da área para abrir. Em <b>Automático</b> cada detalhe segue a <b>Base</b> e o contraste é ajustado sozinho para continuar legível; use ↺ para devolver um detalhe ao automático, ou <b>Automático</b> na área inteira. Na <b>Seção inicial</b>, o alinhamento/cor/tamanho valem para o título e a descrição e, no alinhamento, tocar no botão já marcado devolve ao automático; o tamanho escolhido é o máximo no computador e o catálogo mantém a proporção no celular. A sombra só aparece quando a seção inicial usa uma imagem de fundo; a cor de "Cabeçalho e seção inicial" é o padrão do gradiente.</p>
+        <p class="sub thm-note">Aqui você personaliza <b>cada detalhe</b> do catálogo, separado em <b>Modo claro</b> e <b>Modo escuro</b>, em 12 áreas com 104 campos por modo: <b>Base</b> (Fundo, Cartões, Texto, Destaque, Linhas, Texto secundário), <b>Cabeçalho</b> (fundo, título/nome da loja, ícones, fundo e borda dos ícones, quantidade), <b>Seção inicial</b> (cor e opacidade da sombra sobre a imagem de fundo, cor, alinhamento e tamanho do título e da descrição), <b>Busca e filtro</b>, <b>Categorias</b>, <b>Produtos</b>, <b>Página do produto</b> (fotos, opções, quantidade), <b>Rodapé</b>, <b>Carrinho</b>, <b>Botões comuns</b>, <b>Janela de filtros</b> e <b>Avisos</b>. Toque no nome da área para abrir. Em <b>Automático</b> cada detalhe segue a <b>Base</b> e o contraste é ajustado sozinho para continuar legível; use ↺ para devolver um detalhe ao automático, ou <b>Automático</b> na área inteira. Na <b>Seção inicial</b>, o alinhamento/cor/tamanho valem para o título e a descrição e, no alinhamento, tocar no botão já marcado devolve ao automático; o tamanho escolhido é o máximo no computador e o catálogo mantém a proporção no celular. A sombra só aparece quando a seção inicial usa uma imagem de fundo; o fundo da seção inicial (gradiente) segue a cor escolhida em "Cabeçalho e seção inicial".</p>
         <div id="ctGroups"></div>
       </div>
     </div>
@@ -2474,7 +2474,6 @@ var SECTS=[
    ['head-badge','Fundo de quantidade'],
    ['head-line','Linha inferior do cabeçalho']]},
  {k:'hero',n:'Seção inicial',s:[
-   ['hero-bg','Gradiente — cor 1'],['hero-bg2','Gradiente — cor 2'],
    ['hero-overlay','Sombra sobre a imagem — cor'],
    ['hero-overlay-op','Sombra — opacidade','range',{min:0,max:100,step:1,def:50,unit:'%'}],
    ['hero-title','Título — cor'],
@@ -2520,7 +2519,13 @@ var SECTS=[
 ];
 function thm(){return CAT.theme||THEME_DEF}
 function thmPal(t){var th=thm();return(t||root.getAttribute('data-theme'))==='dark'?Object.assign({},THEME_DEF.dark,th.dark||{}):Object.assign({},THEME_DEF.light,th.light||{})}
-function ensureTheme(){if(!CAT.theme)CAT.theme=JSON.parse(JSON.stringify(THEME_DEF))}
+function ensureTheme(){
+  if(!CAT.theme)CAT.theme=JSON.parse(JSON.stringify(THEME_DEF));
+  /* limpeza: "Gradiente — cor 1/2" saiu do painel (o fundo da seção inicial segue a cor de "Cabeçalho e seção inicial") */
+  ['light','dark'].forEach(function(m){
+    if(CAT.theme.secs&&CAT.theme.secs[m]){delete CAT.theme.secs[m]['hero-bg'];delete CAT.theme.secs[m]['hero-bg2']}
+  });
+}
 /* utilitários de cor (usados pela paleta e pelas áreas do catálogo) */
 function cLum(c){var n=parseInt(c.slice(1),16);return(0.299*(n>>16)+0.587*(n>>8&255)+0.114*(n&255))/255}
 function cMix(a,b,w){var na=parseInt(a.slice(1),16),nb=parseInt(b.slice(1),16),r=Math.round,m=function(sa,sb){return r(sa+(sb-sa)*w)};return'#'+[16,8,0].map(function(sh){return m((na>>sh)&255,(nb>>sh)&255).toString(16).padStart(2,'0')}).join('')}
@@ -2573,9 +2578,9 @@ function catVars(t){
   o['head-bg']=headBg;o['head-line']=headLine;o['head-title']=headTitle;o['head-icon']=headIcon;
   o['head-icon-bg']=R('head-icon-bg',headBg);o['head-icon-line']=R('head-icon-line',headLine);
   o['head-badge']=headBadge;o['head-badge-ink']=R('head-badge-ink',autoInk(headBadge,aInk));
-  /* seção inicial */
-  var heroBg=R('hero-bg',CAT.heroColor||accent),heroTitle=R('hero-title',autoInk(heroBg,'#fff'));
-  o['hero-bg']=heroBg;o['hero-bg2']=R('hero-bg2',cMix(heroBg,'#000000',.14));
+  /* seção inicial — o fundo (gradiente) segue a cor de "Cabeçalho e seção inicial" */
+  var heroBg=CAT.heroColor||accent,heroTitle=R('hero-title',autoInk(heroBg,'#fff'));
+  o['hero-bg']=heroBg;o['hero-bg2']=cMix(heroBg,'#000000',.14);
   o['hero-ink']=autoInk(heroBg,aInk);o['hero-title']=heroTitle;o['hero-desc']=R('hero-desc',heroTitle);
   o['hero-overlay']=cRgba(R('hero-overlay','#0a0c14'),tuneNum(sm['hero-overlay-op'],50,0,100)/100);
   o['hero-title-align']=heroAlign(sm['hero-title-align']);o['hero-desc-align']=heroAlign(sm['hero-desc-align']);

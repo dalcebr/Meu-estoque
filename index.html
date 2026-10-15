@@ -223,9 +223,9 @@ body.cat-mode .shell{display:none}
 .cat-bar{max-width:1180px;margin:0 auto;display:flex;align-items:center;gap:8px 10px;min-width:0}
 .cat-bar #catStore{flex:1;min-width:0;font-weight:800;font-size:1.15rem;letter-spacing:-.01em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .cat-prev{display:block;width:100%;max-width:420px;aspect-ratio:16/6;border-radius:16px;border:1px solid var(--line);object-fit:cover;background:var(--track);margin-bottom:10px}
-.cat-hero{background:linear-gradient(180deg,var(--hero-bg,var(--accent)),var(--hero-bg2,color-mix(in srgb,var(--hero-bg,var(--accent)) 86%,#000)));color:var(--hero-title,var(--hero-ink,var(--accent-ink)));padding:clamp(30px,8vw,64px) clamp(16px,5vw,24px);min-height:clamp(170px,30vw,240px);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
-.cat-hero h1{margin:0;font-size:clamp(1.6rem,6vw,2.9rem);line-height:1.1;font-weight:800;letter-spacing:-.03em;overflow-wrap:anywhere}
-.cat-hero p{margin:14px auto 0;max-width:600px;font-size:clamp(.98rem,3.4vw,1.05rem);opacity:.92;white-space:pre-line;color:var(--hero-desc,currentColor)}
+.cat-hero{background:linear-gradient(180deg,var(--hero-bg,var(--accent)),var(--hero-bg2,color-mix(in srgb,var(--hero-bg,var(--accent)) 86%,#000)));color:var(--hero-title,var(--hero-ink,var(--accent-ink)));padding:clamp(30px,8vw,64px) clamp(16px,5vw,24px);min-height:clamp(170px,30vw,240px);display:flex;flex-direction:column;align-items:stretch;justify-content:center}
+.cat-hero h1{margin:0;font-size:var(--hero-title-size,clamp(1.6rem,6vw,2.9rem));line-height:1.1;font-weight:800;letter-spacing:-.03em;overflow-wrap:anywhere;text-align:var(--hero-title-align,center)}
+.cat-hero p{margin:14px 0 0;margin-left:var(--hero-desc-ml,auto);margin-right:var(--hero-desc-mr,auto);max-width:600px;font-size:var(--hero-desc-size,clamp(.98rem,3.4vw,1.05rem));opacity:.92;white-space:pre-line;color:var(--hero-desc,currentColor);text-align:var(--hero-desc-align,center)}
 .cat-body{max-width:1180px;margin:0 auto;padding:20px clamp(14px,4vw,20px) 56px}
 .cat-h1{margin:14px 0 0;font-size:clamp(1.5rem,4vw,2rem);font-weight:800;letter-spacing:-.02em;color:var(--sec-title,var(--ink))}
 .cat-hero.has-img{aspect-ratio:auto;min-height:clamp(200px,42vw,320px)}
@@ -408,6 +408,15 @@ body.cart-open #toast.on{transform:translateX(50%)}
 .thm-auto{border:1px solid var(--line);background:var(--surface);color:var(--muted);font-size:.74rem;font-weight:700;padding:5px 11px;border-radius:99px;min-height:34px;flex:none}
 .thm-auto:hover{color:var(--accent-text);border-color:var(--accent)}
 .thm-note{margin:14px 0 0}
+/* campos de alinhamento e de tamanho dentro das áreas de personalização */
+.thm-f.wide{grid-column:1/-1;flex-wrap:wrap;gap:8px;padding:2px 0}
+.thm-f.wide>.thm-fl{flex:1 1 100%}
+.thm-seg{display:flex;flex:none;border:1px solid var(--line);border-radius:10px;background:var(--surface);overflow:hidden}
+.thm-seg .thm-a{width:38px;height:36px;border:0;background:none;color:var(--muted);display:grid;place-items:center;cursor:pointer}
+.thm-seg .thm-a svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.thm-seg .thm-a[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.thm-rg{flex:1;min-width:90px;height:34px;accent-color:var(--accent)}
+.thm-val{flex:none;min-width:62px;text-align:right;font-size:.78rem;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums}
 .thm-gh{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
 .thm-gh .lbl{margin:0;font-size:.78rem;font-weight:800;color:var(--muted);letter-spacing:.05em;text-transform:uppercase}
 .thm-auto{border:1px solid var(--line);background:var(--surface);color:var(--muted);font-size:.74rem;font-weight:700;padding:5px 11px;border-radius:99px;min-height:32px}
@@ -722,7 +731,7 @@ body.cart-open #btt{right:calc(var(--drawer) + 20px)}
         <div class="seg" id="ctRadius"><button type="button" data-r="sharp" style="border-radius:2px">Reto</button><button type="button" data-r="rounded">Arredondado</button></div>
       </div>
       <div class="w">
-        <p class="sub thm-note">Aqui você personaliza <b>cada detalhe</b> do catálogo, separado em <b>Modo claro</b> e <b>Modo escuro</b>, em 12 áreas com 101 campos por modo: <b>Base</b> (Fundo, Cartões, Texto, Destaque, Linhas, Texto secundário), <b>Cabeçalho</b> (fundo, título/nome da loja, ícones, fundo e borda dos ícones, quantidade), <b>Seção inicial</b> (as duas cores do gradiente, título, descrição, sombra sobre a imagem), <b>Busca e filtro</b>, <b>Categorias</b>, <b>Produtos</b>, <b>Página do produto</b> (fotos, opções, quantidade), <b>Rodapé</b>, <b>Carrinho</b>, <b>Botões comuns</b>, <b>Janela de filtros</b> e <b>Avisos</b>. Toque no nome da área para abrir. Em <b>Automático</b> cada detalhe segue a <b>Base</b> e o contraste é ajustado sozinho para continuar legível; use ↺ para devolver um detalhe ao automático, ou <b>Automático</b> na área inteira. A cor de "Cabeçalho e seção inicial" é o padrão do gradiente.</p>
+        <p class="sub thm-note">Aqui você personaliza <b>cada detalhe</b> do catálogo, separado em <b>Modo claro</b> e <b>Modo escuro</b>, em 12 áreas com 106 campos por modo: <b>Base</b> (Fundo, Cartões, Texto, Destaque, Linhas, Texto secundário), <b>Cabeçalho</b> (fundo, título/nome da loja, ícones, fundo e borda dos ícones, quantidade), <b>Seção inicial</b> (as duas cores do gradiente, cor e opacidade da sombra sobre a imagem de fundo, cor, alinhamento e tamanho do título e da descrição), <b>Busca e filtro</b>, <b>Categorias</b>, <b>Produtos</b>, <b>Página do produto</b> (fotos, opções, quantidade), <b>Rodapé</b>, <b>Carrinho</b>, <b>Botões comuns</b>, <b>Janela de filtros</b> e <b>Avisos</b>. Toque no nome da área para abrir. Em <b>Automático</b> cada detalhe segue a <b>Base</b> e o contraste é ajustado sozinho para continuar legível; use ↺ para devolver um detalhe ao automático, ou <b>Automático</b> na área inteira. Na <b>Seção inicial</b>, o alinhamento/cor/tamanho valem para o título e a descrição e, no alinhamento, tocar no botão já marcado devolve ao automático; o tamanho escolhido é o máximo no computador e o catálogo mantém a proporção no celular. A sombra só aparece quando a seção inicial usa uma imagem de fundo; a cor de "Cabeçalho e seção inicial" é o padrão do gradiente.</p>
         <div id="ctGroups"></div>
       </div>
     </div>
@@ -2465,8 +2474,15 @@ var SECTS=[
    ['head-badge','Fundo de quantidade'],
    ['head-line','Linha inferior do cabeçalho']]},
  {k:'hero',n:'Seção inicial',s:[
-   ['hero-bg','Gradiente — cor 1'],['hero-bg2','Gradiente — cor 2'],['hero-title','Título'],['hero-desc','Descrição'],
-   ['hero-overlay','Sombra sobre a imagem de fundo']]},
+   ['hero-bg','Gradiente — cor 1'],['hero-bg2','Gradiente — cor 2'],
+   ['hero-overlay','Sombra sobre a imagem — cor'],
+   ['hero-overlay-op','Sombra — opacidade','range',{min:0,max:100,step:1,def:50,unit:'%'}],
+   ['hero-title','Título — cor'],
+   ['hero-title-align','Título — alinhamento','align'],
+   ['hero-title-size','Título — tamanho','range',{min:1.2,max:4.6,step:.05,def:2.9,unit:'rem'}],
+   ['hero-desc','Descrição — cor'],
+   ['hero-desc-align','Descrição — alinhamento','align'],
+   ['hero-desc-size','Descrição — tamanho','range',{min:.7,max:2.2,step:.05,def:1.05,unit:'rem'}]]},
  {k:'search',n:'Busca e botão de filtro',s:[
    ['srch-bg','Campo de busca — fundo'],['srch-ink','Campo de busca — texto digitado'],['srch-ph','Campo de busca — texto de exemplo'],
    ['srch-ic','Campo de busca — ícone da lupa'],['srch-line','Campo de busca — borda'],
@@ -2531,6 +2547,14 @@ function derivePal(p){
 }
 /* converte #rrggbb em rgba() — usado na sombra sobre a imagem e no fundo escurecido do carrinho */
 function cRgba(c,a){if(!/^#[0-9a-f]{6}$/i.test(c||''))return c;return'rgba('+parseInt(c.slice(1,3),16)+','+parseInt(c.slice(3,5),16)+','+parseInt(c.slice(5,7),16)+','+a+')'}
+/* ajustes numéricos/listas da personalização (tamanho, opacidade, alinhamento) */
+function tuneNum(v,def,min,max){var n=parseFloat(v);if(!isFinite(n))return def;if(min!=null&&n<min)n=min;if(max!=null&&n>max)n=max;return n}
+function tuneOne(v,list,def){return list.indexOf(v)>=0?v:def}
+function f2(n){return String(Math.round(n*1000)/1000)}
+function heroAlign(v){return tuneOne(v,['left','center','right'],'center')}
+/* o tamanho escolhido é a medida máxima (desktop) e o catálogo mantém a proporção no celular */
+function heroTitleSizeCss(v){return'clamp('+f2(v*.5517)+'rem,'+f2(v*2.069)+'vw,'+f2(v)+'rem)'}
+function heroDescSizeCss(v){return'clamp('+f2(v*.9333)+'rem,'+f2(v*3.238)+'vw,'+f2(v)+'rem)'}
 /* cores resolvidas de cada área do catálogo ("auto" = segue a base e mantém a harmonia) */
 function catVars(t){
   var pal=derivePal(thmPal(t)),sm=(thm().secs||{})[t]||{};
@@ -2550,11 +2574,15 @@ function catVars(t){
   o['head-icon-bg']=R('head-icon-bg',headBg);o['head-icon-line']=R('head-icon-line',headLine);
   o['head-badge']=headBadge;o['head-badge-ink']=R('head-badge-ink',autoInk(headBadge,aInk));
   /* seção inicial */
-  var heroBg=R('hero-bg',CAT.heroColor||accent); /* padrão: cor escolhida em "Cabeçalho e seção inicial" */
-  var heroTitle=R('hero-title',autoInk(heroBg,'#fff'));
+  var heroBg=R('hero-bg',CAT.heroColor||accent),heroTitle=R('hero-title',autoInk(heroBg,'#fff'));
   o['hero-bg']=heroBg;o['hero-bg2']=R('hero-bg2',cMix(heroBg,'#000000',.14));
   o['hero-ink']=autoInk(heroBg,aInk);o['hero-title']=heroTitle;o['hero-desc']=R('hero-desc',heroTitle);
-  o['hero-overlay']=cRgba(R('hero-overlay','#0a0c14'),.5);
+  o['hero-overlay']=cRgba(R('hero-overlay','#0a0c14'),tuneNum(sm['hero-overlay-op'],50,0,100)/100);
+  o['hero-title-align']=heroAlign(sm['hero-title-align']);o['hero-desc-align']=heroAlign(sm['hero-desc-align']);
+  o['hero-title-size']=heroTitleSizeCss(tuneNum(sm['hero-title-size'],2.9,1.2,4.6));
+  o['hero-desc-size']=heroDescSizeCss(tuneNum(sm['hero-desc-size'],1.05,.7,2.2));
+  var da=o['hero-desc-align'],dm=da==='left'?['0','auto']:da==='right'?['auto','0']:['auto','auto'];
+  o['hero-desc-ml']=dm[0];o['hero-desc-mr']=dm[1];
   /* busca e filtro */
   const srchBg=R('srch-bg',surface),filtBtnBg=R('filt-btn-bg',surface);
   o['srch-bg']=srchBg;o['srch-ink']=R('srch-ink',autoInk(srchBg,ink));o['srch-ph']=R('srch-ph',muted);
@@ -2699,18 +2727,40 @@ buildFontPickers();
 /* ===== painel de cores: cada detalhe do catálogo, por área e por modo ===== */
 var CAT_COL_SECS=(function(){try{return JSON.parse(localStorage.getItem('cat_col_secs')||'{}')||{}}catch(e){return{}}})();
 function catColSave(){try{localStorage.setItem('cat_col_secs',JSON.stringify(CAT_COL_SECS))}catch(e){}}
-function isCustom(v){return !!(v&&/^#[0-9a-f]{6}$/i.test(v))}
+function isCustom(v){return !(v==null||v===''||v==='auto')}
+/* opções (3º/4º item) de um campo da personalização, achadas pela chave */
+function fieldDef(k){for(var i=0;i<SECTS.length;i++){var s=SECTS[i].s;for(var j=0;j<s.length;j++){if(s[j][0]===k)return s[j]}}return null}
+function fieldOpts(k){var d=fieldDef(k);return(d&&d[3])||{}}
+function rangeLabel(inp){var op=fieldOpts(inp.dataset.k),n=parseFloat(inp.value);return(op.unit==='%'?Math.round(n)+'%':f2(n)+(op.unit?' '+op.unit:''))}
+var ALIGNS=[['left','À esquerda'],['center','Ao centro'],['right','À direita']];
+var ALIGN_ICON={left:'M4 6h16M4 11h9M4 16h13',center:'M4 6h16M7.5 11h9M5.5 16h13',right:'M4 6h16M11 11h9M7 16h13'};
+function themeFieldHtml(mode,g,s,res,own){
+  var k=s[0],lab=s[1],ty=s[2]||'color',op=s[3]||{},ar=esc(g.n+': '+lab),v=own[k];
+  var rst='<button type="button" class="thm-rst" data-mode="'+mode+'" data-k="'+k+'" title="Voltar ao automático" aria-label="'+esc(lab)+': voltar ao automático">&#8635;</button>';
+  if(ty==='range'){
+    var cur=tuneNum(v,op.def,op.min,op.max);
+    var out=op.unit==='%'?Math.round(cur)+'%':f2(cur)+(op.unit?' '+op.unit:'');
+    return '<div class="thm-f wide"><span class="thm-fl">'+esc(lab)+'</span>'+
+      '<input type="range" class="thm-rg" data-mode="'+mode+'" data-k="'+k+'" min="'+op.min+'" max="'+op.max+'" step="'+op.step+'" value="'+cur+'" aria-label="'+ar+'">'+
+      '<output class="thm-val">'+out+'</output>'+rst+'</div>';
+  }
+  if(ty==='align'){
+    var al=heroAlign(v);
+    return '<div class="thm-f wide"><span class="thm-fl">'+esc(lab)+'</span><div class="thm-seg">'+
+      ALIGNS.map(function(a){return '<button type="button" class="thm-a" data-mode="'+mode+'" data-k="'+k+'" data-v="'+a[0]+'" aria-pressed="'+(al===a[0]?'true':'false')+'" title="'+a[1]+'" aria-label="'+ar+' — '+a[1]+'"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="'+ALIGN_ICON[a[0]]+'"/></svg></button>'}).join('')+
+      '</div>'+rst+'</div>';
+  }
+  return '<div class="thm-f"><input type="color" data-mode="'+mode+'" data-k="'+k+'" value="'+res[k]+'" aria-label="'+ar+'">'+
+    '<span class="thm-fl">'+esc(lab)+'</span>'+rst+'</div>';
+}
 function themeGroupsHtml(){
   return ['light','dark'].map(function(mode){
     var res=catVars(mode); /* valores já resolvidos, para os campos abrirem na cor que está valendo */
+    var own=(thm().secs||{})[mode]||{};
     var groups=SECTS.map(function(g){
       var kkey=mode+':'+g.k;
       var on=CAT_COL_SECS[kkey]!==undefined?CAT_COL_SECS[kkey]:(g.k==='base'); /* padrão: só "Base" aberta */
-      var fields=g.s.map(function(s){
-        return '<div class="thm-f"><input type="color" data-mode="'+mode+'" data-k="'+s[0]+'" value="'+res[s[0]]+'" aria-label="'+esc(g.n+': '+s[1])+'">'+
-          '<span class="thm-fl">'+esc(s[1])+'</span>'+
-          '<button type="button" class="thm-rst" data-mode="'+mode+'" data-k="'+s[0]+'" title="Voltar ao automático" aria-label="'+esc(s[1])+': voltar ao automático">&#8635;</button></div>';
-      }).join('');
+      var fields=g.s.map(function(s){return themeFieldHtml(mode,g,s,res,own)}).join('');
       return '<section class="thm-grp'+(on?' on':'')+'" data-sec="'+g.k+'">'+
         '<div class="thm-gh"><button type="button" class="thm-tgl" aria-expanded="'+(on?'true':'false')+'"><span class="lbl">'+esc(g.n)+'</span>'+
         '<svg class="thm-tg" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>'+
@@ -2735,7 +2785,7 @@ function drawThemeCfg(){
   if(th.bodyFont)loadFont(th.bodyFont);
   syncFontPickers();
 }
-/* marca em cada campo/área o que está personalizado e mostra a cor que está valendo */
+/* marca em cada campo/área o que está personalizado e mostra o valor que está valendo */
 function syncThemeGroups(){
   var box=$('ctGroups');if(!box)return;
   var sm=thm().secs||{};
@@ -2743,9 +2793,19 @@ function syncThemeGroups(){
     var res=catVars(mode),own=sm[mode]||{},mEl=box.querySelector('#ct'+(mode==='light'?'Light':'Dark'));
     if(!mEl)return;
     mEl.querySelectorAll('.thm-f').forEach(function(f){
-      var inp=f.querySelector('input[type=color]');if(!inp)return;
-      if(res[inp.dataset.k])inp.value=res[inp.dataset.k];
-      f.classList.toggle('own',isCustom(own[inp.dataset.k]));
+      var el=f.querySelector('[data-k]');if(!el)return;
+      var k=el.dataset.k,v=own[k];
+      if(el.type==='color'&&res[k]){el.value=res[k]}
+      else if(el.type==='range'){ /* tamanho / opacidade: volta ao valor guardado (ou ao padrão) */
+        var op=fieldOpts(k);
+        el.value=tuneNum(v,op.def,op.min,op.max);
+        var out=f.querySelector('.thm-val');if(out)out.textContent=rangeLabel(el);
+      }
+      f.classList.toggle('own',isCustom(v));
+      if(f.querySelector('.thm-seg')){ /* alinhamento: marca o botão ativo */
+        var al=heroAlign(v);
+        f.querySelectorAll('.thm-a').forEach(function(b){b.setAttribute('aria-pressed',b.dataset.v===al?'true':'false')});
+      }
     });
     mEl.querySelectorAll('.thm-grp').forEach(function(g){
       var sec=SECTS.filter(function(x){return x.k===g.dataset.sec})[0]||{s:[]};
@@ -2754,19 +2814,38 @@ function syncThemeGroups(){
   });
 }
 $('ctGroups').addEventListener('input',function(e){
-  var inp=e.target.closest('input[type=color]');if(!inp)return;
-  var mode=inp.dataset.mode;ensureTheme();
+  var inp=e.target;if(!inp||inp.tagName!=='INPUT')return;
+  if(inp.type!=='color'&&inp.type!=='range')return;
+  var mode=inp.dataset.mode,k=inp.dataset.k;if(!mode||!k)return;
+  ensureTheme();
   CAT.theme.secs[mode]=CAT.theme.secs[mode]||{};
-  CAT.theme.secs[mode][inp.dataset.k]=inp.value;
-  saveCat();applyCatTheme();syncThemeGroups();
+  CAT.theme.secs[mode][k]=inp.type==='range'?Number(inp.value):inp.value;
+  var f=inp.closest('.thm-f');
+  if(f){ /* feedback imediato, sem redesenhar o painel enquanto arrasta */
+    var g=f.closest('.thm-grp');f.classList.add('own');if(g)g.classList.add('own');
+    if(inp.type==='range'){var out=f.querySelector('.thm-val');if(out)out.textContent=rangeLabel(inp)}
+  }
+  saveCat();applyCatTheme();
 });
-$('ctGroups').addEventListener('change',function(e){if(e.target.closest('input[type=color]'))toast('Cor atualizada.')});
+$('ctGroups').addEventListener('change',function(e){
+  var inp=e.target.closest('input');if(!inp)return;
+  if(inp.type==='color')toast('Cor atualizada.');
+  else if(inp.type==='range')toast(rangeLabel(inp)+' aplicado.');
+});
 $('ctGroups').addEventListener('click',function(e){
   var b=e.target.closest('button');if(!b)return;
   var mode=b.dataset.mode;
   if(b.classList.contains('thm-rst')){ /* um detalhe volta ao automático */
     ensureTheme();if(CAT.theme.secs[mode])delete CAT.theme.secs[mode][b.dataset.k];
     saveCat();applyCatTheme();syncThemeGroups();toast('Detalhe de volta ao automático.');
+    return;
+  }
+  if(b.classList.contains('thm-a')){ /* alinhamento: escolhe ou volta ao automático tocando de novo */
+    ensureTheme();CAT.theme.secs[mode]=CAT.theme.secs[mode]||{};
+    var ak=b.dataset.k,ja=CAT.theme.secs[mode][ak]===b.dataset.v;
+    if(ja)delete CAT.theme.secs[mode][ak];else CAT.theme.secs[mode][ak]=b.dataset.v;
+    saveCat();applyCatTheme();syncThemeGroups();
+    toast(ja?'Alinhamento de volta ao automático.':'Alinhamento atualizado.');
     return;
   }
   if(b.classList.contains('thm-auto')){ /* a área inteira volta ao automático */

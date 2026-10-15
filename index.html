@@ -256,12 +256,12 @@ body.cat-mode .shell{display:none}
 .cf-list{list-style:none;margin:12px 0 0;padding:0;display:grid;gap:9px;justify-items:center}
 .cf-list li{display:flex;align-items:center;justify-content:center;gap:9px;min-width:0;font-size:.9rem;color:var(--foot-text,var(--muted))}
 .cf-list li[hidden]{display:none}
-.cf-list svg{width:17px;height:17px;flex:none;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.cf-list svg{width:17px;height:17px;flex:none;stroke:var(--foot-ic,currentColor);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .cf-list a{color:var(--foot-link,var(--ink));font-weight:500;text-decoration:none;overflow-wrap:anywhere}
 .cf-list a:hover,.cf-list a:focus-visible{color:var(--accent-text);text-decoration:underline}
 .cf-social{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
 /* os ícones usam a mesma linguagem dos botões do cabeçalho (.ib) e seguem a cor dos ícones do cabeçalho */
-.cf-ic{background:var(--foot-icon-bg,var(--track));color:var(--foot-icon,var(--ink));text-decoration:none;transition:background .16s ease,color .16s ease,border-color .16s ease,transform .16s ease}
+.cf-ic{background:var(--foot-icon-bg,var(--track));border-color:var(--foot-icon-line,var(--line));color:var(--foot-icon,var(--ink));text-decoration:none;transition:background .16s ease,color .16s ease,border-color .16s ease,transform .16s ease}
 .cf-ic:hover,.cf-ic:focus-visible{background:var(--foot-icon-on-bg,var(--accent));border-color:var(--foot-icon-on-bg,var(--accent));color:var(--foot-icon-on-ink,var(--accent-ink))}
 .cf-ic:active{transform:scale(.94)}
 .cf-legal{margin:22px 0 0;padding-top:18px;border-top:1px solid var(--foot-line,var(--line));font-size:.82rem;color:var(--foot-legal,var(--muted));line-height:1.5;text-align:center}
@@ -736,7 +736,7 @@ body.cart-open #btt{right:calc(var(--drawer) + 20px)}
         <div class="seg" id="ctRadius"><button type="button" data-r="sharp" style="border-radius:2px">Reto</button><button type="button" data-r="rounded">Arredondado</button></div>
       </div>
       <div class="w">
-        <p class="sub thm-note">Aqui você personaliza <b>cada detalhe</b> do catálogo, separado em <b>Modo claro</b> e <b>Modo escuro</b>, em 11 áreas com 108 campos por modo: <b>Base</b> (Fundo, Cartões, Texto, Destaque, Linhas, Texto secundário), <b>Cabeçalho</b> (fundo, título/nome da loja, ícones, fundo e borda dos ícones, quantidade), <b>Seção inicial</b> (cor e opacidade da sombra sobre a imagem de fundo, cor, alinhamento e tamanho do título e da descrição), <b>Pesquisa e filtro</b> (fundo, borda e texto da barra, lupa, ícone de filtro com fundo e borda, e a janela de opções), <b>Seção Categorias</b> (título, setas com fundo e borda, cards, nome e gradientes das pontas do carrossel), <b>Produtos</b> (fundo, borda, nome, preço do card; ícones de carrinho/coração com fundo, borda e cor de preenchimento quando usados), <b>Página do produto</b> (fotos, opções, quantidade), <b>Rodapé</b>, <b>Carrinho</b>, <b>Botões comuns</b> e <b>Avisos</b>. Toque no nome da área para abrir. Em <b>Automático</b> cada detalhe segue a <b>Base</b> e o contraste é ajustado sozinho para continuar legível; use ↺ para devolver um detalhe ao automático, ou <b>Automático</b> na área inteira. Na <b>Seção inicial</b>, o alinhamento/cor/tamanho valem para o título e a descrição e, no alinhamento, tocar no botão já marcado devolve ao automático; o tamanho escolhido é o máximo no computador e o catálogo mantém a proporção no celular. A sombra só aparece quando a seção inicial usa uma imagem de fundo; o fundo da seção inicial (gradiente) segue a cor escolhida em "Cabeçalho e seção inicial".</p>
+        <p class="sub thm-note">Aqui você personaliza <b>cada detalhe</b> do catálogo, separado em <b>Modo claro</b> e <b>Modo escuro</b>, em 11 áreas com 110 campos por modo: <b>Base</b> (Fundo, Cartões, Texto, Destaque, Linhas, Texto secundário), <b>Cabeçalho</b> (fundo, título/nome da loja, ícones, fundo e borda dos ícones, quantidade), <b>Seção inicial</b> (cor e opacidade da sombra sobre a imagem de fundo, cor, alinhamento e tamanho do título e da descrição), <b>Pesquisa e filtro</b> (fundo, borda e texto da barra, lupa, ícone de filtro com fundo e borda, e a janela de opções), <b>Seção Categorias</b> (título, setas com fundo e borda, cards, nome e gradientes das pontas do carrossel), <b>Produtos</b> (fundo, borda, nome, preço do card; ícones de carrinho/coração com fundo, borda e cor de preenchimento quando usados), <b>Página do produto</b> (fotos, opções, quantidade), <b>Rodapé</b> (fundo, linhas, título, contatos com links e ícones, ícones das redes sociais com fundo e borda, direitos reservados), <b>Carrinho</b>, <b>Botões comuns</b> e <b>Avisos</b>. Toque no nome da área para abrir. Em <b>Automático</b> cada detalhe segue a <b>Base</b> e o contraste é ajustado sozinho para continuar legível; use ↺ para devolver um detalhe ao automático, ou <b>Automático</b> na área inteira. Na <b>Seção inicial</b>, o alinhamento/cor/tamanho valem para o título e a descrição e, no alinhamento, tocar no botão já marcado devolve ao automático; o tamanho escolhido é o máximo no computador e o catálogo mantém a proporção no celular. A sombra só aparece quando a seção inicial usa uma imagem de fundo; o fundo da seção inicial (gradiente) segue a cor escolhida em "Cabeçalho e seção inicial".</p>
         <div id="ctGroups"></div>
       </div>
     </div>
@@ -2557,8 +2557,18 @@ var SECTS=[
    ['pp-chip-on-bg','Opção escolhida — fundo'],['pp-chip-on-ink','Opção escolhida — texto'],
    ['pp-qty-bg','Quantidade — fundo'],['pp-qty-ink','Quantidade — texto'],['pp-qty-line','Quantidade — borda']]},
  {k:'foot',n:'Rodapé',s:[
-   ['foot-bg','Fundo'],['foot-line','Linhas'],['foot-name','Nome da loja'],['foot-text','Contatos e textos'],['foot-link','Links'],
-   ['foot-icon','Ícones das redes'],['foot-icon-bg','Ícones — fundo'],['foot-icon-on-bg','Ícone tocado — fundo'],['foot-icon-on-ink','Ícone tocado — ícone'],['foot-legal','Direitos reservados']]},
+   ['foot-bg','Fundo'],
+   ['foot-line','Linhas'],
+   ['foot-name','Título (nome da loja)'],
+   ['foot-text','Contatos (e-mail e telefone)'],
+   ['foot-link','Contatos — links'],
+   ['foot-ic','Ícones de contato (e-mail e telefone)'],
+   ['foot-icon','Ícones das redes sociais'],
+   ['foot-icon-bg','Fundo dos ícones sociais'],
+   ['foot-icon-line','Borda dos ícones sociais'],
+   ['foot-icon-on-bg','Ícone social tocado — fundo'],
+   ['foot-icon-on-ink','Ícone social tocado — ícone'],
+   ['foot-legal','Direitos reservados']]},
  {k:'cart',n:'Carrinho (lateral)',s:[
    ['cart-bg','Fundo'],['cart-ink','Texto'],['cart-title','Título'],['cart-line','Linhas e bordas'],['cart-muted','Textos secundários'],
    ['cart-total','Total'],['cart-btn','Botão finalizar — fundo'],['cart-btn-ink','Botão finalizar — texto'],
@@ -2679,8 +2689,9 @@ function catVars(t){
   var footBg=R('foot-bg',surface),footName=R('foot-name',autoInk(footBg,ink)),footOnBg=R('foot-icon-on-bg',accent);
   o['foot-bg']=footBg;o['foot-line']=R('foot-line',cMix(footBg,ink,.12));o['foot-name']=footName;
   o['foot-text']=R('foot-text',cMix(footName,footBg,.45));o['foot-link']=R('foot-link',footName);
+  o['foot-ic']=R('foot-ic',o['foot-text']); /* ícones de e-mail/telefone: padrão segue o texto dos contatos */
   o['foot-icon']=R('foot-icon',headIcon); /* padrão: segue a cor dos ícones do cabeçalho */
-  o['foot-icon-bg']=R('foot-icon-bg',track);
+  o['foot-icon-bg']=R('foot-icon-bg',track);o['foot-icon-line']=R('foot-icon-line',line);
   o['foot-icon-on-bg']=footOnBg;o['foot-icon-on-ink']=R('foot-icon-on-ink',autoInk(footOnBg,aInk));
   o['foot-legal']=R('foot-legal',cMix(footName,footBg,.45));
   /* carrinho lateral */

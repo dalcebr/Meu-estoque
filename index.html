@@ -378,6 +378,11 @@ body.cart-open #toast.on{transform:translateX(50%)}
 .cdrawer .btn.main{background:var(--cart-btn,var(--accent));border-color:var(--cart-btn,var(--accent));color:var(--cart-btn-ink,var(--accent-ink))}
 .cdrawer .qty{background:var(--cart-qty-bg,var(--cart-bg,var(--surface)));border-color:var(--cart-qty-line,var(--cart-line,var(--line)));color:var(--cart-qty-ink,var(--cart-ink,var(--ink)))}
 .cdrawer .linerm{color:var(--cart-rm,var(--bad))}
+/* botão fechar (X) do carrinho e botão esvaziar: cores próprias da aba */
+.cdrawer .cd-head .ib{background:var(--cart-close-bg,var(--surface));border-color:var(--cart-close-line,var(--line));color:var(--cart-close-ink,var(--ink))}
+.cdrawer #catCartClear{background:var(--cart-clear-bg,var(--surface));border-color:var(--cart-clear-line,var(--line));color:var(--cart-clear-ink,var(--ink))}
+/* foto ausente nos itens do carrinho */
+.cdrawer .noimg{background:var(--cart-img-bg,var(--track));color:var(--cart-muted,var(--muted))}
 /* botões comuns (voltar, fechar, esvaziar carrinho, limpar filtro) */
 #catPage .btn:not(.main),.cdrawer .btn:not(.main),#catFiltDlg .btn:not(.main){background:var(--btn-bg,var(--surface));border-color:var(--btn-line,var(--line));color:var(--btn-ink,var(--ink))}
 @media (max-width:380px){.cd-item{grid-template-columns:56px minmax(0,1fr)}.cd-img{width:56px;height:56px}.cd-line{grid-column:2;justify-self:start}}
@@ -736,7 +741,7 @@ body.cart-open #btt{right:calc(var(--drawer) + 20px)}
         <div class="seg" id="ctRadius"><button type="button" data-r="sharp" style="border-radius:2px">Reto</button><button type="button" data-r="rounded">Arredondado</button></div>
       </div>
       <div class="w">
-        <p class="sub thm-note">Aqui você personaliza <b>cada detalhe</b> do catálogo, separado em <b>Modo claro</b> e <b>Modo escuro</b>, em 12 áreas com 112 campos por modo: <b>Geral</b> (cor de fundo da página e o botão “voltar ao início” — seta e fundo), <b>Base</b> (Cartões, Texto, Destaque, Linhas, Texto secundário), <b>Cabeçalho</b> (fundo, título/nome da loja, ícones, fundo e borda dos ícones, quantidade), <b>Seção inicial</b> (cor e opacidade da sombra sobre a imagem de fundo, cor, alinhamento e tamanho do título e da descrição), <b>Pesquisa e filtro</b> (fundo, borda e texto da barra, lupa, ícone de filtro com fundo e borda, e a janela de opções), <b>Seção Categorias</b> (título, setas com fundo e borda, cards, nome e gradientes das pontas do carrossel), <b>Produtos</b> (fundo, borda, nome, preço do card; ícones de carrinho/coração com fundo, borda e cor de preenchimento quando usados), <b>Página do produto</b> (fotos, opções, quantidade), <b>Rodapé</b> (fundo, linhas, título, contatos com links e ícones, ícones das redes sociais com fundo e borda, direitos reservados), <b>Carrinho</b>, <b>Botões comuns</b> e <b>Avisos</b>. Toque no nome da área para abrir. Em <b>Automático</b> cada detalhe segue a <b>Base</b> e o contraste é ajustado sozinho para continuar legível; use ↺ para devolver um detalhe ao automático, ou <b>Automático</b> na área inteira. Na <b>Seção inicial</b>, o alinhamento/cor/tamanho valem para o título e a descrição e, no alinhamento, tocar no botão já marcado devolve ao automático; o tamanho escolhido é o máximo no computador e o catálogo mantém a proporção no celular. A sombra só aparece quando a seção inicial usa uma imagem de fundo; o fundo da seção inicial (gradiente) segue a cor escolhida em "Cabeçalho e seção inicial".</p>
+        <p class="sub thm-note">Aqui você personaliza <b>cada detalhe</b> do catálogo, separado em <b>Modo claro</b> e <b>Modo escuro</b>, em 12 áreas com 119 campos por modo: <b>Geral</b> (cor de fundo da página e o botão “voltar ao início” — seta e fundo), <b>Base</b> (Cartões, Texto, Destaque, Linhas, Texto secundário), <b>Cabeçalho</b> (fundo, título/nome da loja, ícones, fundo e borda dos ícones, quantidade), <b>Seção inicial</b> (cor e opacidade da sombra sobre a imagem de fundo, cor, alinhamento e tamanho do título e da descrição), <b>Pesquisa e filtro</b> (fundo, borda e texto da barra, lupa, ícone de filtro com fundo e borda, e a janela de opções), <b>Seção Categorias</b> (título, setas com fundo e borda, cards, nome e gradientes das pontas do carrossel), <b>Produtos</b> (fundo, borda, nome, preço do card; ícones de carrinho/coração com fundo, borda e cor de preenchimento quando usados), <b>Página do produto</b> (fotos, opções, quantidade), <b>Rodapé</b> (fundo, linhas, título, contatos com links e ícones, ícones das redes sociais com fundo e borda, direitos reservados), <b>Carrinho (aba lateral)</b> (fundo, título, textos, total, quantidade, botões finalizar/esvaziar/fechar/remover e o fundo escurecido) e <b>Botões comuns</b> e <b>Avisos</b>. Toque no nome da área para abrir. Em <b>Automático</b> cada detalhe segue a <b>Base</b> e o contraste é ajustado sozinho para continuar legível; use ↺ para devolver um detalhe ao automático, ou <b>Automático</b> na área inteira. Na <b>Seção inicial</b>, o alinhamento/cor/tamanho valem para o título e a descrição e, no alinhamento, tocar no botão já marcado devolve ao automático; o tamanho escolhido é o máximo no computador e o catálogo mantém a proporção no celular. A sombra só aparece quando a seção inicial usa uma imagem de fundo; o fundo da seção inicial (gradiente) segue a cor escolhida em "Cabeçalho e seção inicial".</p>
         <div id="ctGroups"></div>
       </div>
     </div>
@@ -2573,11 +2578,27 @@ var SECTS=[
    ['foot-icon-on-bg','Ícone social tocado — fundo'],
    ['foot-icon-on-ink','Ícone social tocado — ícone'],
    ['foot-legal','Direitos reservados']]},
- {k:'cart',n:'Carrinho (lateral)',s:[
-   ['cart-bg','Fundo'],['cart-ink','Texto'],['cart-title','Título'],['cart-line','Linhas e bordas'],['cart-muted','Textos secundários'],
-   ['cart-total','Total'],['cart-btn','Botão finalizar — fundo'],['cart-btn-ink','Botão finalizar — texto'],
-   ['cart-qty-bg','Quantidade — fundo'],['cart-qty-ink','Quantidade — texto'],['cart-qty-line','Quantidade — borda'],
-   ['cart-rm','Botão remover (lixeira)'],['cart-scrim','Fundo escurecido atrás']]},
+ {k:'cart',n:'Carrinho (aba lateral)',s:[
+   ['cart-bg','Fundo (aba de carrinho)'],
+   ['cart-ink','Texto'],
+   ['cart-title','Título'],
+   ['cart-line','Linhas e bordas'],
+   ['cart-muted','Textos secundários'],
+   ['cart-total','Total'],
+   ['cart-img-bg','Foto ausente — fundo'],
+   ['cart-qty-bg','Quantidade — fundo'],
+   ['cart-qty-ink','Quantidade — texto'],
+   ['cart-qty-line','Quantidade — borda'],
+   ['cart-btn','Botão finalizar compra — fundo'],
+   ['cart-btn-ink','Botão finalizar compra — texto'],
+   ['cart-clear-bg','Botão esvaziar — fundo'],
+   ['cart-clear-ink','Botão esvaziar — texto'],
+   ['cart-clear-line','Botão esvaziar — borda'],
+   ['cart-close-bg','Botão fechar (X) — fundo'],
+   ['cart-close-ink','Botão fechar (X) — ícone'],
+   ['cart-close-line','Botão fechar (X) — borda'],
+   ['cart-rm','Botão remover (lixeira)'],
+   ['cart-scrim','Fundo escurecido atrás']]},
  {k:'buttons',n:'Botões comuns (Voltar, Fechar, Esvaziar, Limpar filtro)',s:[
    ['btn-bg','Fundo'],['btn-ink','Texto e ícone'],['btn-line','Borda']]},
  {k:'toast',n:'Avisos (toast)',s:[['toast-bg','Fundo'],['toast-ink','Texto']]}
@@ -2603,7 +2624,9 @@ function cRatio(a,b){
 function autoInk(bg,pref){
   if(!/^#[0-9a-f]{6}$/i.test(bg||'')||!/^#[0-9a-f]{6}$/i.test(pref||''))return pref;
   if(cRatio(bg,pref)>=4.5)return pref;
-  return cLum(bg)>.5?'#10131C':'#ECEEF5';
+  /* entre escuro e claro, escolhe o que dá mais contraste (ex.: fundo vermelho pede texto escuro) */
+  var dark='#10131C',light='#ECEEF5';
+  return cRatio(bg,light)>=cRatio(bg,dark)?light:dark;
 }
 /* derive secondary colors from palette */
 function derivePal(p){
@@ -2709,6 +2732,12 @@ function catVars(t){
   o['cart-qty-bg']=R('cart-qty-bg',cartBg);o['cart-qty-ink']=R('cart-qty-ink',autoInk(cartBg,ink));
   o['cart-qty-line']=R('cart-qty-line',cMix(cartBg,cartInk,.12));o['cart-rm']=R('cart-rm',pal.bad);
   o['cart-scrim']=cRgba(R('cart-scrim','#05070c'),.55);
+  /* botões próprios do carrinho: fechar (X) e esvaziar; padrão segue os botões comuns de hoje */
+  o['cart-img-bg']=R('cart-img-bg',track);
+  var ctCloseBg=R('cart-close-bg',surface);
+  o['cart-close-bg']=ctCloseBg;o['cart-close-ink']=R('cart-close-ink',autoInk(ctCloseBg,ink));o['cart-close-line']=R('cart-close-line',line);
+  var ctClearBg=R('cart-clear-bg',R('btn-bg',surface));
+  o['cart-clear-bg']=ctClearBg;o['cart-clear-ink']=R('cart-clear-ink',R('btn-ink',autoInk(surface,ink)));o['cart-clear-line']=R('cart-clear-line',R('btn-line',line));
   /* botões comuns */
   o['btn-bg']=R('btn-bg',surface);o['btn-ink']=R('btn-ink',autoInk(surface,ink));o['btn-line']=R('btn-line',line);
   /* janela de filtros */

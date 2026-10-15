@@ -317,7 +317,7 @@ body.cat-mode #toast{background:var(--toast-bg,var(--ink));color:var(--toast-ink
 #catPage .mc .price b{color:var(--prod-price,inherit)}
 #catPage .noimg{background:var(--prod-img-bg,var(--track));color:var(--prod-muted,var(--muted))}
 #catPage .mc .acts2 .ib{background:var(--prod-icon-bg,var(--surface));border-color:var(--prod-icon-line,var(--line));color:var(--prod-icon,var(--prod-ink));font-family:inherit}
-#catPage .mc .acts2 .ib[aria-pressed="true"]{background:var(--soft);border-color:var(--accent);color:var(--accent-text)}
+#catPage .mc .acts2 .ib[aria-pressed="true"]{background:var(--prod-icon-on-bg,var(--soft));border-color:var(--prod-icon-on-line,var(--accent));color:var(--prod-icon-on,var(--accent-text))}
 .pp{display:grid;gap:20px;margin-top:14px}
 @media (min-width:700px){.pp{grid-template-columns:1fr 1fr;align-items:start}}
 .pp-main{display:block;width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:22px;border:1px solid var(--line);background:var(--track)}
@@ -477,7 +477,7 @@ body.cart-open #toast.on{transform:translateX(50%)}
 @keyframes pop{0%{transform:scale(1)}50%{transform:scale(1.28)}100%{transform:scale(1)}}
 .pop{animation:pop .32s ease}
 /* D: flash ao adicionar ao carrinho */
-.flash{background:var(--accent)!important;color:var(--accent-ink)!important;transition:background .15s,color .15s}
+.flash{background:var(--prod-icon-on-bg,var(--accent))!important;border-color:var(--prod-icon-on-line,var(--accent))!important;color:var(--prod-icon-on,var(--accent-ink))!important;transition:background .15s,color .15s}
 /* E: faixa de preço no filtro */
 .price-range{display:grid;gap:10px;grid-template-columns:1fr 1fr;margin-top:14px}
 .price-range input{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:12px;background:var(--bg);min-height:44px;font:inherit}
@@ -731,7 +731,7 @@ body.cart-open #btt{right:calc(var(--drawer) + 20px)}
         <div class="seg" id="ctRadius"><button type="button" data-r="sharp" style="border-radius:2px">Reto</button><button type="button" data-r="rounded">Arredondado</button></div>
       </div>
       <div class="w">
-        <p class="sub thm-note">Aqui você personaliza <b>cada detalhe</b> do catálogo, separado em <b>Modo claro</b> e <b>Modo escuro</b>, em 11 áreas com 105 campos por modo: <b>Base</b> (Fundo, Cartões, Texto, Destaque, Linhas, Texto secundário), <b>Cabeçalho</b> (fundo, título/nome da loja, ícones, fundo e borda dos ícones, quantidade), <b>Seção inicial</b> (cor e opacidade da sombra sobre a imagem de fundo, cor, alinhamento e tamanho do título e da descrição), <b>Pesquisa e filtro</b> (fundo, borda e texto da barra, lupa, ícone de filtro com fundo e borda, e a janela de opções), <b>Seção Categorias</b> (título, setas com fundo e borda, cards, nome e gradientes das pontas do carrossel), <b>Produtos</b> (cartões, preços, ícones), <b>Página do produto</b> (fotos, opções, quantidade), <b>Rodapé</b>, <b>Carrinho</b>, <b>Botões comuns</b> e <b>Avisos</b>. Toque no nome da área para abrir. Em <b>Automático</b> cada detalhe segue a <b>Base</b> e o contraste é ajustado sozinho para continuar legível; use ↺ para devolver um detalhe ao automático, ou <b>Automático</b> na área inteira. Na <b>Seção inicial</b>, o alinhamento/cor/tamanho valem para o título e a descrição e, no alinhamento, tocar no botão já marcado devolve ao automático; o tamanho escolhido é o máximo no computador e o catálogo mantém a proporção no celular. A sombra só aparece quando a seção inicial usa uma imagem de fundo; o fundo da seção inicial (gradiente) segue a cor escolhida em "Cabeçalho e seção inicial".</p>
+        <p class="sub thm-note">Aqui você personaliza <b>cada detalhe</b> do catálogo, separado em <b>Modo claro</b> e <b>Modo escuro</b>, em 11 áreas com 108 campos por modo: <b>Base</b> (Fundo, Cartões, Texto, Destaque, Linhas, Texto secundário), <b>Cabeçalho</b> (fundo, título/nome da loja, ícones, fundo e borda dos ícones, quantidade), <b>Seção inicial</b> (cor e opacidade da sombra sobre a imagem de fundo, cor, alinhamento e tamanho do título e da descrição), <b>Pesquisa e filtro</b> (fundo, borda e texto da barra, lupa, ícone de filtro com fundo e borda, e a janela de opções), <b>Seção Categorias</b> (título, setas com fundo e borda, cards, nome e gradientes das pontas do carrossel), <b>Produtos</b> (fundo, borda, nome, preço do card; ícones de carrinho/coração com fundo, borda e cor de preenchimento quando usados), <b>Página do produto</b> (fotos, opções, quantidade), <b>Rodapé</b>, <b>Carrinho</b>, <b>Botões comuns</b> e <b>Avisos</b>. Toque no nome da área para abrir. Em <b>Automático</b> cada detalhe segue a <b>Base</b> e o contraste é ajustado sozinho para continuar legível; use ↺ para devolver um detalhe ao automático, ou <b>Automático</b> na área inteira. Na <b>Seção inicial</b>, o alinhamento/cor/tamanho valem para o título e a descrição e, no alinhamento, tocar no botão já marcado devolve ao automático; o tamanho escolhido é o máximo no computador e o catálogo mantém a proporção no celular. A sombra só aparece quando a seção inicial usa uma imagem de fundo; o fundo da seção inicial (gradiente) segue a cor escolhida em "Cabeçalho e seção inicial".</p>
         <div id="ctGroups"></div>
       </div>
     </div>
@@ -2496,9 +2496,19 @@ var SECTS=[
    ['cc-name','Nome (da categoria)'],
    ['cc-fade','Gradientes (nas pontas do carrossel)']]},
  {k:'prods',n:'Todos os produtos',s:[
-   ['prod-card','Card — fundo'],['prod-line','Card — borda'],['prod-name','Nome do produto'],['prod-ink','Texto'],['prod-price','Preço'],
-   ['prod-muted','Texto “a partir de” / sem foto'],['prod-img-bg','Foto ausente — fundo'],
-   ['prod-icon','Ícones (carrinho/favorito)'],['prod-icon-bg','Ícones — fundo'],['prod-icon-line','Ícones — borda']]},
+   ['prod-card','Fundo de card (foto, valor e nome do produto)'],
+   ['prod-line','Card — borda'],
+   ['prod-name','Nome do produto'],
+   ['prod-ink','Texto'],
+   ['prod-price','Preço'],
+   ['prod-muted','Texto “a partir de” / sem foto'],
+   ['prod-img-bg','Foto ausente — fundo'],
+   ['prod-icon','Ícones dos cards (carrinho e coração)'],
+   ['prod-icon-bg','Fundo de ícones'],
+   ['prod-icon-line','Borda de ícones'],
+   ['prod-icon-on','Cor de preenchimento (ícone usado)'],
+   ['prod-icon-on-bg','Fundo do ícone usado'],
+   ['prod-icon-on-line','Borda do ícone usado']]},
  {k:'pp',n:'Página do produto',s:[
    ['pp-title','Título'],['pp-price','Preço'],['pp-desc','Descrição'],['pp-img-bg','Fotos — fundo'],
    ['pp-icon','Ícones (carrinho/favorito)'],['pp-icon-bg','Ícones — fundo'],['pp-icon-line','Ícones — borda'],
@@ -2609,6 +2619,11 @@ function catVars(t){
   o['prod-ink']=R('prod-ink',prodName);o['prod-price']=R('prod-price',prodName);
   o['prod-muted']=R('prod-muted',cMix(prodName,prodCard,.45));o['prod-img-bg']=R('prod-img-bg',track);
   o['prod-icon']=R('prod-icon',prodName);o['prod-icon-bg']=R('prod-icon-bg',prodCard);o['prod-icon-line']=R('prod-icon-line',cMix(prodCard,ink,.12));
+  /* ícone usado (carrinho/coração preenchido): cor de preenchimento, fundo e borda.
+     padrões idênticos ao visual anterior (--accent-text / --soft / --accent) */
+  var dk=(t||root.getAttribute('data-theme'))==='dark';
+  var aText=dk?cMix(accent,'#ffffff',.42):cMix(accent,'#000000',.18),aSoft=cMix(accent,surface,.89);
+  o['prod-icon-on']=R('prod-icon-on',aText);o['prod-icon-on-bg']=R('prod-icon-on-bg',aSoft);o['prod-icon-on-line']=R('prod-icon-on-line',accent);
   /* página do produto */
   o['pp-title']=R('pp-title',autoInk(bg,ink));o['pp-price']=R('pp-price',autoInk(bg,ink));o['pp-desc']=R('pp-desc',muted);
   o['pp-img-bg']=R('pp-img-bg',track);o['pp-img-line']=R('pp-img-line',line);

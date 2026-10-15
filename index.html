@@ -488,8 +488,8 @@ body.cart-open #btt{right:calc(var(--drawer) + 20px)}
 /* H: gradientes laterais no carrossel de categorias */
 .cc-track-wrap{position:relative}
 .cc-track-wrap::before,.cc-track-wrap::after{content:'';position:absolute;top:0;bottom:12px;width:32px;z-index:1;pointer-events:none}
-.cc-track-wrap::before{left:0;background:linear-gradient(to right,var(--bg),transparent)}
-.cc-track-wrap::after{right:0;background:linear-gradient(to left,var(--bg),transparent)}
+.cc-track-wrap::before{left:0;background:linear-gradient(to right,var(--cc-fade,var(--bg)),transparent)}
+.cc-track-wrap::after{right:0;background:linear-gradient(to left,var(--cc-fade,var(--bg)),transparent)}
 .cc-track-wrap.at-start::before{opacity:0}.cc-track-wrap.at-end::after{opacity:0}
 /* H: setas de categoria sempre 44px */
 .cc-nav .ib{width:44px;height:44px}
@@ -731,7 +731,7 @@ body.cart-open #btt{right:calc(var(--drawer) + 20px)}
         <div class="seg" id="ctRadius"><button type="button" data-r="sharp" style="border-radius:2px">Reto</button><button type="button" data-r="rounded">Arredondado</button></div>
       </div>
       <div class="w">
-        <p class="sub thm-note">Aqui você personaliza <b>cada detalhe</b> do catálogo, separado em <b>Modo claro</b> e <b>Modo escuro</b>, em 12 áreas com 104 campos por modo: <b>Base</b> (Fundo, Cartões, Texto, Destaque, Linhas, Texto secundário), <b>Cabeçalho</b> (fundo, título/nome da loja, ícones, fundo e borda dos ícones, quantidade), <b>Seção inicial</b> (cor e opacidade da sombra sobre a imagem de fundo, cor, alinhamento e tamanho do título e da descrição), <b>Busca e filtro</b>, <b>Categorias</b>, <b>Produtos</b>, <b>Página do produto</b> (fotos, opções, quantidade), <b>Rodapé</b>, <b>Carrinho</b>, <b>Botões comuns</b>, <b>Janela de filtros</b> e <b>Avisos</b>. Toque no nome da área para abrir. Em <b>Automático</b> cada detalhe segue a <b>Base</b> e o contraste é ajustado sozinho para continuar legível; use ↺ para devolver um detalhe ao automático, ou <b>Automático</b> na área inteira. Na <b>Seção inicial</b>, o alinhamento/cor/tamanho valem para o título e a descrição e, no alinhamento, tocar no botão já marcado devolve ao automático; o tamanho escolhido é o máximo no computador e o catálogo mantém a proporção no celular. A sombra só aparece quando a seção inicial usa uma imagem de fundo; o fundo da seção inicial (gradiente) segue a cor escolhida em "Cabeçalho e seção inicial".</p>
+        <p class="sub thm-note">Aqui você personaliza <b>cada detalhe</b> do catálogo, separado em <b>Modo claro</b> e <b>Modo escuro</b>, em 12 áreas com 105 campos por modo: <b>Base</b> (Fundo, Cartões, Texto, Destaque, Linhas, Texto secundário), <b>Cabeçalho</b> (fundo, título/nome da loja, ícones, fundo e borda dos ícones, quantidade), <b>Seção inicial</b> (cor e opacidade da sombra sobre a imagem de fundo, cor, alinhamento e tamanho do título e da descrição), <b>Busca e filtro</b>, <b>Seção Categorias</b> (título, setas com fundo e borda, cards, nome e gradientes das pontas do carrossel), <b>Produtos</b>, <b>Página do produto</b> (fotos, opções, quantidade), <b>Rodapé</b>, <b>Carrinho</b>, <b>Botões comuns</b>, <b>Janela de filtros</b> e <b>Avisos</b>. Toque no nome da área para abrir. Em <b>Automático</b> cada detalhe segue a <b>Base</b> e o contraste é ajustado sozinho para continuar legível; use ↺ para devolver um detalhe ao automático, ou <b>Automático</b> na área inteira. Na <b>Seção inicial</b>, o alinhamento/cor/tamanho valem para o título e a descrição e, no alinhamento, tocar no botão já marcado devolve ao automático; o tamanho escolhido é o máximo no computador e o catálogo mantém a proporção no celular. A sombra só aparece quando a seção inicial usa uma imagem de fundo; o fundo da seção inicial (gradiente) segue a cor escolhida em "Cabeçalho e seção inicial".</p>
         <div id="ctGroups"></div>
       </div>
     </div>
@@ -2487,9 +2487,17 @@ var SECTS=[
    ['srch-ic','Campo de busca — ícone da lupa'],['srch-line','Campo de busca — borda'],
    ['filt-btn-bg','Botão de filtro — fundo'],['filt-btn-ic','Botão de filtro — ícone'],['filt-btn-line','Botão de filtro — borda'],
    ['filt-dot','Botão de filtro — ponto de aviso']]},
- {k:'cats',n:'Categorias',s:[
-   ['cc-title','Título da seção'],['cc-card','Card — fundo'],['cc-line','Card — borda'],['cc-name','Nome da categoria'],
-   ['cc-ph-bg','Imagem do card — fundo'],['cc-ph-ink','Sigla (categoria sem foto)'],['cc-nav-bg','Setas — fundo'],['cc-nav-ic','Setas — ícone'],['cc-nav-line','Setas — borda']]},
+ {k:'cats',n:'Seção Categorias',s:[
+   ['cc-title','Título de seção (e o nome Categorias)'],
+   ['cc-nav-ic','Ícones (setas de esquerda e direita)'],
+   ['cc-nav-bg','Fundo de ícones (setas)'],
+   ['cc-nav-line','Borda de ícones (setas)'],
+   ['cc-card','Cards (foto e nome da categoria) — fundo'],
+   ['cc-line','Cards — borda'],
+   ['cc-ph-bg','Foto do card — fundo'],
+   ['cc-ph-ink','Sigla (categoria sem foto)'],
+   ['cc-name','Nome (da categoria)'],
+   ['cc-fade','Gradientes (nas pontas do carrossel)']]},
  {k:'prods',n:'Todos os produtos',s:[
    ['prod-card','Card — fundo'],['prod-line','Card — borda'],['prod-name','Nome do produto'],['prod-ink','Texto'],['prod-price','Preço'],
    ['prod-muted','Texto “a partir de” / sem foto'],['prod-img-bg','Foto ausente — fundo'],
@@ -2600,6 +2608,7 @@ function catVars(t){
   var ccCard=R('cc-card',surface),ccName=R('cc-name',autoInk(ccCard,ink));
   o['cc-title']=R('cc-title',autoInk(bg,ink));o['cc-card']=ccCard;o['cc-line']=R('cc-line',cMix(ccCard,ink,.12));
   o['cc-name']=ccName;o['cc-ph-bg']=R('cc-ph-bg',track);o['cc-ph-ink']=R('cc-ph-ink',cMix(ccName,ccCard,.45));
+  o['cc-fade']=R('cc-fade',bg); /* gradiente das pontas do carrossel: cor → transparente */
   o['cc-nav-bg']=R('cc-nav-bg',ccCard);o['cc-nav-ic']=R('cc-nav-ic',ccName);o['cc-nav-line']=R('cc-nav-line',cMix(ccCard,ink,.12));
   /* produtos */
   var prodCard=R('prod-card',surface),prodName=R('prod-name',autoInk(prodCard,ink));

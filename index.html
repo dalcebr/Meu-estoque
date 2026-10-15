@@ -417,6 +417,11 @@ body.cart-open #toast.on{transform:translateX(50%)}
 .thm-seg .thm-a[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
 .thm-rg{flex:1;min-width:90px;height:34px;accent-color:var(--accent)}
 .thm-val{flex:none;min-width:62px;text-align:right;font-size:.78rem;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums}
+/* prévia do catálogo dentro de "Aparência do catálogo" */
+.ct-prev{margin-top:18px;padding-top:16px;border-top:1px solid var(--line)}
+.ct-prev-h{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.ct-prev-h .lbl{margin:0}
+#ctPrev{display:block;width:100%;height:min(70vh,520px);border:1px solid var(--line);border-radius:16px;background:var(--surface)}
 .thm-gh{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
 .thm-gh .lbl{margin:0;font-size:.78rem;font-weight:800;color:var(--muted);letter-spacing:.05em;text-transform:uppercase}
 .thm-auto{border:1px solid var(--line);background:var(--surface);color:var(--muted);font-size:.74rem;font-weight:700;padding:5px 11px;border-radius:99px;min-height:32px}
@@ -734,6 +739,17 @@ body.cart-open #btt{right:calc(var(--drawer) + 20px)}
         <p class="sub thm-note">Aqui você personaliza <b>cada detalhe</b> do catálogo, separado em <b>Modo claro</b> e <b>Modo escuro</b>, em 11 áreas com 108 campos por modo: <b>Base</b> (Fundo, Cartões, Texto, Destaque, Linhas, Texto secundário), <b>Cabeçalho</b> (fundo, título/nome da loja, ícones, fundo e borda dos ícones, quantidade), <b>Seção inicial</b> (cor e opacidade da sombra sobre a imagem de fundo, cor, alinhamento e tamanho do título e da descrição), <b>Pesquisa e filtro</b> (fundo, borda e texto da barra, lupa, ícone de filtro com fundo e borda, e a janela de opções), <b>Seção Categorias</b> (título, setas com fundo e borda, cards, nome e gradientes das pontas do carrossel), <b>Produtos</b> (fundo, borda, nome, preço do card; ícones de carrinho/coração com fundo, borda e cor de preenchimento quando usados), <b>Página do produto</b> (fotos, opções, quantidade), <b>Rodapé</b>, <b>Carrinho</b>, <b>Botões comuns</b> e <b>Avisos</b>. Toque no nome da área para abrir. Em <b>Automático</b> cada detalhe segue a <b>Base</b> e o contraste é ajustado sozinho para continuar legível; use ↺ para devolver um detalhe ao automático, ou <b>Automático</b> na área inteira. Na <b>Seção inicial</b>, o alinhamento/cor/tamanho valem para o título e a descrição e, no alinhamento, tocar no botão já marcado devolve ao automático; o tamanho escolhido é o máximo no computador e o catálogo mantém a proporção no celular. A sombra só aparece quando a seção inicial usa uma imagem de fundo; o fundo da seção inicial (gradiente) segue a cor escolhida em "Cabeçalho e seção inicial".</p>
         <div id="ctGroups"></div>
       </div>
+    </div>
+    <div class="ct-prev">
+      <div class="ct-prev-h">
+        <span class="lbl">Prévia do catálogo</span>
+        <span style="display:flex;gap:8px;flex-wrap:wrap">
+          <button type="button" class="btn sm" id="ctPrevOpen">Abrir em nova aba</button>
+          <button type="button" class="btn sm" id="ctPrevBtn">Atualizar prévia</button>
+        </span>
+      </div>
+      <iframe id="ctPrev" title="Prévia do catálogo" loading="lazy"></iframe>
+      <p class="sub" style="margin:8px 0 0">Mostra o catálogo como o cliente vê. As cores mudam aqui na hora; se não mudar, toque em "Atualizar prévia".</p>
     </div>
     <div class="acts" style="margin-top:14px"><button type="button" class="btn" id="ctReset">Restaurar padrão</button></div>
   </section>
@@ -1080,7 +1096,7 @@ function show(v){
   $('v-home').hidden=v!=='home';$('v-prod').hidden=v!=='products';$('v-stock').hidden=v!=='stock';$('v-sales').hidden=v!=='sales';$('v-clients').hidden=v!=='clients';$('v-reports').hidden=v!=='reports';$('v-catalog').hidden=v!=='catalog';
   $('title').textContent={home:'Início',products:'Produtos',stock:'Estoque',sales:'Vendas',clients:'Clientes',reports:'Relatórios',catalog:'Catálogo'}[v];
   document.querySelectorAll('.nav[data-view]').forEach(function(b){b.setAttribute('aria-current',b.dataset.view===v?'page':'false')});
-  scrollTo(0,0);if(v==='products')showList();if(v==='stock')drawStock();if(v==='sales')drawSales();if(v==='clients')drawClients();if(v==='reports')drawReports();if(v==='catalog')drawCatalogCfg();
+  scrollTo(0,0);if(v==='products')showList();if(v==='stock')drawStock();if(v==='sales')drawSales();if(v==='clients')drawClients();if(v==='reports')drawReports();if(v==='catalog'){drawCatalogCfg();loadCatPrev()}
 }
 document.querySelectorAll('.nav[data-view]').forEach(function(b){b.addEventListener('click',function(){show(b.dataset.view)})});
 /* lista */
@@ -1282,7 +1298,7 @@ idb().then(function(){return Promise.all([kvGet('products'),kvGet('moves'),kvGet
   if(Array.isArray(r[1]))M=r[1];
   if(Array.isArray(r[2]))S=r[2];
   if(Array.isArray(r[3]))CLI=r[3];
-  if(r[4]&&typeof r[4]==='object')CAT=Object.assign({store:'',title:'',desc:'',heroMode:'color',heroColor:null,heroImg:null,whats:'',email:'',tel:'',insta:'',face:'',tiktok:'',theme:null},r[4]);
+  if(r[4]&&typeof r[4]==='object')CAT=Object.assign({},CAT_DEF,r[4]);
   if(Array.isArray(r[5]))PRE=r[5];else if(r[5]==null){PRE=seedPre();kvSet('presets',PRE)}
   window.__loaded=true; /* B: dados carregados — skeletons desaparecem */
   syncStock();syncSales();render();
@@ -1290,7 +1306,7 @@ idb().then(function(){return Promise.all([kvGet('products'),kvGet('moves'),kvGet
   if(!$('v-sales').hidden)drawSales();
   if(!$('v-clients').hidden)drawClients();
   if(!$('v-reports').hidden)drawReports();
-  if(!$('v-catalog').hidden)drawCatalogCfg();
+  if(!$('v-catalog').hidden){drawCatalogCfg();loadCatPrev()}
   if(CATALOG){catReadState();drawCatalogPage()}else checkPedidoLink();
 });
 
@@ -1952,6 +1968,15 @@ document.querySelectorAll('#v-reports [data-dl]').forEach(function(b){b.onclick=
 
 /* ===== Catálogo ===== */
 var CAT={store:'',title:'',desc:'',heroMode:'color',heroColor:null,heroImg:null,whats:'',email:'',tel:'',insta:'',face:'',tiktok:'',theme:null},CATALOG=/[?&]catalogo(=|&|$)/.test(location.search),catT,DEBOUNCE=150;
+var CAT_DEF={store:'',title:'',desc:'',heroMode:'color',heroColor:null,heroImg:null,whats:'',email:'',tel:'',insta:'',face:'',tiktok:'',theme:null};
+/* canal para avisar o catálogo aberto em outra aba/na prévia que a aparência mudou */
+var CAT_BC=null;try{if(window.BroadcastChannel)CAT_BC=new BroadcastChannel('meu-estoque-catalogo')}catch(e){CAT_BC=null}
+var CATPREV=/[?&]previa=/.test(location.search); /* true quando está na prévia da aba Catálogo */
+function catRevPing(mode){
+  var rev=String(Date.now());
+  try{localStorage.setItem('cat_rev',JSON.stringify({t:Date.now(),mode:mode||''}))}catch(e){try{localStorage.setItem('cat_rev',rev)}catch(e2){}}
+  if(CAT_BC){try{CAT_BC.postMessage({cat:1,mode:mode||''})}catch(e){}}
+}
 function catalogUrl(){return location.href.split('#')[0].split('?')[0]+'?catalogo'}
 function catName(){return(CAT.store||'').trim()||'Catálogo'}
 function inkFor(c){var n=parseInt(c.slice(1),16),l=(0.299*(n>>16)+0.587*(n>>8&255)+0.114*(n&255))/255;return l>0.62?'#10131C':'#fff'}
@@ -2004,6 +2029,14 @@ function drawCatalogCfg(){
   if(CAT.heroImg)$('catImgPrev').src=blobUrl(CAT.heroImg);
   drawThemeCfg();
 }
+/* ===== prévia do catálogo dentro da aba Catálogo ===== */
+function loadCatPrev(force){
+  var f=$('ctPrev');if(!f||CATALOG)return;
+  if(f.src&&!force)return;
+  f.src=catalogUrl()+(catalogUrl().indexOf('?')>=0?'&':'?')+'previa='+Date.now();
+}
+$('ctPrevBtn').onclick=function(){loadCatPrev(true);toast('Prévia atualizada.')};
+$('ctPrevOpen').onclick=function(){var url=catalogUrl();Promise.resolve(saveCat(true)).then(function(){window.open(url,'_blank','noopener')})};
 $('catBgMode').onclick=function(e){var b=e.target.closest('button');if(!b)return;CAT.heroMode=b.dataset.m;saveCat();drawCatalogCfg()};
 $('catSw').onclick=function(e){var b=e.target.closest('button');if(!b)return;CAT.heroColor=b.dataset.c;$('catColor').value=b.dataset.c;markCatSw();saveCat()};
 $('catSw').oninput=function(e){if(e.target.id==='catColor'){CAT.heroColor=e.target.value;markCatSw();saveCat()}};
@@ -2056,13 +2089,20 @@ function initCatCollapse(){
 }
 initCatCollapse();
 $('catTheme').onclick=function(){var t=root.getAttribute('data-theme')==='dark'?'light':'dark';root.setAttribute('data-theme',t);set('tema_cat',t);applyCatTheme(t)};
-function saveCat(now){
+function saveCat(now,mode){
   clearTimeout(catT);
-  var go=function(){return kvSet('catalog',CAT).then(function(){$('catSaved').textContent='Alterações salvas.'})};
-  if(now)return go();catT=setTimeout(go,DEBOUNCE);
+  var go=function(){return kvSet('catalog',CAT).then(function(){
+    var s=$('catSaved');if(s)s.textContent='Alterações salvas.';
+    catRevPing(mode); /* avisa o catálogo aberto (outra aba ou a prévia) */
+  })};
+  if(now)return go();
+  return new Promise(function(r){catT=setTimeout(function(){go().then(function(){r()},function(){r()})},DEBOUNCE)});
 }
 ['store','title','desc','whats','email','tel','insta','face','tiktok'].forEach(function(k){$('cat-'+k).oninput=function(){CAT[k]=this.value;$('catSaved').textContent='Salvando…';saveCat();if(k!=='title'&&k!=='desc')drawCatFoot()}});
-$('catOpen').onclick=function(){saveCat(true);window.open(catalogUrl(),'_blank','noopener')};
+$('catOpen').onclick=function(){
+  var url=catalogUrl();
+  Promise.resolve(saveCat(true)).then(function(){window.open(url,'_blank','noopener')});
+};
 function legacyCopy(){var i=$('catUrl');i.focus();i.select();try{return document.execCommand('copy')}catch(e){return false}}
 $('catCopy').onclick=function(){
   var done=function(ok){toast(ok?'Link do catálogo copiado.':'Não foi possível copiar. Selecione o link e copie manualmente.')};
@@ -2847,7 +2887,7 @@ $('ctGroups').addEventListener('input',function(e){
     var g=f.closest('.thm-grp');f.classList.add('own');if(g)g.classList.add('own');
     if(inp.type==='range'){var out=f.querySelector('.thm-val');if(out)out.textContent=rangeLabel(inp)}
   }
-  saveCat();applyCatTheme();
+  saveCat(false,mode);applyCatTheme();
 });
 $('ctGroups').addEventListener('change',function(e){
   var inp=e.target.closest('input');if(!inp)return;
@@ -2859,21 +2899,21 @@ $('ctGroups').addEventListener('click',function(e){
   var mode=b.dataset.mode;
   if(b.classList.contains('thm-rst')){ /* um detalhe volta ao automático */
     ensureTheme();if(CAT.theme.secs[mode])delete CAT.theme.secs[mode][b.dataset.k];
-    saveCat();applyCatTheme();syncThemeGroups();toast('Detalhe de volta ao automático.');
+    saveCat(false,mode);applyCatTheme();syncThemeGroups();toast('Detalhe de volta ao automático.');
     return;
   }
   if(b.classList.contains('thm-a')){ /* alinhamento: escolhe ou volta ao automático tocando de novo */
     ensureTheme();CAT.theme.secs[mode]=CAT.theme.secs[mode]||{};
     var ak=b.dataset.k,ja=CAT.theme.secs[mode][ak]===b.dataset.v;
     if(ja)delete CAT.theme.secs[mode][ak];else CAT.theme.secs[mode][ak]=b.dataset.v;
-    saveCat();applyCatTheme();syncThemeGroups();
+    saveCat(false,mode);applyCatTheme();syncThemeGroups();
     toast(ja?'Alinhamento de volta ao automático.':'Alinhamento atualizado.');
     return;
   }
   if(b.classList.contains('thm-auto')){ /* a área inteira volta ao automático */
     ensureTheme();CAT.theme.secs[mode]=CAT.theme.secs[mode]||{};
     (SECTS.filter(function(g){return g.k===b.dataset.sec})[0]||{s:[]}).s.forEach(function(x){delete CAT.theme.secs[mode][x[0]]});
-    saveCat();applyCatTheme();syncThemeGroups();toast('Área restaurada para Automático.');
+    saveCat(false,mode);applyCatTheme();syncThemeGroups();toast('Área restaurada para Automático.');
     return;
   }
   if(b.dataset.all!=null){ /* abrir/recolher todas as áreas de um modo */
@@ -2891,12 +2931,11 @@ $('ctGroups').addEventListener('click',function(e){
     CAT_COL_SECS[mode+':'+grp.dataset.sec]=on;catColSave();
   }
 });
-$('ct-hf').onchange=function(){ensureTheme();CAT.theme.headFont=this.value;loadFont(this.value);saveCat();applyCatTheme()};
-$('ct-bf').onchange=function(){ensureTheme();CAT.theme.bodyFont=this.value;loadFont(this.value);saveCat();applyCatTheme()};
+$('ct-hf').onchange=function(){ensureTheme();CAT.theme.headFont=this.value;loadFont(this.value);saveCat(false,'');applyCatTheme()};
+$('ct-bf').onchange=function(){ensureTheme();CAT.theme.bodyFont=this.value;loadFont(this.value);saveCat(false,'');applyCatTheme()};
 $('ctRadius').onclick=function(e){var b=e.target.closest('button');if(!b)return;ensureTheme();CAT.theme.radius=b.dataset.r;
-  document.querySelectorAll('#ctRadius button').forEach(function(x){x.setAttribute('aria-pressed',x.dataset.r===b.dataset.r)});saveCat();applyCatTheme()};
+  document.querySelectorAll('#ctRadius button').forEach(function(x){x.setAttribute('aria-pressed',x.dataset.r===b.dataset.r)});saveCat(false,'');applyCatTheme()};
 $('ctReset').onclick=function(){CAT.theme=null;saveCat();drawThemeCfg();applyCatTheme();toast('Aparência restaurada ao padrão.')};
-/* G: botão voltar ao topo — aparece após 400px de scroll */
 (function(){
   const btt=$('btt');if(!btt)return;
   btt.onclick=function(){scrollTo({top:0,behavior:'smooth'})};
@@ -2908,6 +2947,25 @@ $('ctReset').onclick=function(){CAT.theme=null;saveCat();drawThemeCfg();applyCat
 })();
 /* hook theme into catalog rendering and theme toggle */
 if(CATALOG)drawCatalogPage();
+/* catálogo aberto (aba, janela ou prévia): recarrega sozinho quando a aparência é salva no estoque */
+if(CATALOG){
+  var aplicarRev=function(mode){
+    idb().then(function(){return kvGet('catalog')}).then(function(c){
+      if(!c||typeof c!=='object')return;
+      if(JSON.stringify(c)===JSON.stringify(CAT)&&!mode)return; /* nada mudou */
+      CAT=Object.assign({},CAT_DEF,c);
+      drawCatalogPage(); /* redesenha com o tema novo */
+      if(CATPREV&&mode){applyCatTheme(mode);toast('Vendo o modo '+(mode==='dark'?'escuro':'claro')+'.')} /* prévia segue o modo que você edita */
+    }).catch(function(){});
+  };
+  if(CAT_BC)CAT_BC.onmessage=function(ev){var d=ev&&ev.data;aplicarRev(d&&d.mode||'')};
+  window.addEventListener('storage',function(e){
+    if(e.key!=='cat_rev')return;
+    var m='';try{m=(JSON.parse(e.newValue)||{}).mode||''}catch(err){}
+    aplicarRev(m);
+  });
+  window.addEventListener('focus',function(){aplicarRev('')});
+}
 </script>
 </body>
 </html>

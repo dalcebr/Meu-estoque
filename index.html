@@ -731,7 +731,7 @@ body.cart-open #btt{right:calc(var(--drawer) + 20px)}
         <div class="seg" id="ctRadius"><button type="button" data-r="sharp" style="border-radius:2px">Reto</button><button type="button" data-r="rounded">Arredondado</button></div>
       </div>
       <div class="w">
-        <p class="sub thm-note">Aqui você personaliza <b>cada detalhe</b> do catálogo, separado em <b>Modo claro</b> e <b>Modo escuro</b>, em 12 áreas com 105 campos por modo: <b>Base</b> (Fundo, Cartões, Texto, Destaque, Linhas, Texto secundário), <b>Cabeçalho</b> (fundo, título/nome da loja, ícones, fundo e borda dos ícones, quantidade), <b>Seção inicial</b> (cor e opacidade da sombra sobre a imagem de fundo, cor, alinhamento e tamanho do título e da descrição), <b>Busca e filtro</b>, <b>Seção Categorias</b> (título, setas com fundo e borda, cards, nome e gradientes das pontas do carrossel), <b>Produtos</b>, <b>Página do produto</b> (fotos, opções, quantidade), <b>Rodapé</b>, <b>Carrinho</b>, <b>Botões comuns</b>, <b>Janela de filtros</b> e <b>Avisos</b>. Toque no nome da área para abrir. Em <b>Automático</b> cada detalhe segue a <b>Base</b> e o contraste é ajustado sozinho para continuar legível; use ↺ para devolver um detalhe ao automático, ou <b>Automático</b> na área inteira. Na <b>Seção inicial</b>, o alinhamento/cor/tamanho valem para o título e a descrição e, no alinhamento, tocar no botão já marcado devolve ao automático; o tamanho escolhido é o máximo no computador e o catálogo mantém a proporção no celular. A sombra só aparece quando a seção inicial usa uma imagem de fundo; o fundo da seção inicial (gradiente) segue a cor escolhida em "Cabeçalho e seção inicial".</p>
+        <p class="sub thm-note">Aqui você personaliza <b>cada detalhe</b> do catálogo, separado em <b>Modo claro</b> e <b>Modo escuro</b>, em 11 áreas com 105 campos por modo: <b>Base</b> (Fundo, Cartões, Texto, Destaque, Linhas, Texto secundário), <b>Cabeçalho</b> (fundo, título/nome da loja, ícones, fundo e borda dos ícones, quantidade), <b>Seção inicial</b> (cor e opacidade da sombra sobre a imagem de fundo, cor, alinhamento e tamanho do título e da descrição), <b>Pesquisa e filtro</b> (fundo, borda e texto da barra, lupa, ícone de filtro com fundo e borda, e a janela de opções), <b>Seção Categorias</b> (título, setas com fundo e borda, cards, nome e gradientes das pontas do carrossel), <b>Produtos</b> (cartões, preços, ícones), <b>Página do produto</b> (fotos, opções, quantidade), <b>Rodapé</b>, <b>Carrinho</b>, <b>Botões comuns</b> e <b>Avisos</b>. Toque no nome da área para abrir. Em <b>Automático</b> cada detalhe segue a <b>Base</b> e o contraste é ajustado sozinho para continuar legível; use ↺ para devolver um detalhe ao automático, ou <b>Automático</b> na área inteira. Na <b>Seção inicial</b>, o alinhamento/cor/tamanho valem para o título e a descrição e, no alinhamento, tocar no botão já marcado devolve ao automático; o tamanho escolhido é o máximo no computador e o catálogo mantém a proporção no celular. A sombra só aparece quando a seção inicial usa uma imagem de fundo; o fundo da seção inicial (gradiente) segue a cor escolhida em "Cabeçalho e seção inicial".</p>
         <div id="ctGroups"></div>
       </div>
     </div>
@@ -832,11 +832,9 @@ body.cart-open #btt{right:calc(var(--drawer) + 20px)}
 <dialog id="catFiltDlg">
   <form method="dialog">
     <h2>Filtrar e ordenar</h2>
-    <p class="sub" style="margin:6px 0 0">Escolha como os produtos aparecem na lista.</p>
+    <p class="sub" style="margin:6px 0 0">Escolha uma opção. A lista muda na hora.</p>
     <div class="fopts" id="catFiltOpts"></div>
-    <span class="lbl" style="margin:18px 0 6px">Faixa de preço</span>
-    <div class="price-range"><input type="number" id="filtMin" min="0" step="0.01" inputmode="decimal" placeholder="Mínimo"><input type="number" id="filtMax" min="0" step="0.01" inputmode="decimal" placeholder="Máximo"></div>
-    <div class="dlg-actions" style="margin-top:12px"><button type="button" class="btn" data-clear>Limpar filtro</button><button type="button" class="btn main" data-apply>Aplicar</button></div>
+    <div class="dlg-actions" style="margin-top:12px"><button type="button" class="btn" data-clear>Limpar filtro</button></div>
   </form>
 </dialog>
 
@@ -2078,8 +2076,8 @@ $('catShare').onclick=function(){
 };
 /* página pública do catálogo: vitrine, favoritos, página do produto e carrinho lateral */
 window.__loaded=false; /* B: flag de carregamento — true quando o IndexedDB responder */
-var catSt={q:'',cq:'',cat:'',sort:'',minPrice:null,maxPrice:null},pp={id:null,sel:{},qty:1,img:0},cdFocus=null;
-var SORTS=[['','Padrão'],['low','Menor preço'],['high','Maior preço'],['sold','Mais vendidos'],['new','Novidades']];
+var catSt={q:'',cq:'',cat:'',sort:''},pp={id:null,sel:{},qty:1,img:0},cdFocus=null;
+var SORTS=[['low','Menor preço'],['high','Maior preço'],['sold','Mais vendidos'],['new','Mais recentes'],['old','Mais antigos']];
 function jget(k,d){try{return JSON.parse(get(k))||d}catch(e){return d}}
 var FAV=jget('cat_fav',[]),CART=jget('cat_cart',[]);
 var ICON_HEART='<svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>';
@@ -2118,20 +2116,12 @@ function gridClick(e){
 }
 /* B: skeletons enquanto o IndexedDB carrega */
 function skeletonHtml(n){let h='';for(let i=0;i<n;i++)h+='<div class="card pc skeleton"><div class="sk-img"></div><div class="sk-line"></div><div class="sk-line short"></div></div>';return h}
-/* E: filtro de preço — helper */
-function priceFilter(L){
-  const mn=catSt.minPrice,mx=catSt.maxPrice;
-  if(mn!=null||mx!=null)L=L.filter(function(p){const pr=minPrice(p);return(mn==null||pr>=mn)&&(mx==null||pr<=mx)});
-  return L;
-}
-/* F: serializa estado na URL após # */
+/* filtro/ordenação — só a ordenação escolhida no pop-up */
 function catPushState(){
   if(!CATALOG)return;
   const params=new URLSearchParams();
   if(catSt.q)params.set('q',catSt.q);
   if(catSt.sort)params.set('sort',catSt.sort);
-  if(catSt.minPrice!=null)params.set('min',catSt.minPrice);
-  if(catSt.maxPrice!=null)params.set('max',catSt.maxPrice);
   const qs=params.toString();
   const base=location.hash.split('?')[0]||'';
   try{history.replaceState(null,'',location.pathname+location.search+(base||'#')+(qs?'?'+qs:''))}catch(e){}
@@ -2141,9 +2131,7 @@ function catReadState(){
     const m=location.hash.match(/\?(.+)$/);if(!m)return;
     const sp=new URLSearchParams(m[1]);
     if(sp.has('q')){catSt.q=sp.get('q');$('catQ').value=catSt.q}
-    if(sp.has('sort'))catSt.sort=sp.get('sort');
-    if(sp.has('min'))catSt.minPrice=parseFloat(sp.get('min'))||null;
-    if(sp.has('max'))catSt.maxPrice=parseFloat(sp.get('max'))||null;
+    if(sp.has('sort')&&SORTS.some(function(s){return s[0]===sp.get('sort')}))catSt.sort=sp.get('sort');
   }catch(e){}
 }
 /* vitrine — inclui esgotados com overlay (I) */
@@ -2152,10 +2140,10 @@ function drawCatList(){
   if(!window.__loaded){$('catGrid').innerHTML=skeletonHtml(6);return}
   var all=P.slice(); /* todos os produtos, incluindo esgotados */
   catSt.cats=Array.from(new Set(all.filter(function(p){return p.stock>0}).map(function(p){return(p.cat||'').trim()}).filter(Boolean))).sort(function(a,b){return a.localeCompare(b,'pt-BR')});
-  const hasFilter=!!(catSt.sort||catSt.minPrice!=null||catSt.maxPrice!=null);
+  const hasFilter=!!catSt.sort;
   $('catDot').hidden=!hasFilter;
   var q=catSt.q.trim().toLowerCase();
-  var L=priceFilter(sortList(all.filter(function(p){return!q||(p.name+' '+(p.cat||'')+' '+(p.desc||'')).toLowerCase().indexOf(q)>=0}),catSt.sort));
+  var L=sortList(all.filter(function(p){return!q||(p.name+' '+(p.cat||'')+' '+(p.desc||'')).toLowerCase().indexOf(q)>=0}),catSt.sort);
   $('catCount').textContent=plural(L.length,'produto','produtos');
   $('catGrid').innerHTML=L.length?L.map(cardHtml).join(''):'<div class="card empty" style="grid-column:1/-1">'+(all.length?'Nenhum produto encontrado.':'Em breve, novos produtos por aqui.')+'</div>';
   updateBadges();catPushState();
@@ -2164,10 +2152,10 @@ function drawCatList(){
 function drawCatPage(){
   var cat=catSt.cat,all=P.filter(function(p){return(p.cat||'').trim()===cat});
   $('catCatTitle').textContent=cat||'Categoria';
-  const hasFilter=!!(catSt.sort||catSt.minPrice!=null||catSt.maxPrice!=null);
+  const hasFilter=!!catSt.sort;
   $('catCdot').hidden=!hasFilter;
   var q=catSt.cq.trim().toLowerCase();
-  var L=priceFilter(sortList(all.filter(function(p){return!q||(p.name+' '+(p.sku||'')+' '+(p.desc||'')).toLowerCase().indexOf(q)>=0}),catSt.sort));
+  var L=sortList(all.filter(function(p){return!q||(p.name+' '+(p.sku||'')+' '+(p.desc||'')).toLowerCase().indexOf(q)>=0}),catSt.sort);
   $('catCCount').textContent=plural(L.length,'produto','produtos');
   /* K: categoria vazia → mensagem + botão "Ver todos os produtos" */
   $('catCatGrid').innerHTML=L.length?L.map(cardHtml).join(''):'<div class="card empty" style="grid-column:1/-1">'+(all.length?'Nenhum produto encontrado.':'Nenhum produto nesta categoria.<br><br><button type="button" class="btn main" onclick="location.hash=\'\'">Ver todos os produtos</button>')+'</div>';
@@ -2193,6 +2181,7 @@ function sortList(L,sort){
   else if(sort==='high')L.sort(function(a,b){return minPrice(b)-minPrice(a)});
   else if(sort==='sold'){var m=soldUnits();L.sort(function(a,b){return(m[b.id]||0)-(m[a.id]||0)})}
   else if(sort==='new')L.sort(function(a,b){return regTime(b)-regTime(a)});
+  else if(sort==='old')L.sort(function(a,b){return regTime(a)-regTime(b)});
   return L;
 }
 function redrawCat(){
@@ -2205,26 +2194,22 @@ function openFilt(btn){
   filtFocus=btn||document.activeElement;
   if(filtFocus&&filtFocus.setAttribute)filtFocus.setAttribute('aria-expanded','true');
   $('catFiltOpts').innerHTML=SORTS.map(function(s){return'<button type="button" class="fopt" data-sort="'+s[0]+'" aria-pressed="'+(catSt.sort===s[0])+'"><span>'+s[1]+'</span>'+ICON_CHECK+'</button>'}).join('');
-  /* E: preenche inputs de preço com valores atuais */
-  $('filtMin').value=catSt.minPrice!=null?catSt.minPrice:'';
-  $('filtMax').value=catSt.maxPrice!=null?catSt.maxPrice:'';
   $('catFiltDlg').showModal();
 }
 $('catFilterBtn').onclick=function(){openFilt(this)};
 $('catCfilterBtn').onclick=function(){openFilt(this)};
+/* escolher uma opção aplica na hora; tocar de novo nela desmarca */
+$('catFiltOpts').onclick=function(e){
+  var b=e.target.closest('[data-sort]');if(!b)return;
+  catSt.sort=catSt.sort===b.dataset.sort?'':b.dataset.sort;
+  $('catFiltDlg').close();redrawCat();
+  if(catSt.sort)toast('Ordenado por '+b.querySelector('span').textContent.toLowerCase()+'.');
+};
 $('catFiltDlg').onclick=function(e){
-  var b=e.target.closest('[data-sort]');
-  if(b){catSt.sort=b.dataset.sort;
-    /* marca visualmente */
-    $('catFiltOpts').querySelectorAll('.fopt').forEach(function(f){f.setAttribute('aria-pressed',f.dataset.sort===catSt.sort)});
-    return}
-  /* E: botão Aplicar — lê preço e fecha */
-  if(e.target.closest('[data-apply]')){
-    const mn=parseFloat($('filtMin').value),mx=parseFloat($('filtMax').value);
-    catSt.minPrice=isNaN(mn)?null:mn;
-    catSt.maxPrice=isNaN(mx)?null:mx;
-    this.close();redrawCat();return}
-  if(e.target.closest('[data-clear]')){catSt.sort='';catSt.minPrice=null;catSt.maxPrice=null;this.close();redrawCat();return}
+  if(e.target.closest('[data-clear]')){
+    catSt.sort='';
+    this.close();redrawCat();toast('Filtro limpo.');
+  }
 };
 $('catFiltDlg').addEventListener('close',function(){
   ['catFilterBtn','catCfilterBtn'].forEach(function(id){$(id).setAttribute('aria-expanded','false')});
@@ -2482,11 +2467,23 @@ var SECTS=[
    ['hero-desc','Descrição — cor'],
    ['hero-desc-align','Descrição — alinhamento','align'],
    ['hero-desc-size','Descrição — tamanho','range',{min:.7,max:2.2,step:.05,def:1.05,unit:'rem'}]]},
- {k:'search',n:'Busca e botão de filtro',s:[
-   ['srch-bg','Campo de busca — fundo'],['srch-ink','Campo de busca — texto digitado'],['srch-ph','Campo de busca — texto de exemplo'],
-   ['srch-ic','Campo de busca — ícone da lupa'],['srch-line','Campo de busca — borda'],
-   ['filt-btn-bg','Botão de filtro — fundo'],['filt-btn-ic','Botão de filtro — ícone'],['filt-btn-line','Botão de filtro — borda'],
-   ['filt-dot','Botão de filtro — ponto de aviso']]},
+ {k:'search',n:'Pesquisa e filtro',s:[
+   ['srch-bg','Barra — fundo'],
+   ['srch-line','Barra — borda'],
+   ['srch-ink','Barra — texto'],
+   ['srch-ph','Barra — texto de exemplo'],
+   ['srch-ic','Ícone de lupa'],
+   ['filt-btn-ic','Ícone de filtro'],
+   ['filt-btn-bg','Ícone de filtro — fundo'],
+   ['filt-btn-line','Ícone de filtro — borda'],
+   ['filt-dot','Ícone de filtro — ponto de aviso'],
+   ['filt-bg','Opções — fundo da janela'],
+   ['filt-ink','Opções — texto da janela'],
+   ['filt-line','Opções — borda da janela'],
+   ['filt-opt-bg','Opções — fundo'],
+   ['filt-opt-ink','Opções — texto'],
+   ['filt-opt-on-bg','Opção selecionada — fundo'],
+   ['filt-opt-on-ink','Opção selecionada — texto']]},
  {k:'cats',n:'Seção Categorias',s:[
    ['cc-title','Título de seção (e o nome Categorias)'],
    ['cc-nav-ic','Ícones (setas de esquerda e direita)'],
@@ -2519,10 +2516,6 @@ var SECTS=[
    ['cart-rm','Botão remover (lixeira)'],['cart-scrim','Fundo escurecido atrás']]},
  {k:'buttons',n:'Botões comuns (Voltar, Fechar, Esvaziar, Limpar filtro)',s:[
    ['btn-bg','Fundo'],['btn-ink','Texto e ícone'],['btn-line','Borda']]},
- {k:'filt',n:'Janela de filtros e ordenação',s:[
-   ['filt-bg','Fundo'],['filt-ink','Texto'],['filt-line','Bordas'],
-   ['filt-opt-bg','Opção — fundo'],['filt-opt-ink','Opção — texto'],
-   ['filt-opt-on-bg','Opção marcada — fundo'],['filt-opt-on-ink','Opção marcada — texto']]},
  {k:'toast',n:'Avisos (toast)',s:[['toast-bg','Fundo'],['toast-ink','Texto']]}
 ];
 function thm(){return CAT.theme||THEME_DEF}

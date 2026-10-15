@@ -218,6 +218,8 @@ body.cat-mode .shell{display:none}
 /* botões do cabeçalho (carrinho, favoritos, modo claro/escuro) */
 .cat-head .ib{background:var(--head-icon-bg,var(--surface));border-color:var(--head-icon-line,var(--line));color:var(--head-icon,var(--ink))}
 .cat-head .ib .badge{background:var(--head-badge,var(--accent));color:var(--head-badge-ink,var(--accent-ink));border-color:var(--head-icon-bg,var(--surface))}
+/* ícone ativo (coração marcado) mantém as cores escolhidas para o cabeçalho */
+.cat-head .ib[aria-pressed="true"]{background:var(--head-icon-bg,var(--surface));border-color:var(--head-icon-line,var(--line));color:var(--head-icon,var(--ink))}
 .cat-bar{max-width:1180px;margin:0 auto;display:flex;align-items:center;gap:8px 10px;min-width:0}
 .cat-bar #catStore{flex:1;min-width:0;font-weight:800;font-size:1.15rem;letter-spacing:-.01em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .cat-prev{display:block;width:100%;max-width:420px;aspect-ratio:16/6;border-radius:16px;border:1px solid var(--line);object-fit:cover;background:var(--track);margin-bottom:10px}
@@ -720,7 +722,7 @@ body.cart-open #btt{right:calc(var(--drawer) + 20px)}
         <div class="seg" id="ctRadius"><button type="button" data-r="sharp" style="border-radius:2px">Reto</button><button type="button" data-r="rounded">Arredondado</button></div>
       </div>
       <div class="w">
-        <p class="sub thm-note">Aqui você personaliza <b>cada detalhe</b> do catálogo, separado em <b>Modo claro</b> e <b>Modo escuro</b>, em 12 áreas com 101 campos por modo: <b>Base</b> (Fundo, Cartões, Texto, Destaque, Linhas, Texto secundário), <b>Cabeçalho</b> (fundo, nome da loja, linha, ícones e seus botões, contador), <b>Seção inicial</b> (as duas cores do gradiente, título, descrição, sombra sobre a imagem), <b>Busca e filtro</b>, <b>Categorias</b>, <b>Produtos</b>, <b>Página do produto</b> (fotos, opções, quantidade), <b>Rodapé</b>, <b>Carrinho</b>, <b>Botões comuns</b>, <b>Janela de filtros</b> e <b>Avisos</b>. Toque no nome da área para abrir. Em <b>Automático</b> cada detalhe segue a <b>Base</b> e o contraste é ajustado sozinho para continuar legível; use ↺ para devolver um detalhe ao automático, ou <b>Automático</b> na área inteira. A cor de "Cabeçalho e seção inicial" é o padrão do gradiente.</p>
+        <p class="sub thm-note">Aqui você personaliza <b>cada detalhe</b> do catálogo, separado em <b>Modo claro</b> e <b>Modo escuro</b>, em 12 áreas com 101 campos por modo: <b>Base</b> (Fundo, Cartões, Texto, Destaque, Linhas, Texto secundário), <b>Cabeçalho</b> (fundo, título/nome da loja, ícones, fundo e borda dos ícones, quantidade), <b>Seção inicial</b> (as duas cores do gradiente, título, descrição, sombra sobre a imagem), <b>Busca e filtro</b>, <b>Categorias</b>, <b>Produtos</b>, <b>Página do produto</b> (fotos, opções, quantidade), <b>Rodapé</b>, <b>Carrinho</b>, <b>Botões comuns</b>, <b>Janela de filtros</b> e <b>Avisos</b>. Toque no nome da área para abrir. Em <b>Automático</b> cada detalhe segue a <b>Base</b> e o contraste é ajustado sozinho para continuar legível; use ↺ para devolver um detalhe ao automático, ou <b>Automático</b> na área inteira. A cor de "Cabeçalho e seção inicial" é o padrão do gradiente.</p>
         <div id="ctGroups"></div>
       </div>
     </div>
@@ -2454,9 +2456,14 @@ var SECTS=[
    ['bg','Fundo da página'],['surface','Cartões e painéis'],['ink','Texto'],['muted','Texto secundário'],
    ['accent','Destaque'],['line','Linhas e bordas'],['track','Fundos suaves (miniaturas)'],['sec-title','Títulos de página (Favoritos/Categoria)']]},
  {k:'header',n:'Cabeçalho',s:[
-   ['head-bg','Fundo'],['head-title','Nome da loja'],['head-line','Linha inferior'],
-   ['head-icon','Cor dos ícones'],['head-icon-bg','Botões — fundo'],['head-icon-line','Botões — borda'],
-   ['head-badge','Contador do carrinho/favoritos — fundo'],['head-badge-ink','Contador — texto']]},
+   ['head-bg','Fundo'],
+   ['head-title','Título (e o nome da loja)'],
+   ['head-icon','Ícones (carrinho, coração, lua/sol)'],
+   ['head-icon-bg','Fundo de ícones'],
+   ['head-icon-line','Bordas de ícones'],
+   ['head-badge-ink','Texto de quantidade'],
+   ['head-badge','Fundo de quantidade'],
+   ['head-line','Linha inferior do cabeçalho']]},
  {k:'hero',n:'Seção inicial',s:[
    ['hero-bg','Gradiente — cor 1'],['hero-bg2','Gradiente — cor 2'],['hero-title','Título'],['hero-desc','Descrição'],
    ['hero-overlay','Sombra sobre a imagem de fundo']]},

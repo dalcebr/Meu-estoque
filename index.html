@@ -487,7 +487,7 @@ body.cart-open #toast.on{transform:translateX(50%)}
 .price-range{display:grid;gap:10px;grid-template-columns:1fr 1fr;margin-top:14px}
 .price-range input{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:12px;background:var(--bg);min-height:44px;font:inherit}
 /* G: botão voltar ao topo */
-#btt{position:fixed;bottom:calc(env(safe-area-inset-bottom,0px) + 20px);right:20px;z-index:6;width:44px;height:44px;border-radius:50%;border:0;background:var(--accent);color:var(--accent-ink);font-size:1.2rem;font-weight:800;box-shadow:0 4px 16px rgba(0,0,0,.18);opacity:0;visibility:hidden;transition:opacity .2s,visibility .2s,right .25s;cursor:pointer}
+#btt{position:fixed;bottom:calc(env(safe-area-inset-bottom,0px) + 20px);right:20px;z-index:6;width:44px;height:44px;border-radius:50%;border:0;background:var(--btt-bg,var(--accent));color:var(--btt-ink,var(--accent-ink));font-size:1.2rem;font-weight:800;box-shadow:0 4px 16px rgba(0,0,0,.18);opacity:0;visibility:hidden;transition:opacity .2s,visibility .2s,right .25s;cursor:pointer}
 #btt.on{opacity:1;visibility:visible}
 body.cart-open #btt{right:calc(var(--drawer) + 20px)}
 /* H: gradientes laterais no carrossel de categorias */
@@ -736,7 +736,7 @@ body.cart-open #btt{right:calc(var(--drawer) + 20px)}
         <div class="seg" id="ctRadius"><button type="button" data-r="sharp" style="border-radius:2px">Reto</button><button type="button" data-r="rounded">Arredondado</button></div>
       </div>
       <div class="w">
-        <p class="sub thm-note">Aqui você personaliza <b>cada detalhe</b> do catálogo, separado em <b>Modo claro</b> e <b>Modo escuro</b>, em 11 áreas com 110 campos por modo: <b>Base</b> (Fundo, Cartões, Texto, Destaque, Linhas, Texto secundário), <b>Cabeçalho</b> (fundo, título/nome da loja, ícones, fundo e borda dos ícones, quantidade), <b>Seção inicial</b> (cor e opacidade da sombra sobre a imagem de fundo, cor, alinhamento e tamanho do título e da descrição), <b>Pesquisa e filtro</b> (fundo, borda e texto da barra, lupa, ícone de filtro com fundo e borda, e a janela de opções), <b>Seção Categorias</b> (título, setas com fundo e borda, cards, nome e gradientes das pontas do carrossel), <b>Produtos</b> (fundo, borda, nome, preço do card; ícones de carrinho/coração com fundo, borda e cor de preenchimento quando usados), <b>Página do produto</b> (fotos, opções, quantidade), <b>Rodapé</b> (fundo, linhas, título, contatos com links e ícones, ícones das redes sociais com fundo e borda, direitos reservados), <b>Carrinho</b>, <b>Botões comuns</b> e <b>Avisos</b>. Toque no nome da área para abrir. Em <b>Automático</b> cada detalhe segue a <b>Base</b> e o contraste é ajustado sozinho para continuar legível; use ↺ para devolver um detalhe ao automático, ou <b>Automático</b> na área inteira. Na <b>Seção inicial</b>, o alinhamento/cor/tamanho valem para o título e a descrição e, no alinhamento, tocar no botão já marcado devolve ao automático; o tamanho escolhido é o máximo no computador e o catálogo mantém a proporção no celular. A sombra só aparece quando a seção inicial usa uma imagem de fundo; o fundo da seção inicial (gradiente) segue a cor escolhida em "Cabeçalho e seção inicial".</p>
+        <p class="sub thm-note">Aqui você personaliza <b>cada detalhe</b> do catálogo, separado em <b>Modo claro</b> e <b>Modo escuro</b>, em 12 áreas com 112 campos por modo: <b>Geral</b> (cor de fundo da página e o botão “voltar ao início” — seta e fundo), <b>Base</b> (Cartões, Texto, Destaque, Linhas, Texto secundário), <b>Cabeçalho</b> (fundo, título/nome da loja, ícones, fundo e borda dos ícones, quantidade), <b>Seção inicial</b> (cor e opacidade da sombra sobre a imagem de fundo, cor, alinhamento e tamanho do título e da descrição), <b>Pesquisa e filtro</b> (fundo, borda e texto da barra, lupa, ícone de filtro com fundo e borda, e a janela de opções), <b>Seção Categorias</b> (título, setas com fundo e borda, cards, nome e gradientes das pontas do carrossel), <b>Produtos</b> (fundo, borda, nome, preço do card; ícones de carrinho/coração com fundo, borda e cor de preenchimento quando usados), <b>Página do produto</b> (fotos, opções, quantidade), <b>Rodapé</b> (fundo, linhas, título, contatos com links e ícones, ícones das redes sociais com fundo e borda, direitos reservados), <b>Carrinho</b>, <b>Botões comuns</b> e <b>Avisos</b>. Toque no nome da área para abrir. Em <b>Automático</b> cada detalhe segue a <b>Base</b> e o contraste é ajustado sozinho para continuar legível; use ↺ para devolver um detalhe ao automático, ou <b>Automático</b> na área inteira. Na <b>Seção inicial</b>, o alinhamento/cor/tamanho valem para o título e a descrição e, no alinhamento, tocar no botão já marcado devolve ao automático; o tamanho escolhido é o máximo no computador e o catálogo mantém a proporção no celular. A sombra só aparece quando a seção inicial usa uma imagem de fundo; o fundo da seção inicial (gradiente) segue a cor escolhida em "Cabeçalho e seção inicial".</p>
         <div id="ctGroups"></div>
       </div>
     </div>
@@ -2486,8 +2486,12 @@ var THEME_DEF={headFont:'',bodyFont:'',radius:'rounded',
   secs:{light:{},dark:{}}};
 /* áreas de cor do catálogo — cada detalhe, por modo. Vazio/"auto" = segue a base (harmonia automática). */
 var SECTS=[
+ {k:'geral',n:'Geral',s:[
+   ['bg','Cor de fundo da página'],
+   ['btt-ink','Seta do botão “voltar ao início”'],
+   ['btt-bg','Fundo do botão “voltar ao início”']]},
  {k:'base',n:'Base do catálogo (harmonia geral)',s:[
-   ['bg','Fundo da página'],['surface','Cartões e painéis'],['ink','Texto'],['muted','Texto secundário'],
+   ['surface','Cartões e painéis'],['ink','Texto'],['muted','Texto secundário'],
    ['accent','Destaque'],['line','Linhas e bordas'],['track','Fundos suaves (miniaturas)'],['sec-title','Títulos de página (Favoritos/Categoria)']]},
  {k:'header',n:'Cabeçalho',s:[
    ['head-bg','Fundo'],
@@ -2603,7 +2607,7 @@ function autoInk(bg,pref){
 }
 /* derive secondary colors from palette */
 function derivePal(p){
-  var lum=cLum,mix=cMix,isDark=lum(p.bg)<0.4,aInk=lum(p.accent)>0.62?'#10131C':'#fff';
+  var lum=cLum,mix=cMix,isDark=lum(p.bg)<0.4,aInk=lum(p.accent)>0.62?'#10131C':'#ffffff'; /* sempre 6 dígitos: o autoInk depende disso para corrigir o contraste */
   return{bg:p.bg,surface:p.surface,ink:p.ink,accent:p.accent,
     'accent-ink':aInk,
     muted:mix(p.ink,isDark?'#000000':'#ffffff',.38),
@@ -2632,6 +2636,9 @@ function catVars(t){
   var aInk=autoInk(accent,pal['accent-ink']);
   var o=Object.assign({},pal);
   o.bg=bg;o.surface=surface;o.ink=ink;o.accent=accent;o.muted=muted;o.line=line;o.track=track;o['accent-ink']=aInk;
+  /* geral: fundo da página (acima) e botão "voltar ao início" */
+  var bttBg=R('btt-bg',accent);
+  o['btt-bg']=bttBg;o['btt-ink']=R('btt-ink',autoInk(bttBg,aInk));
   /* cabeçalho */
   var headBg=R('head-bg',surface),headLine=R('head-line',cMix(headBg,ink,.12));
   var headTitle=R('head-title',autoInk(headBg,ink)),headIcon=R('head-icon',headTitle);
@@ -2726,6 +2733,9 @@ function loadFont(name){
 function applyCatTheme(darkOverride){
   var th=thm(),t=darkOverride||root.getAttribute('data-theme'),pal=catVars(t);
   var targets=[document.getElementById('catPage'),document.getElementById('catDrawer'),document.getElementById('catScrim'),document.getElementById('catFiltDlg')];
+  /* no catálogo, o fundo da página, os avisos (toast) e o botão "voltar ao início" ficam fora da #catPage:
+     aplicamos a paleta também no body para que recebam as cores escolhidas */
+  if(CATALOG)targets.push(document.body);
   targets.forEach(function(el){
     if(!el)return;
     Object.keys(pal).forEach(function(k){el.style.setProperty('--'+k,pal[k])});

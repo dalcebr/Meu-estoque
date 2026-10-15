@@ -143,6 +143,8 @@ dialog input[type=text]{width:100%;padding:12px 14px;font-size:1.1rem;border-rad
 .opt .oline{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .opt .oline .full{grid-column:1/-1}
 @media (min-width:640px){.opt{grid-template-columns:1fr 90px 120px 120px 44px;align-items:start}.opt .on{grid-column:auto}.opt .rm{grid-column:auto}.opt .oline{display:contents}.opt .oline .full{grid-column:auto}}
+/* mobile: opção em 2 linhas — Opção (largura total) + × no canto; abaixo, qtd./preço/custo lado a lado */
+@media (max-width:480px){.opt .on{grid-column:1;grid-row:1}.opt .rm{grid-column:2;grid-row:1;align-self:start}.opt .oline{grid-column:1/-1;grid-row:2;grid-template-columns:repeat(3,1fr)}.opt .oline .full{grid-column:auto}}
 .crow{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
 dialog{max-height:92vh;overflow:auto}
 .opt input{min-width:0;padding:11px 12px;border:1px solid var(--line);border-radius:12px;background:var(--bg);min-height:44px}
@@ -167,6 +169,8 @@ dialog{max-height:92vh;overflow:auto}
 .pcode .cmsg.warn{color:var(--bad);font-weight:500}
 .bar{display:flex;flex-wrap:wrap;gap:10px;justify-content:flex-end;align-items:center}
 .bar .err{margin-right:auto;color:var(--bad);font-weight:500}
+/* mobile: barra de ações do formulário fixa no rodapé */
+@media (max-width:640px){.bar{position:sticky;bottom:0;background:var(--surface);padding:12px 16px;border-top:1px solid var(--line);z-index:4;margin-left:-16px;margin-right:-16px}}
 .btn.danger{color:var(--bad)}
 .cv canvas{display:block;width:100%;max-width:360px;aspect-ratio:1/1;margin:12px auto;border-radius:14px;border:1px solid var(--line);touch-action:none;cursor:grab;background:#fff}
 #zoom{width:100%;accent-color:var(--accent)}
@@ -279,6 +283,7 @@ body.cat-mode #toast{background:var(--toast-bg,var(--ink));color:var(--toast-ink
 @media (min-width:640px){.cat-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}}
 @media (min-width:960px){.cat-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
 @media (min-width:1400px){.cat-bar,#catList,#catFav{max-width:1280px}.cat-grid{grid-template-columns:repeat(5,minmax(0,1fr))}}
+@media (max-width:380px){.cat-grid{grid-template-columns:repeat(2,minmax(140px,1fr));gap:10px}}
 /* carrossel de categorias (entre o hero e a busca) */
 .cat-cats{margin:2px 0 16px}
 .cc-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}
@@ -906,7 +911,7 @@ body.cart-open #btt{right:calc(var(--drawer) + 20px)}
  <div class="dlg-actions"><button type="button" class="btn danger" id="clDel" hidden>Excluir cliente</button><button type="button" class="btn" data-close>Cancelar</button><button type="button" class="btn main" id="clOk">Salvar cliente</button></div>
 </dialog>
 <input type="file" id="file" accept="image/*" multiple hidden>
-<div id="toast" role="status" aria-live="polite" popover="manual" hidden></div>
+<div id="toast" role="status" aria-live="polite" aria-atomic="true" popover="manual" hidden></div>
 <dialog id="cropDlg">
   <h2 id="cropT">Editar foto</h2>
   <p class="sub" id="cropInfo">Arraste para posicionar e use o zoom. O resultado é um quadrado de 1000 × 1000 px.</p>
@@ -920,6 +925,21 @@ body.cart-open #btt{right:calc(var(--drawer) + 20px)}
 var D={today:0,todayN:0,month:0,cost:0,week:[0,0,0,0,0,0,0],items:0,units:0,sCost:0,sSale:0,low:[],lowN:0,recent:[]};
 var COLORS=[["#4F46E5","Índigo"],["#2563EB","Azul"],["#0891B2","Turquesa"],["#0E9F6E","Verde"],["#CA8A04","Dourado"],["#EA580C","Laranja"],["#DB2777","Rosa"],["#7C3AED","Violeta"]];
 var $=function(i){return document.getElementById(i)},$$=function(sel){return document.querySelectorAll(sel)},root=document.documentElement;
+/* foco acessível em <dialog>: guarda o elemento ativo e foca o primeiro campo ao abrir */
+function bindDialogFocus(dlg){
+  const origShow=dlg.showModal,origClose=dlg.close;
+  dlg.showModal=function(){
+    dlg.__prevFocus=document.activeElement;
+    origShow.apply(dlg,arguments);
+    const el=dlg.querySelector('input,select,textarea')||dlg.querySelector('h2');
+    if(el&&el.focus)el.focus();
+  };
+  dlg.close=function(){
+    origClose.apply(dlg,arguments);
+    if(dlg.__prevFocus&&dlg.__prevFocus.focus)dlg.__prevFocus.focus();
+  };
+}
+$$('dialog').forEach(bindDialogFocus);
 var brl=function(v){return v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'})};
 var pf=function(v){return v.toLocaleString('pt-BR',{maximumFractionDigits:1})+'%'};
 function get(k){try{return localStorage.getItem(k)}catch(e){return null}}
@@ -2063,6 +2083,8 @@ function favList(){return P.filter(function(p){return p.stock>0&&FAV.indexOf(p.i
 function updateBadges(){
   var n=CART.reduce(function(a,l){return a+l.qty},0),f=favList().length;
   $('catCartN').textContent=n;$('catCartN').hidden=!n;$('catWishN').textContent=f;$('catWishN').hidden=!f;
+  $('catCartN').setAttribute('aria-label',n?plural(n,'item no carrinho','itens no carrinho'):'Carrinho vazio');
+  $('catWishN').setAttribute('aria-label',f?plural(f,'produto nos favoritos','produtos nos favoritos'):'Nenhum favorito');
   $('catWish').setAttribute('aria-pressed',location.hash==='#favoritos');
   var pb=$('catProd').querySelector('[data-a="view"] .badge');if(pb){pb.textContent=n;pb.hidden=!n}
 }
@@ -2479,11 +2501,16 @@ function ensureTheme(){if(!CAT.theme)CAT.theme=JSON.parse(JSON.stringify(THEME_D
 /* utilitários de cor (usados pela paleta e pelas áreas do catálogo) */
 function cLum(c){var n=parseInt(c.slice(1),16);return(0.299*(n>>16)+0.587*(n>>8&255)+0.114*(n&255))/255}
 function cMix(a,b,w){var na=parseInt(a.slice(1),16),nb=parseInt(b.slice(1),16),r=Math.round,m=function(sa,sb){return r(sa+(sb-sa)*w)};return'#'+[16,8,0].map(function(sh){return m((na>>sh)&255,(nb>>sh)&255).toString(16).padStart(2,'0')}).join('')}
-/* mantém a cor preferida quando ela tem contraste suficiente; senão usa preto/branco */
+/* mantém a cor preferida quando ela tem contraste WCAG suficiente (>= 4.5); senão força preto/branco */
+function cRatio(a,b){
+  function lin(c){c/=255;return c<=0.03928?c/12.92:Math.pow((c+0.055)/1.055,2.4)}
+  function lum(h){var n=parseInt(h.slice(1),16),r=lin(n>>16),g=lin(n>>8&255),b=lin(n&255);return 0.2126*r+0.7152*g+0.0722*b}
+  var l1=lum(a),l2=lum(b),hi=Math.max(l1,l2),lo=Math.min(l1,l2);return(hi+0.05)/(lo+0.05);
+}
 function autoInk(bg,pref){
   if(!/^#[0-9a-f]{6}$/i.test(bg||'')||!/^#[0-9a-f]{6}$/i.test(pref||''))return pref;
-  if(Math.abs(cLum(bg)-cLum(pref))>=.45)return pref;
-  return cLum(bg)>.5?'#12141D':'#ECEEF5';
+  if(cRatio(bg,pref)>=4.5)return pref;
+  return cLum(bg)>.5?'#10131C':'#ECEEF5';
 }
 /* derive secondary colors from palette */
 function derivePal(p){
@@ -2504,6 +2531,7 @@ function catVars(t){
   /* base */
   var bg=R('bg',pal.bg),surface=R('surface',pal.surface),ink=R('ink',pal.ink),accent=R('accent',pal.accent);
   var muted=R('muted',pal.muted),line=R('line',pal.line),track=R('track',pal.track);
+  ink=autoInk(bg,ink); /* garante contraste do texto-base contra o fundo da página */
   var aInk=autoInk(accent,pal['accent-ink']);
   var o=Object.assign({},pal);
   o.bg=bg;o.surface=surface;o.ink=ink;o.accent=accent;o.muted=muted;o.line=line;o.track=track;o['accent-ink']=aInk;
@@ -2521,9 +2549,10 @@ function catVars(t){
   o['hero-ink']=autoInk(heroBg,aInk);o['hero-title']=heroTitle;o['hero-desc']=R('hero-desc',heroTitle);
   o['hero-overlay']=cRgba(R('hero-overlay','#0a0c14'),.5);
   /* busca e filtro */
-  o['srch-bg']=R('srch-bg',surface);o['srch-ink']=R('srch-ink',ink);o['srch-ph']=R('srch-ph',muted);
+  const srchBg=R('srch-bg',surface),filtBtnBg=R('filt-btn-bg',surface);
+  o['srch-bg']=srchBg;o['srch-ink']=R('srch-ink',autoInk(srchBg,ink));o['srch-ph']=R('srch-ph',muted);
   o['srch-ic']=R('srch-ic',muted);o['srch-line']=R('srch-line',line);
-  o['filt-btn-bg']=R('filt-btn-bg',surface);o['filt-btn-ic']=R('filt-btn-ic',ink);o['filt-btn-line']=R('filt-btn-line',line);
+  o['filt-btn-bg']=filtBtnBg;o['filt-btn-ic']=R('filt-btn-ic',autoInk(filtBtnBg,ink));o['filt-btn-line']=R('filt-btn-line',line);
   o['filt-dot']=R('filt-dot',accent);
   /* títulos de página */
   o['sec-title']=R('sec-title',autoInk(bg,ink));
@@ -2541,13 +2570,14 @@ function catVars(t){
   /* página do produto */
   o['pp-title']=R('pp-title',autoInk(bg,ink));o['pp-price']=R('pp-price',autoInk(bg,ink));o['pp-desc']=R('pp-desc',muted);
   o['pp-img-bg']=R('pp-img-bg',track);o['pp-img-line']=R('pp-img-line',line);
-  o['pp-icon']=R('pp-icon',ink);o['pp-icon-bg']=R('pp-icon-bg',surface);o['pp-icon-line']=R('pp-icon-line',line);
+  const ppIconBg=R('pp-icon-bg',surface),ppChipBg=R('pp-chip-bg',surface),ppQtyBg=R('pp-qty-bg',surface);
+  o['pp-icon']=R('pp-icon',autoInk(ppIconBg,ink));o['pp-icon-bg']=ppIconBg;o['pp-icon-line']=R('pp-icon-line',line);
   var ppBtn=R('pp-btn',accent);
   o['pp-btn']=ppBtn;o['pp-btn-ink']=R('pp-btn-ink',autoInk(ppBtn,aInk));
-  o['pp-chip-bg']=R('pp-chip-bg',surface);o['pp-chip-ink']=R('pp-chip-ink',ink);o['pp-chip-line']=R('pp-chip-line',line);
+  o['pp-chip-bg']=ppChipBg;o['pp-chip-ink']=R('pp-chip-ink',autoInk(ppChipBg,ink));o['pp-chip-line']=R('pp-chip-line',line);
   var chipOn=R('pp-chip-on-bg',accent);
   o['pp-chip-on-bg']=chipOn;o['pp-chip-on-ink']=R('pp-chip-on-ink',autoInk(chipOn,aInk));
-  o['pp-qty-bg']=R('pp-qty-bg',surface);o['pp-qty-ink']=R('pp-qty-ink',ink);o['pp-qty-line']=R('pp-qty-line',line);
+  o['pp-qty-bg']=ppQtyBg;o['pp-qty-ink']=R('pp-qty-ink',autoInk(ppQtyBg,ink));o['pp-qty-line']=R('pp-qty-line',line);
   /* rodapé */
   var footBg=R('foot-bg',surface),footName=R('foot-name',autoInk(footBg,ink)),footOnBg=R('foot-icon-on-bg',accent);
   o['foot-bg']=footBg;o['foot-line']=R('foot-line',cMix(footBg,ink,.12));o['foot-name']=footName;

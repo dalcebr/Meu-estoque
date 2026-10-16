@@ -2495,8 +2495,15 @@ $('catCheckout').onclick=function(){
   var co=orderCode(CART);if(!co)return toast('Não foi possível gerar o código deste pedido.');
   var lk=pedidoLink(co.code);
   var itens=plural(cartUnits(),'item','itens');
-  /* mensagem curta: total + link. O resumo completo aparece quando o vendedor abre o link. */
-  var msg='Olá, '+catName()+'!\nQuero fazer este pedido ('+itens+' · '+brl(cartTotal())+').\nPedido '+co.id+': '+(lk||co.code);
+  /* mensagem personalizada: cada item com nome, quantidade e valor; depois o total e o link de preenchimento automático */
+  var linhas=CART.map(function(l){
+    var p=P.find(function(x){return x.id===l.pid});if(!p)return'';
+    var u=unitFor(p,l.vars),vt=(l.vars||[]).map(function(v){return v.o}).join(', ');
+    return '• '+l.qty+'x '+p.name+(vt?' ('+vt+')':'')+' — '+brl(u.price)+' cada = '+brl(u.price*l.qty);
+  }).filter(function(x){return !!x}).join('\n');
+  var msg='Olá, '+catName()+'! Quero fazer este pedido:\n\n'+linhas+
+    '\n\nTotal: '+brl(cartTotal())+' ('+itens+')'+
+    '\nPedido '+co.id+'\nPreencher venda automaticamente: '+(lk||co.code);
   window.open('https://wa.me/'+num+'?text='+encodeURIComponent(msg),'_blank','noopener');
   toast('Abrindo o WhatsApp da loja. O pedido '+co.id+' vai com o link do código.');
 };
@@ -2504,19 +2511,14 @@ $('catCheckout').onclick=function(){
 function selArr(p){var out=[];Object.keys(pp.sel).forEach(function(gi){var oi=pp.sel[gi];if(p.vars[gi]&&p.vars[gi].opts[oi])out.push({gi:+gi,oi:oi,g:p.vars[gi].name,o:p.vars[gi].opts[oi].n})});return out}
 function drawProd(){
   var p=P.find(function(x){return x.id===pp.id}),box=$('catProd');
-  if(!p||p.stock<=0){box.innerHTML='<div class="pp-top"><button class="btn sm" data-a="back" type="button">← Voltar</button>'+
-    '<button type="button" class="ib" data-a="view" aria-label="Ver carrinho" title="Ver carrinho">'+ICON_CART+'<span class="badge"'+(cartUnits()?'':' hidden')+'>'+cartUnits()+'</span></button></div>'+
+  if(!p||p.stock<=0){box.innerHTML='<div class="pp-top"><button class="btn sm" data-a="back" type="button">← Voltar</button></div>'+
     '<div class="card empty" style="margin-top:14px">Produto indisponível no momento.</div>';return}
   var sel=selArr(p),allPicked=p.vars.every(function(g,gi){return!needsPick(g)||pp.sel[gi]!=null});
   var price=allPicked?brl(unitFor(p,sel).price):(hasRange(p)?'a partir de '+brl(minPrice(p)):brl(p.price));
   var fav=FAV.indexOf(p.id)>=0,i=Math.min(pp.img,Math.max(0,p.imgs.length-1));
   var avail=p.stock;sel.forEach(function(v){avail=Math.min(avail,p.vars[v.gi].opts[v.oi].q)});
   pp.qty=Math.max(1,Math.min(pp.qty,avail));
-  box.innerHTML='<div class="pp-top"><button class="btn sm" data-a="back" type="button">← Voltar</button>'+
-    '<div class="pp-icons">'+
-    '<button type="button" class="ib" data-a="view" aria-label="Ver carrinho" title="Ver carrinho">'+ICON_CART+'<span class="badge"'+(cartUnits()?'':' hidden')+'>'+cartUnits()+'</span></button>'+
-    '<button type="button" class="ib" data-a="fav" aria-pressed="'+fav+'" aria-label="'+(fav?'Remover dos favoritos':'Adicionar aos favoritos')+'">'+ICON_HEART+'</button>'+
-    '</div></div>'+
+  box.innerHTML='<div class="pp-top"><button class="btn sm" data-a="back" type="button">← Voltar</button></div>'+
     '<div class="pp"><div>'+catPhoto(p,i,'pp-main')+(p.imgs.length>1?'<div class="pp-th">'+p.imgs.map(function(_,k){return'<button type="button" data-a="th" data-i="'+k+'" aria-pressed="'+(k===i)+'" aria-label="Foto '+(k+1)+'"><img alt="" src="'+blobUrl(p.imgs[k])+'"></button>'}).join('')+'</div>':'')+'</div>'+
     '<div>'+(p.cat?'<span class="pill">'+esc(p.cat)+'</span>':'')+'<h1>'+esc(p.name)+'</h1><div class="pp-price">'+price+'</div>'+
     (p.desc?'<p class="pp-desc">'+esc(p.desc)+'</p>':'')+

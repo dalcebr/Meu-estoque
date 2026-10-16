@@ -2157,7 +2157,7 @@ function gridClick(e){
   var b=e.target.closest('button[data-a]');if(!b)return;var p=P.find(function(x){return x.id===b.dataset.id});if(!p)return;
   if(b.dataset.a==='fav'){animPop(b);toggleFav(p.id);redrawCat();drawCatFav()}
   else if(p.vars.some(needsPick)){toast('Escolha uma opção na página do produto.');location.hash='#produto/'+p.id}
-  else if(addCart(p,[],1)){animFlash(b);toast('Adicionado ao carrinho.');openCart()}
+  else if(addCart(p,[],1)){animFlash(b);drawCatCart();toast('Adicionado ao carrinho.')}
 }
 /* B: skeletons enquanto o IndexedDB carrega */
 function skeletonHtml(n){let h='';for(let i=0;i<n;i++)h+='<div class="card pc skeleton"><div class="sk-img"></div><div class="sk-line"></div><div class="sk-line short"></div></div>';return h}
@@ -2441,7 +2441,7 @@ $('catProd').onclick=function(e){
   else if(a==='qp')pp.qty++;
   else if(a==='add'){
     var sel=selArr(p),er=checkAdd(p,sel,pp.qty);
-    if(!er){addCart(p,sel,pp.qty);openCart();toast('Adicionado ao carrinho.')}
+    if(!er){addCart(p,sel,pp.qty);drawCatCart();toast('Adicionado ao carrinho.')}
     else toast(er.msg);
     return;
   }

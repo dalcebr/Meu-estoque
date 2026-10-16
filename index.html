@@ -163,6 +163,15 @@ dialog{max-height:92vh;overflow:auto}
 /* código do pedido (WhatsApp → venda) */
 .pcode{border:1px solid var(--line);border-radius:20px;padding:14px;margin:4px 0 0;background:color-mix(in srgb,var(--accent) 5%,var(--surface))}
 .pcode h3{margin:0 0 4px}
+/* tela do pedido (link do WhatsApp) */
+#pdCode{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.95rem}
+#pdItems{margin:8px 0 0}
+#pdItems li{padding:10px 0;border-top:1px solid var(--line);display:flex;gap:12px;justify-content:space-between;align-items:flex-start}
+#pdItems li:first-child{border-top:0}
+#pdItems .pi-n{min-width:0;overflow-wrap:anywhere}
+#pdItems .pi-n b{display:block}
+#pdItems .pi-v{color:var(--muted);font-size:.84rem}
+#pdItems .pi-p{white-space:nowrap;font-weight:700;font-variant-numeric:tabular-nums}
 .pcode .vf{margin-top:10px}
 .pcode .vf .fld{flex:1;min-width:180px}
 .pcode .cmsg{margin:10px 0 0;font-size:.86rem;font-weight:600;white-space:pre-line}
@@ -712,7 +721,7 @@ body.cart-open #btt{right:calc(var(--drawer) + 20px)}
   </section>
   <section class="card">
     <h3>Pedidos</h3>
-    <p class="sub">Ao tocar em "Finalizar compra", o cliente envia o pedido para este WhatsApp.</p>
+    <p class="sub">Ao tocar em "Finalizar compra", o cliente envia uma mensagem curta com um link. Ao abrir esse link, aparece o código do pedido — você copia (botão <b>Copiar</b>) e cola em <b>Nova venda → Pedido do WhatsApp</b>, ou toca em <b>Preencher venda</b> e os itens entram sozinhos.</p>
     <div class="ff"><label class="fld w"><span>WhatsApp da loja (recebe os pedidos do carrinho)</span><input id="cat-whats" type="tel" maxlength="20" placeholder="(11) 99999-9999"></label></div>
     <p class="sub" id="catSaved" style="margin-top:12px">As alterações são salvas automaticamente.</p>
   </section>
@@ -859,6 +868,17 @@ body.cart-open #btt{right:calc(var(--drawer) + 20px)}
   </form>
 </dialog>
 
+<dialog id="pedidoDlg">
+ <h2>Pedido <span id="pdId"></span></h2>
+ <p class="sub" id="pdFrom" style="margin:4px 0 0"></p>
+ <label class="lbl">Código do pedido — copie e cole em Nova venda</label>
+ <div class="vf pre"><input id="pdCode" type="text" readonly aria-label="Código do pedido"><button type="button" class="btn main" id="pdCopy">Copiar</button></div>
+ <p class="sub" id="pdItemsT" style="margin:16px 0 0;font-weight:700"></p>
+ <ul class="rows" id="pdItems"></ul>
+ <p class="sub" id="pdMsg" style="margin:12px 0 0"></p>
+ <div class="dlg-actions"><button type="button" class="btn" data-close>Fechar</button><button type="button" class="btn main" id="pdFill">Preencher venda</button></div>
+</dialog>
+
 <dialog id="goalDlg">
   <form method="dialog" id="goalForm">
     <h2>Meta do mês</h2>
@@ -901,7 +921,7 @@ body.cart-open #btt{right:calc(var(--drawer) + 20px)}
  <h2>Nova venda</h2>
  <div class="pcode">
   <h3>Pedido do WhatsApp</h3>
-  <p class="sub">Cole o código curto que veio na mensagem do cliente (ex.: <b>ESTQ1.K3P9X1A.m8d2f1c:2:1yu</b>) — ou toque no link "Abrir a venda pronta" da própria mensagem, que já abre esta tela preenchida. Produtos, valores e quantidades entram sozinhos; você só confere com o cliente.</p>
+  <p class="sub">Cole o código curto que veio na mensagem do cliente (ex.: <b>ESTQ1.K3P9X1A.m8d2f1c:2:1yu</b>) — ou abra o link que ele enviou (<b>?p=…</b>): aparece o código do pedido para copiar, e o botão <b>Preencher venda</b> já lança os itens. Produtos, valores e quantidades entram sozinhos; você só confere com o cliente.</p>
   <div class="vf pre"><label class="fld"><span>Código do pedido</span><input id="saCode" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="ESTQ1.K3P9X1A.m8d2f1c:2:1yu"></label><button type="button" class="btn" id="saCodePaste">Colar</button><button type="button" class="btn main" id="saCodeGo">Preencher venda</button></div>
   <div class="vf pre"><label class="fld"><span>Ou abra o link do pedido</span><input id="saLink" type="text" placeholder="link enviado no WhatsApp"></label><button type="button" class="btn" id="saLinkGo">Abrir</button></div>
   <p class="sub cmsg" id="saCodeMsg" hidden></p>
@@ -1586,10 +1606,21 @@ function orderCode(list){
   }).filter(function(x){return !!x}).join(',');
   return body?{id:id,code:PCODE+id+'.'+body}:null;
 }
-// link que abre a venda já preenchida (o vendedor só toca nele no WhatsApp)
+// link CURTO que leva à tela do pedido: base?p=<corpo>  (sem o prefixo "ESTQ1." e sem %XX desnecessário)
 function pedidoLink(code){
   var u=location.href.split('#')[0].split('?')[0];
-  return /^https?:/i.test(u)?u+'?pedido='+encodeURIComponent(code).replace(/%3A/g,':'):'';
+  if(!/^https?:/i.test(u))return '';
+  var body=String(code||'').replace(/^ESTQ1\./i,'').replace(/[^A-Za-z0-9.:,/_~-]/g,function(c){return encodeURIComponent(c)});
+  return body?u+'?p='+body:'';
+}
+// devolve o código completo (ESTQ1.…) a partir do que veio no link/campo
+function fullCode(raw){
+  var m=String(raw||'').match(/[?&#](?:pedido|p)=([^&#\s]+)/);
+  var s=m?m[1]:(String(raw||'').match(/ESTQ1\.([^\s"'<>]+)/)||[])[1];
+  if(!s){var t=String(raw||'').trim();if(t&&/^[A-Za-z0-9]+[.]/.test(t)&&t.indexOf(':')>0)s=t}
+  if(!s)return '';
+  s=dec(s).replace(/^ESTQ1[.=]/i,'').replace(/[.,;:)\]]+$/,'');
+  return s?PCODE+s:'';
 }
 function parseV2(s){
   var d=s.indexOf('.');if(d<1)return null;
@@ -1617,11 +1648,9 @@ function parseV1(s){   // formato antigo, mantido para pedidos já enviados
 }
 // aceita o código puro, a mensagem inteira ou o link do pedido
 function readOrder(raw){
-  raw=String(raw||'').trim();
-  var m=raw.match(/[?&#]pedido=([^&#\s]+)/);
-  var s=m?dec(m[1]):(raw.match(/ESTQ1\.([^\s"'<>]+)/)||[])[1];
-  if(!s)return{e:'Código do pedido não encontrado. Copie a mensagem do cliente inteira — ela começa com ESTQ1.'};
-  s=dec(s).replace(/^ESTQ1[.=]/i,'').replace(/[.,;:)\]]+$/,'');
+  var full=fullCode(raw);
+  if(!full)return{e:'Código do pedido não encontrado. Copie a mensagem do cliente inteira — ela começa com ESTQ1.'};
+  var s=full.slice(PCODE.length);
   var o=s.indexOf(':')>0?parseV2(s):parseV1(s);
   if(!o)return{e:'Não entendi este código. Confira se copiou a mensagem completa.'};
   return{o:o};
@@ -1682,16 +1711,83 @@ $('saCodePaste').onclick=function(){
 };
 $('saCode').onkeydown=function(e){if(e.key==='Enter'){e.preventDefault();$('saCodeGo').onclick()}};
 $('saCode').onpaste=function(){var el=this;setTimeout(function(){if(el.value.trim())applyOrderCode(el.value)},0)};
-$('saLinkGo').onclick=function(){var v=$('saLink').value.trim();if(!v)return codeMsg('Cole o link do pedido (ele termina com ?pedido=ESTQ1.…).',true);applyOrderCode(v)};
-// link ?pedido=… : abre Vendas com a venda já preenchida
-function checkPedidoLink(raw){
-  var code=raw||'';
-  if(!code){try{var sp=new URLSearchParams(location.search),hp=location.hash.match(/[#&]pedido=([^&#]+)/);code=sp.get('pedido')||(hp?dec(hp[1]):'')}catch(e){}}
-  if(!code)return false;
-  if(raw===undefined){try{history.replaceState(null,'',location.href.split('?')[0].split('#')[0])}catch(e){}}
-  if(CATALOG||!P.length)return false;
+$('saLinkGo').onclick=function(){var v=$('saLink').value.trim();if(!v)return codeMsg('Cole o link do pedido (ele termina com ?p=…).',true);applyOrderCode(v)};
+/* ===== tela do pedido: o link do WhatsApp abre aqui, com o código pronto para copiar ===== */
+function orderItemInfo(p,it){
+  var sel=[],vtxt=[],bad=false;
+  (it.opts||[]).forEach(function(op){
+    if(!p)return;
+    var gn=typeof op==='string'?'':String(op.g||''),on=typeof op==='string'?op:String(op.o||'');
+    if(!on)return;
+    var gi=-1,oi=-1,cands=optCands(on);
+    p.vars.forEach(function(g,j){
+      if(gi>=0||(gn&&norm(g.name)!==norm(gn)))return;
+      var k=g.opts.findIndex(function(x){return cands.some(function(c){return norm(x.n)===norm(c)})});
+      if(k>=0){gi=j;oi=k}
+    });
+    if(gi<0){bad=true;vtxt.push((gn?gn+': ':'')+on.replace(/_/g,' '));return}
+    sel.push({gi:gi,oi:oi,g:p.vars[gi].name,o:p.vars[gi].opts[oi].n});vtxt.push(p.vars[gi].name+': '+p.vars[gi].opts[oi].n);
+  });
+  return{sel:sel,vtxt:vtxt.join(', '),bad:bad};
+}
+function showPedidoDlg(raw){
+  var full=fullCode(raw),rd=readOrder(full);
+  if(rd.e)return toast(rd.e);
+  var o=rd.o,nome=catName();
+  $('pdId').textContent=o.id||'';
+  $('pdCode').value=full;
+  $('pdFrom').textContent='Enviado pelo cliente para o WhatsApp da loja. Confira antes de registrar.';
+  var tot=0,ok=true,rows=[];
+  o.items.forEach(function(it){
+    var p=P.find(function(x){return x.id===it.pid});
+    if(!p&&it.nm)p=P.find(function(x){return norm(x.name)===norm(it.nm)});
+    var info=p?orderItemInfo(p,it):{vtxt:'',bad:false};
+    var up=it.price!=null?it.price:(p&&!info.bad?unitFor(p,info.sel).price:null);
+    if(up==null)ok=false;else tot+=up*it.qty;
+    rows.push('<li><span class="pi-n"><b>'+esc(p?p.name:(it.nm||'Produto '+it.pid))+'</b>'+
+      (info.vtxt?'<span class="pi-v">'+esc(info.vtxt)+'</span>':'')+
+      (p?'':(it.nm?'':'<span class="pi-v">não está no seu catálogo</span>'))+
+      (p&&info.bad?'<span class="pi-v">opção não encontrada no cadastro</span>':'')+'</span>'+
+      '<span class="pi-p">'+it.qty+'x'+(up!=null?'<br>'+brl(up*it.qty):'')+'</span></li>');
+  });
+  $('pdItemsT').textContent=plural(o.items.length,'item no pedido','itens no pedido')+(ok?' · total '+brl(tot):'');
+  $('pdItems').innerHTML=rows.join('');
+  $('pdMsg').textContent='Copie o código e cole em Nova venda → Pedido do WhatsApp, ou toque em “Preencher venda” para lançar '+
+    (P.length?'automaticamente.':'— antes disso, cadastre os produtos.');
+  if(!$('pedidoDlg').open)$('pedidoDlg').showModal();
+}
+$('pdCopy').onclick=function(){
+  var el=$('pdCode'),v=el.value;if(!v)return;
+  var done=function(ok){toast(ok?'Código copiado. Cole em Nova venda → Pedido do WhatsApp.':'Selecione o código acima e copie manualmente.')};
+  el.focus();el.select();
+  if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(v).then(function(){done(true)},function(){try{done(document.execCommand('copy'))}catch(e){done(false)}});
+  else{try{done(document.execCommand('copy'))}catch(e){done(false)}}
+};
+$('pdFill').onclick=function(){
+  var v=$('pdCode').value.trim();if(!v)return;
+  $('pedidoDlg').close();
+  if(!P.length)return toast('Cadastre um produto antes de registrar uma venda.');
   show('sales');openSale();
-  $('saCode').value=code;applyOrderCode(code);
+  $('saCode').value=v;applyOrderCode(v);
+};
+// link ?p=… (curto, novo) mostra a tela do pedido; ?pedido=… (antigo) preenche a venda direto
+function checkPedidoLink(raw){
+  var p='',ped='';
+  if(raw!=null){p=raw;ped=raw}
+  else{
+    var q=location.search||'',h=location.hash||'';
+    var m=q.match(/[?&]p=([^&#\s]+)/i);if(m)p=dec(m[1]);
+    if(!p){var a=q.match(/[?&]pedido=([^&#\s]+)/i);if(a)ped=dec(a[1])}
+    if(!p&&!ped){var b=h.match(/[#&]p=([^&#\s]+)/i);if(b)p=dec(b[1])}
+    if(!p&&!ped){var c=h.match(/[#&]pedido=([^&#\s]+)/i);if(c)ped=dec(c[1])}
+  }
+  if(!p&&!ped)return false;
+  if(raw===undefined){try{history.replaceState(null,'',location.href.split('?')[0].split('#')[0])}catch(e){}}
+  if(CATALOG)return false;   /* dentro do catálogo (cliente) não há venda a registrar */
+  if(p){showPedidoDlg(p);return true}   /* a tela abre mesmo sem produtos: o código sempre pode ser copiado */
+  if(!P.length)return false;
+  show('sales');openSale();
+  $('saCode').value=ped;applyOrderCode(ped);
   return true;
 }
 function openSale(){
@@ -2394,16 +2490,13 @@ $('catCheckout').onclick=function(){
   var num=(CAT.whats||'').replace(/\D/g,'');
   if(!num)return toast('Esta loja ainda não configurou o WhatsApp para receber pedidos.');
   if(num.length<=11)num='55'+num;
-  var money=function(v){return brl(v).replace(/\u00a0/g,' ')};
-  var lines=CART.map(function(l){var p=P.find(function(x){return x.id===l.pid}),u=unitFor(p,l.vars),vt=l.vars.map(function(v){return v.g+': '+v.o}).join(', ');
-    return'• '+l.qty+'x '+p.name+(vt?' ('+vt+')':'')+' — '+money(u.price*l.qty)});
   var co=orderCode(CART);if(!co)return toast('Não foi possível gerar o código deste pedido.');
   var lk=pedidoLink(co.code);
-  var msg='Olá, '+catName()+'! Gostaria de fazer este pedido:\n\n'+lines.join('\n')+'\n\nTotal dos produtos: '+money(cartTotal())+'\nFrete: a combinar com a loja'+
-    '\n\nPedido '+co.id+'\nCódigo: '+co.code+(lk?'\nAbrir a venda pronta: '+lk:'')+
-    '\n(loja: '+(lk?'toque no link ou ':'')+'copie o código e cole em Nova venda → Pedido do WhatsApp)';
+  var itens=plural(cartUnits(),'item','itens');
+  /* mensagem curta: total + link. O resumo completo aparece quando o vendedor abre o link. */
+  var msg='Olá, '+catName()+'!\nQuero fazer este pedido ('+itens+' · '+brl(cartTotal())+').\nPedido '+co.id+': '+(lk||co.code);
   window.open('https://wa.me/'+num+'?text='+encodeURIComponent(msg),'_blank','noopener');
-  toast('Abrindo o WhatsApp da loja. O pedido '+co.id+' vai com o código para o vendedor.');
+  toast('Abrindo o WhatsApp da loja. O pedido '+co.id+' vai com o link do código.');
 };
 /* página do produto */
 function selArr(p){var out=[];Object.keys(pp.sel).forEach(function(gi){var oi=pp.sel[gi];if(p.vars[gi]&&p.vars[gi].opts[oi])out.push({gi:+gi,oi:oi,g:p.vars[gi].name,o:p.vars[gi].opts[oi].n})});return out}

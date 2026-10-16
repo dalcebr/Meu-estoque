@@ -164,7 +164,7 @@ dialog{max-height:92vh;overflow:auto}
 .pcode{border:1px solid var(--line);border-radius:20px;padding:14px;margin:4px 0 0;background:color-mix(in srgb,var(--accent) 5%,var(--surface))}
 .pcode h3{margin:0 0 4px}
 /* tela do pedido (link do WhatsApp) */
-#pdCode{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.95rem}
+#pdCode{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.95rem;flex:1 1 200px;min-width:0;width:auto}
 #pdItems{margin:8px 0 0}
 #pdItems li{padding:10px 0;border-top:1px solid var(--line);display:flex;gap:12px;justify-content:space-between;align-items:flex-start}
 #pdItems li:first-child{border-top:0}
@@ -436,7 +436,9 @@ body.cart-open #toast.on{transform:translateX(50%)}
 .ct-prev-h{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:10px}
 .ct-prev-h .lbl{margin:0}
 #ctPrev{display:block;width:100%;height:min(70vh,520px);border:1px solid var(--line);border-radius:16px;background:var(--surface)}
-.thm-gh{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
+.thm-gh{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.thm-grp.on .thm-gh{margin-bottom:10px}
+.thm-tgl{flex:1;min-width:0;display:flex;align-items:center;gap:8px;min-height:36px;padding:0;border:0;background:none;color:inherit;font:inherit;text-align:left;cursor:pointer}
 .thm-gh .lbl{margin:0;font-size:.78rem;font-weight:800;color:var(--muted);letter-spacing:.05em;text-transform:uppercase}
 .thm-auto{border:1px solid var(--line);background:var(--surface);color:var(--muted);font-size:.74rem;font-weight:700;padding:5px 11px;border-radius:99px;min-height:32px}
 .thm-auto:hover{color:var(--accent-text);border-color:var(--accent)}

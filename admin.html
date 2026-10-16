@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Acessos · Painel de administrador</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%234F46E5' stroke-width='2' stroke-linejoin='round'%3E%3Cpath d='M12 3l7 3v6c0 4.4-3 7.6-7 9-4-1.4-7-4.6-7-9V6z'/%3E%3Cpath d='m9 12 2 2 4-4'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
+<script>
+(function(){var g=function(k){try{return localStorage.getItem(k)}catch(e){return null}};
+var t=g('tema');if(t!=='light'&&t!=='dark')t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';
+var r=document.documentElement;r.setAttribute('data-theme',t);
+var a=g('cor')||'#4F46E5';r.style.setProperty('--accent',a);
+var n=parseInt(a.slice(1),16),l=(0.299*(n>>16)+0.587*(n>>8&255)+0.114*(n&255))/255;
+r.style.setProperty('--accent-ink',l>0.62?'#10131C':'#fff')})();
+</script>
+<style>
+:root{--bg:#F3F4F9;--surface:#fff;--ink:#12141D;--muted:#646B7D;--line:#E4E7EF;--track:#E9ECF4;--bad:#D92D20;--good:#0E9F6E;--accent:#4F46E5;--accent-ink:#fff;
+--soft:color-mix(in srgb,var(--accent) 11%,var(--surface));--accent-text:color-mix(in srgb,var(--accent) 82%,#000);--shadow:0 1px 2px rgba(18,20,29,.04),0 12px 28px -16px rgba(18,20,29,.18);color-scheme:light;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0B0D13;--surface:#14171F;--ink:#ECEEF5;--muted:#9AA1B4;--line:#232734;--track:#232734;--bad:#FF7A70;--good:#34D399;--accent-text:color-mix(in srgb,var(--accent) 58%,#fff);--shadow:none;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0B0D13;--surface:#14171F;--ink:#ECEEF5;--muted:#9AA1B4;--line:#232734;--track:#232734;--bad:#FF7A70;--good:#34D399;--accent-text:color-mix(in srgb,var(--accent) 58%,#fff);--shadow:none;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 15px/1.5 "Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",sans-serif;-webkit-text-size-adjust:100%}
+button,input,textarea,select{font:inherit;color:inherit}button{cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+[hidden]{display:none!important}
+.sub{color:var(--muted);margin:6px 0 0;font-size:.9rem}
+.w100{width:100%}
+.wrap{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.grow{flex:1}
+.lk{border:0;background:none;color:var(--accent-text);font-weight:700;padding:8px 2px;min-height:40px;font-size:.9rem}
+.lk.danger{color:var(--bad)}
+.err{color:var(--bad);font-weight:600;margin:12px 0 0;font-size:.9rem}
+.ok{color:var(--good);font-weight:600;margin:12px 0 0;font-size:.9rem}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:14px;padding:10px 18px;min-height:44px;font-weight:700}
+.btn.sm{padding:7px 12px;min-height:38px;border-radius:12px;font-size:.86rem}
+.btn.main{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.danger{color:var(--bad)}
+.btn[disabled]{opacity:.5;cursor:not-allowed}
+.ib{width:44px;height:44px;display:grid;place-items:center;border:1px solid var(--line);background:var(--surface);border-radius:14px}
+.ib svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:24px;padding:20px;box-shadow:var(--shadow)}
+.card h3{margin:0;font-size:.95rem;font-weight:700}
+.sec-h{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between}
+.sec-h h2{margin:0;font-size:clamp(1.4rem,4vw,1.9rem);font-weight:800;letter-spacing:-.03em}
+/* ---------- tela de entrada ---------- */
+#gate{min-height:100vh;min-height:100dvh;display:grid;place-items:center;padding:24px 16px}
+#gate .gcard{width:min(470px,100%);display:grid;gap:4px}
+.brand{display:flex;align-items:center;gap:12px;padding-bottom:6px;font-weight:800;font-size:1.05rem;line-height:1.2}
+.logo{width:40px;height:40px;border-radius:13px;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;flex:none}
+.logo svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2;stroke-linejoin:round}
+.brand small{display:block;font-weight:500;color:var(--muted);font-size:.8rem}
+.pw{position:relative;display:block}
+.pw input{padding-right:52px}
+.pw .eye{position:absolute;right:4px;top:50%;transform:translateY(-50%);width:40px;height:40px;border:0;background:none;color:var(--muted);border-radius:12px}
+.pw .eye:hover{background:var(--track);color:var(--ink)}
+/* ---------- casca do painel ---------- */
+.shell{min-height:100vh}
+.col{min-width:0}
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;display:flex;align-items:center;gap:10px;padding:12px 16px;background:color-mix(in srgb,var(--bg) 86%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+.top h1{margin:0;font-size:1.05rem;font-weight:800;flex:1;letter-spacing:-.01em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.scrim{position:fixed;inset:0;background:rgba(5,7,12,.55);opacity:0;visibility:hidden;transition:opacity .2s,visibility .2s;z-index:9}
+.side{position:fixed;top:0;bottom:0;left:0;width:min(300px,86vw);background:var(--surface);z-index:10;transform:translateX(-102%);visibility:hidden;transition:transform .25s,visibility .25s;padding:calc(env(safe-area-inset-top,0px) + 16px) 14px calc(env(safe-area-inset-bottom,0px) + 16px);display:flex;flex-direction:column;gap:2px;overflow:auto}
+body.open .side{transform:none;visibility:visible}body.open .scrim{opacity:1;visibility:visible}
+.nav{display:block;width:100%;text-align:left;padding:11px 14px;border:0;background:transparent;border-radius:12px;min-height:44px;font-weight:500;color:var(--muted)}
+.nav:hover{background:var(--track);color:var(--ink)}
+.nav[aria-current="page"]{background:var(--soft);color:var(--accent-text);font-weight:700}
+.who{display:flex;align-items:center;gap:12px;margin:10px 4px 4px;padding:12px;border:1px solid var(--line);border-radius:18px;background:var(--bg)}
+.who .nm{min-width:0}
+.who b{display:block;font-size:.92rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.who span{display:block;color:var(--muted);font-size:.8rem}
+main{max-width:1080px;margin:0 auto;padding:8px 16px 56px;display:grid;gap:18px}
+/* ---------- componentes ---------- */
+.stats{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:16px;box-shadow:var(--shadow)}
+.stat b{display:block;font-size:1.7rem;font-weight:800;letter-spacing:-.03em;line-height:1.1}
+.stat span{color:var(--muted);font-size:.84rem;font-weight:500}
+.ulist{display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(310px,1fr))}
+.ucard{background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:16px;box-shadow:var(--shadow);display:grid;gap:12px}
+.ucard.off{opacity:.72}
+.uhead{display:flex;gap:12px;align-items:center;min-width:0}
+.avatar{width:44px;height:44px;border-radius:50%;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-weight:800;flex:none}
+.uname{font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.uhandle{color:var(--muted);font-size:.84rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.76rem;font-weight:600;background:var(--track)}
+.chip.on{background:var(--soft);border-color:color-mix(in srgb,var(--accent) 35%,var(--line));color:var(--accent-text)}
+.chip.ok{background:color-mix(in srgb,var(--good) 14%,var(--surface));border-color:color-mix(in srgb,var(--good) 35%,var(--line));color:var(--good)}
+.chip.bad{background:color-mix(in srgb,var(--bad) 12%,var(--surface));border-color:color-mix(in srgb,var(--bad) 35%,var(--line));color:var(--bad)}
+.uacts{display:flex;flex-wrap:wrap;gap:8px}
+.meta{display:grid;gap:2px;color:var(--muted);font-size:.82rem}
+.tg{display:flex;align-items:center;gap:10px}
+.tg input{width:46px;height:26px;appearance:none;-webkit-appearance:none;background:var(--track);border:1px solid var(--line);border-radius:99px;position:relative;transition:background .15s;flex:none}
+.tg input:checked{background:var(--accent);border-color:var(--accent)}
+.tg input::after{content:'';position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;background:var(--surface);box-shadow:0 1px 2px rgba(0,0,0,.25);transition:transform .15s}
+.tg input:checked::after{transform:translateX(20px)}
+.tg label{font-size:.9rem;font-weight:600}
+.fld{display:grid;gap:6px;min-width:0}
+.fld>span{font-size:.86rem;color:var(--muted);font-weight:500}
+.fld input,.fld textarea,.fld select{width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:14px;background:var(--bg);min-height:46px}
+.fld textarea{min-height:82px;resize:vertical}
+.fld small{color:var(--muted);font-size:.78rem}
+.grid2{display:grid;gap:14px;grid-template-columns:1fr 1fr}
+@media (max-width:560px){.grid2{grid-template-columns:1fr}}
+.box{border:1px dashed var(--line);border-radius:20px;padding:14px;background:color-mix(in srgb,var(--accent) 5%,var(--surface))}
+.box h4{margin:0 0 4px;font-size:.9rem}
+.log{display:grid;gap:10px}
+.logit{display:grid;grid-template-columns:1fr auto;gap:4px 12px;align-items:start;border:1px solid var(--line);border-radius:16px;padding:12px 14px;background:var(--surface)}
+.logit b{font-weight:700;font-size:.92rem}
+.logit time{color:var(--muted);font-size:.78rem;font-variant-numeric:tabular-nums;white-space:nowrap}
+.logit p{margin:0;color:var(--muted);font-size:.84rem;grid-column:1/-1}
+.empty{text-align:center;color:var(--muted);padding:36px 18px}
+dialog{border:1px solid var(--line);border-radius:24px;background:var(--surface);color:var(--ink);padding:22px;width:min(520px,94vw);max-height:92vh;overflow:auto}
+dialog::backdrop{background:rgba(5,7,12,.55)}
+dialog h2{margin:0 0 4px;font-size:1.2rem;font-weight:800}
+.dlg-actions{display:flex;flex-wrap:wrap;gap:10px;justify-content:flex-end;margin-top:20px}
+.tabs{display:flex;gap:4px;padding:4px;background:var(--track);border-radius:14px;width:fit-content;max-width:100%;overflow:auto}
+.tabs button{border:0;background:transparent;padding:8px 14px;border-radius:10px;min-height:40px;font-weight:700;color:var(--muted);white-space:nowrap}
+.tabs button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+pre.code{margin:10px 0 0;padding:12px 14px;border:1px solid var(--line);border-radius:14px;background:var(--bg);overflow:auto;font:500 .82rem/1.5 ui-monospace,SFMono-Regular,Menlo,monospace}
+#toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 20px);transform:translateX(-50%) translateY(10px);opacity:0;visibility:hidden;transition:opacity .18s ease,transform .18s ease,visibility .18s;z-index:60;
+background:var(--ink);color:var(--bg);padding:12px 16px;border-radius:14px;font-weight:500;font-size:.95rem;text-align:center;overflow-wrap:anywhere;width:max-content;max-width:calc(100vw - 28px);box-shadow:0 12px 32px -12px rgba(0,0,0,.5)}
+#toast.on{opacity:1;visibility:visible;transform:translateX(-50%)}
+@media (prefers-reduced-motion:reduce){#toast{transition:none}}
+</style>
+</head>
+<body>
+<!-- ================= ENTRADA (login / primeiro acesso) ================= -->
+<div id="gate">
+  <div class="card gcard">
+    <div class="brand"><span class="logo"><svg viewBox="0 0 24 24"><path d="M12 3l7 3v6c0 4.4-3 7.6-7 9-4-1.4-7-4.6-7-9V6z"/><path d="m9 12 2 2 4-4"/></svg></span>
+      <span>Painel de administrador<small id="gateSub">Acessos ao catálogo e estoque</small></span></div>
+    <h2 id="gateT">Carregando…</h2>
+    <p class="sub" id="gateS">Verificando os acessos deste aparelho.</p>
+
+    <form id="gateForm" hidden>
+      <label class="fld" id="fNomeG" hidden style="margin-top:16px"><span>Seu nome</span><input id="gNome" type="text" autocomplete="name" placeholder="Ex.: Maria Lacerda"></label>
+      <label class="fld" style="margin-top:16px"><span>Usuário</span><input id="gUser" type="text" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="ex.: maria"></label>
+      <label class="fld" style="margin-top:14px"><span>Senha</span>
+        <span class="pw"><input id="gPass" type="password" autocomplete="current-password">
+          <button type="button" class="eye" id="gEye" aria-label="Mostrar ou esconder a senha"><svg viewBox="0 0 24 24"><path d="M2 12s3.6-6 10-6 10 6 10 6-3.6 6-10 6S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></button>
+        </span></label>
+      <label class="fld" id="fPass2" hidden style="margin-top:14px"><span>Repita a senha</span><input id="gPass2" type="password" autocomplete="new-password"></label>
+      <p class="err" id="gErr" hidden></p>
+      <button class="btn main w100" id="gOk" type="submit" style="margin-top:18px">Entrar</button>
+    </form>
+
+    <div class="wrap" style="justify-content:space-between;margin-top:8px">
+      <button class="lk" id="gHelp" type="button">Não consigo entrar</button>
+      <button class="lk danger" id="gReset" type="button">Zerar acessos</button>
+    </div>
+    <p class="sub" id="gateHint" hidden></p>
+  </div>
+</div>
+
+<!-- ================= PAINEL ================= -->
+<div class="shell" id="app" hidden>
+<nav class="side" id="side" aria-label="Menu do administrador">
+  <div class="brand"><span class="logo"><svg viewBox="0 0 24 24"><path d="M12 3l8 4.5v9L12 21l-8-4.5v-9z"/><path d="M4 7.5l8 4.5 8-4.5M12 12v9"/></svg></span>
+    <span id="shopName">Meu estoque<small>Administrador</small></span></div>
+  <button class="nav" data-view="acessos" aria-current="page">Acessos</button>
+  <button class="nav" data-view="perfis">Perfis e permissões</button>
+  <button class="nav" data-view="auditoria">Auditoria</button>
+  <button class="nav" data-view="backup">Backup e integração</button>
+  <div class="who" id="whoBox"></div>
+  <div class="grow"></div>
+  <a class="nav" href="index.html" style="text-decoration:none">Abrir estoque</a>
+  <a class="nav" href="index.html?catalogo" style="text-decoration:none">Abrir catálogo</a>
+  <button class="nav" id="navThemes" type="button">Alternar tema</button>
+  <button class="nav" id="navOut" type="button">Sair do painel</button>
+</nav>
+<div class="scrim" id="scrim"></div>
+
+<div class="col">
+<header class="top">
+  <button class="ib" id="menuBtn" aria-label="Abrir ou fechar menu" aria-controls="side"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h10"/></svg></button>
+  <h1 id="title">Acessos</h1>
+  <button class="ib" id="themeBtn" aria-label="Alternar modo claro e escuro">
+    <svg class="moon" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5z"/></svg>
+    <svg class="sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5 19 19M5 19l1.5-1.5M17.5 6.5 19 5"/></svg>
+  </button>
+</header>
+<!-- ---------- ACESSOS ---------- -->
+<main id="v-acessos">
+  <section class="sec-h">
+    <div>
+      <h2>Acessos ao sistema</h2>
+      <p class="sub">Crie, ajuste e bloqueie quem entra no estoque e no catálogo.</p>
+    </div>
+    <button class="btn main" id="newUser">Novo acesso</button>
+  </section>
+
+  <section class="stats" id="stats"></section>
+
+  <div class="wrap">
+    <label class="fld" style="flex:1;min-width:210px"><span>Buscar</span><input id="q" type="search" placeholder="Nome, usuário ou perfil" autocomplete="off"></label>
+    <label class="fld" style="min-width:180px"><span>Situação</span>
+      <select id="fStatus">
+        <option value="todos">Todos</option>
+        <option value="ativos">Liberados</option>
+        <option value="bloqueados">Bloqueados</option>
+        <option value="vencendo">Vencidos ou vencendo</option>
+      </select></label>
+  </div>
+
+  <section id="uList" class="ulist"></section>
+  <p class="empty" id="uEmpty" hidden>Nenhum acesso encontrado.<br>Toque em <b>Novo acesso</b> para criar o primeiro.</p>
+
+  <section class="box">
+    <h4>Como funciona</h4>
+    <p class="sub">As senhas ficam embaralhadas (hash com sal) no mesmo banco do sistema — nunca em texto puro. Elas aparecem uma única vez, na criação: copie e entregue para a pessoa (ou gere uma nova senha depois).</p>
+  </section>
+</main>
+
+<!-- ---------- PERFIS ---------- -->
+<main id="v-perfis" hidden>
+  <section class="sec-h">
+    <div>
+      <h2>Perfis e permissões</h2>
+      <p class="sub">Defina o que cada tipo de acesso pode ver e fazer no sistema.</p>
+    </div>
+    <button class="btn main" id="newPerfil">Novo perfil</button>
+  </section>
+  <section id="pList" class="ulist"></section>
+</main>
+
+<!-- ---------- AUDITORIA ---------- -->
+<main id="v-auditoria" hidden>
+  <section class="sec-h">
+    <div>
+      <h2>Auditoria</h2>
+      <p class="sub" id="logSub">Últimas ações feitas neste painel.</p>
+    </div>
+    <button class="btn" id="logClear">Limpar histórico</button>
+  </section>
+  <section class="log" id="logList"></section>
+  <p class="empty" id="logEmpty" hidden>Sem registros por aqui.</p>
+</main>
+
+<!-- ---------- BACKUP / INTEGRAÇÃO ---------- -->
+<main id="v-backup" hidden>
+  <section class="sec-h">
+    <div>
+      <h2>Backup e integração</h2>
+      <p class="sub">Leve os acessos para outro aparelho e ligue o login no sistema.</p>
+    </div>
+  </section>
+
+  <section class="card">
+    <h3>Backup dos acessos</h3>
+    <p class="sub">O arquivo inclui perfis e acessos (com as senhas já embaralhadas). Guarde em local seguro.</p>
+    <div class="wrap" style="margin-top:14px">
+      <button class="btn main" id="expBtn">Baixar backup (.json)</button>
+      <button class="btn" id="impBtn">Restaurar backup</button>
+      <input type="file" id="impFile" accept="application/json,.json" hidden>
+    </div>
+  </section>
+
+  <section class="card">
+    <h3>Ligar o login no sistema</h3>
+    <p class="sub">O painel grava os acessos na chave <b>users</b> do banco <b>estoque</b> (IndexedDB) — o mesmo que o <b>index.html</b> já usa. Para o sistema passar a pedir usuário e senha, cole este trecho no <b>index.html</b>, logo abaixo da função <b>kvGet</b>:</p>
+    <pre class="code" id="snip">/* acessos criados no admin.html */
+function acessos(){return kvGet('users').then(function(u){return Array.isArray(u)?u:[]})}
+acessos().then(function(us){
+  if(!us.length)return;                    /* ainda sem acessos: sistema livre */
+  var s=JSON.parse(sessionStorage.getItem('ses')||'null');if(!s){location.replace('admin.html');return}
+  var u=us.filter(function(x){return x.user===s.user&&x.ativo})[0];
+  if(!u){location.replace('admin.html');return}
+  if(u.validade&amp;&amp;new Date(u.validade+'T23:59:59')&lt;new Date()){location.replace('admin.html?exp=1');return}
+  document.documentElement.dataset.acesso=JSON.stringify({nome:u.nome,perfil:u.perfil,perms:u.perms,extras:u.extras});
+});</pre>
+    <p class="sub">Depois disso, o menu do sistema pode ser montado a partir de <code>dataset.acesso</code> (ex.: esconder Produtos de quem não tem a permissão).</p>
+    <div class="wrap" style="margin-top:14px">
+      <button class="btn" id="cpSnippet">Copiar trecho</button>
+      <a class="btn" href="index.html" style="text-decoration:none">Abrir estoque</a>
+      <a class="btn" href="index.html?catalogo" style="text-decoration:none">Abrir catálogo</a>
+    </div>
+  </section>
+
+  <section class="card">
+    <h3>Zona de risco</h3>
+    <p class="sub">Apagar os acessos não mexe em produtos, vendas nem no catálogo. Serve para recomeçar quando ninguém mais consegue entrar.</p>
+    <div class="wrap" style="margin-top:14px">
+      <button class="btn danger" id="wipeBtn">Apagar todos os acessos</button>
+    </div>
+  </section>
+</main>
+</div>
+</div>
+<!-- ================= DIÁLOGOS ================= -->
+<dialog id="userDlg">
+  <h2 id="uDlgT">Novo acesso</h2>
+  <p class="sub" id="uDlgS">A pessoa entra no estoque e no catálogo com estes dados.</p>
+
+  <label class="fld" style="margin-top:16px"><span>Nome de quem vai usar</span><input id="fNome2" type="text" autocomplete="off" placeholder="Ex.: João da Silva"></label>
+  <div class="grid2" style="margin-top:14px">
+    <label class="fld"><span>Usuário (login)</span><input id="fUser" type="text" autocapitalize="none" spellcheck="false" placeholder="ex.: joao"></label>
+    <label class="fld"><span>Telefone ou e-mail (opcional)</span><input id="fTel" type="text" autocomplete="off" placeholder="para contato"></label>
+  </div>
+  <label class="fld" style="margin-top:14px"><span>Perfil</span><select id="fPerfil"></select><small id="fPerfilHelp"></small></label>
+
+  <span style="display:block;margin:18px 0 8px;font-size:.86rem;color:var(--muted);font-weight:500">Permissões (toque para ligar ou desligar)</span>
+  <div class="chips" id="fPerms"></div>
+
+  <span style="display:block;margin:18px 0 8px;font-size:.86rem;color:var(--muted);font-weight:500">Poderes extras</span>
+  <div class="chips" id="fExtras"></div>
+
+  <div class="grid2" style="margin-top:16px">
+    <label class="fld"><span>Vale até (opcional)</span><input id="fVal" type="date"></label>
+    <div class="fld"><span>Situação</span>
+      <div class="tg"><input id="fAtivo" type="checkbox" checked><label for="fAtivo">Acesso liberado</label></div>
+      <div class="tg" style="margin-top:8px"><input id="fTroca" type="checkbox"><label for="fTroca">Pedir troca de senha no 1º acesso</label></div>
+    </div>
+  </div>
+
+  <label class="fld" style="margin-top:14px"><span>Observações (opcional)</span><textarea id="fNotas" placeholder="Ex.: só trabalha de manhã"></textarea></label>
+
+  <div class="box" style="margin-top:16px">
+    <div class="tg"><input id="fAuto" type="checkbox" checked><label for="fAuto">Gerar senha forte automaticamente</label></div>
+    <div class="grid2" style="margin-top:12px">
+      <label class="fld"><span>Senha</span><input id="fPass" type="text" autocapitalize="none" spellcheck="false" placeholder="mínimo 6 caracteres"></label>
+      <label class="fld"><span>Repita a senha</span><input id="fPass2" type="text" autocapitalize="none" spellcheck="false"></label>
+    </div>
+    <small class="sub" id="fPassHelp" style="display:block;margin-top:8px"></small>
+  </div>
+
+  <p class="err" id="uErr" hidden></p>
+  <div class="dlg-actions">
+    <button class="btn" type="button" id="uCancel">Cancelar</button>
+    <button class="btn main" type="button" id="uSave">Salvar acesso</button>
+  </div>
+</dialog>
+
+<dialog id="perfilDlg">
+  <h2 id="pDlgT">Novo perfil</h2>
+  <p class="sub">Escolha as permissões do perfil. Os acessos deste perfil podem ser atualizados junto.</p>
+  <label class="fld" style="margin-top:16px"><span>Nome do perfil</span><input id="pNome" type="text" placeholder="Ex.: Caixa"></label>
+  <label class="fld" style="margin-top:14px"><span>Descrição (opcional)</span><input id="pDesc" type="text" placeholder="Ex.: só registra vendas"></label>
+  <span style="display:block;margin:18px 0 8px;font-size:.86rem;color:var(--muted);font-weight:500">Permissões</span>
+  <div class="chips" id="pPerms"></div>
+  <span style="display:block;margin:18px 0 8px;font-size:.86rem;color:var(--muted);font-weight:500">Poderes extras</span>
+  <div class="chips" id="pExtras"></div>
+  <p class="err" id="pErr" hidden></p>
+  <div class="dlg-actions">
+    <button class="btn" type="button" id="pCancel">Cancelar</button>
+    <button class="btn main" type="button" id="pSave">Salvar perfil</button>
+  </div>
+</dialog>
+
+<dialog id="pwDlg">
+  <h2>Senha criada</h2>
+  <p class="sub">Anote ou copie agora: esta senha não será mostrada de novo.</p>
+  <div class="box" style="margin-top:16px">
+    <div class="meta">
+      <span id="pwWho"></span>
+      <span id="pwUser"></span>
+    </div>
+    <p style="margin:10px 0 0;font-size:1.35rem;font-weight:800;letter-spacing:.06em" id="pwVal"></p>
+  </div>
+  <div class="dlg-actions">
+    <button class="btn" type="button" id="pwWa">Enviar no WhatsApp</button>
+    <button class="btn" type="button" id="pwCopy">Copiar dados</button>
+    <button class="btn main" type="button" id="pwOk">Entendi</button>
+  </div>
+</dialog>
+
+<dialog id="askDlg">
+  <h2 id="askT">Confirmar</h2>
+  <p class="sub" id="askS"></p>
+  <label class="fld" id="askFld" hidden style="margin-top:16px"><span id="askLbl">Digite para confirmar</span><input id="askVal" type="text" autocomplete="off" placeholder="APAGAR"></label>
+  <div class="dlg-actions">
+    <button class="btn" type="button" id="askNo">Cancelar</button>
+    <button class="btn" type="button" id="askYes">Confirmar</button>
+  </div>
+</dialog>
+
+<div id="toast" role="status" aria-live="polite"></div>
+<script>
+/* =========================================================================
+   Painel de administrador · cria e gerencia os acessos ao catálogo e estoque
+   Guarda tudo no mesmo banco do sistema: IndexedDB "estoque", store "kv".
+   Chaves usadas: users (acessos), perfis (perfis), acessos_log (auditoria)
+   ========================================================================= */
+var $=function(id){return document.getElementById(id)};
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+function toast(m){var t=$('toast');t.textContent=m;t.classList.add('on');clearTimeout(t._h);t._h=setTimeout(function(){t.classList.remove('on')},2800)}
+function initials(n){var p=String(n||'?').trim().split(/\s+/);return((p[0]||'?').charAt(0)+(p.length>1?p[p.length-1].charAt(0):'')).toUpperCase()}
+function brDate(v){if(!v)return'';var d=new Date(v.length<=10?v+'T12:00:00':v);return isNaN(d)?'':d.toLocaleDateString('pt-BR')}
+function brWhen(t){var d=new Date(t);if(isNaN(d))return'';return d.toLocaleDateString('pt-BR')+' às '+d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}
+function norm(s){return String(s==null?'':s).trim().toLowerCase().replace(/\s+/g,'')}
+
+/* ---------------- armazenamento (mesmo banco do index.html) ---------------- */
+var STORE='kv',db=null,KEY_USERS='users',KEY_PERFIS='perfis',KEY_LOG='acessos_log';
+function idb(){return new Promise(function(r){try{
+  var q=indexedDB.open('estoque');
+  q.onupgradeneeded=function(){var d=q.result;if(!d.objectStoreNames.contains(STORE))d.createObjectStore(STORE)};
+  q.onsuccess=function(){db=q.result;r(db)};
+  q.onerror=function(){r(null)};
+}catch(e){r(null)}})}
+function lsGet(k){try{var v=localStorage.getItem('acc_'+k);return v?JSON.parse(v):null}catch(e){return null}}
+function lsSet(k,v){try{localStorage.setItem('acc_'+k,JSON.stringify(v))}catch(e){}}
+function kvGet(k){return new Promise(function(r){if(!db)return r(lsGet(k));try{
+  var q=db.transaction(STORE).objectStore(STORE).get(k);
+  q.onsuccess=function(){var v=q.result;r(v==null?lsGet(k):v)};
+  q.onerror=function(){r(lsGet(k))};
+}catch(e){r(lsGet(k))}})}
+function kvSet(k,v){return new Promise(function(r){lsSet(k,v);if(!db)return r();try{
+  var t=db.transaction(STORE,'readwrite');t.objectStore(STORE).put(v,k);t.oncomplete=function(){r()};t.onerror=function(){r()};
+}catch(e){r()}})}
+
+/* ---------------- senhas: hash com sal (WebCrypto e alternativa) ---------------- */
+function rand(n){var a=new Uint8Array(n);if(window.crypto&&crypto.getRandomValues)crypto.getRandomValues(a);else for(var i=0;i<n;i++)a[i]=Math.floor(Math.random()*256);return a}
+function hex(a){return Array.prototype.map.call(a,function(x){return('00'+x.toString(16)).slice(-2)}).join('')}
+function salt(){return hex(rand(12))}
+function subtleOK(){try{return !!(window.crypto&&crypto.subtle&&crypto.subtle.digest&&window.TextEncoder)}catch(e){return false}}
+function sha(pw,s){var b=new TextEncoder().encode(s+'|'+pw);return crypto.subtle.digest('SHA-256',b).then(function(h){return hex(new Uint8Array(h))})}
+function fnv(pw,s){var seed=s+'|'+pw,h=0x811c9dc5;for(var r=0;r<4000;r++){var t=seed+'#'+r;for(var i=0;i<t.length;i++){h^=t.charCodeAt(i);h=Math.imul(h,0x01000193)>>>0}}return 'f'+h.toString(16)}
+function hashNew(pw){var s=salt();if(subtleOK())return sha(pw,s).then(function(h){return{a:'sha256',s:s,h:h}});return Promise.resolve({a:'fnv',s:s,h:fnv(pw,s)})}
+function hashCheck(pw,cred){if(!cred)return Promise.resolve(false);if(cred.a==='sha256'&&subtleOK())return sha(pw,cred.s).then(function(h){return h===cred.h});return Promise.resolve(fnv(pw,cred.s)===cred.h)}
+function novaSenha(){var A='ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789',o='';for(var i=0;i<8;i++)o+=A.charAt(rand(1)[0]%A.length);return o.slice(0,4)+'-'+o.slice(4)}
+
+/* ---------------- permissões e perfis ---------------- */
+var MODS=[['inicio','Início'],['produtos','Produtos'],['estoque','Estoque'],['vendas','Vendas'],['clientes','Clientes'],['relatorios','Relatórios'],['catalogo','Catálogo online'],['config','Configurações'],['acessos','Criar acessos']];
+var EXTRAS=[['verCusto','Ver custo e lucro'],['excluir','Excluir produtos'],['publicar','Publicar catálogo'],['exportar','Exportar relatórios']];
+function modLabel(k){for(var i=0;i<MODS.length;i++)if(MODS[i][0]===k)return MODS[i][1];return k}
+function exLabel(k){for(var i=0;i<EXTRAS.length;i++)if(EXTRAS[i][0]===k)return EXTRAS[i][1];return k}
+function allMods(){return MODS.map(function(m){return m[0]})}
+function allExtras(){return EXTRAS.map(function(e){return e[0]})}
+function seedPerfis(){return[
+ {id:'admin',nome:'Administrador',desc:'Acesso total, cria e gerencia os acessos.',perms:allMods(),extras:allExtras(),sistema:true},
+ {id:'gerente',nome:'Gerente',desc:'Opera estoque, vendas, clientes e relatórios.',perms:['inicio','produtos','estoque','vendas','clientes','relatorios','catalogo'],extras:['verCusto','publicar'],sistema:true},
+ {id:'estoque',nome:'Estoquista',desc:'Cuida de produtos, entradas e saídas.',perms:['inicio','produtos','estoque','relatorios'],extras:['verCusto'],sistema:true},
+ {id:'vendedor',nome:'Vendedor',desc:'Registra vendas e clientes e usa o catálogo.',perms:['inicio','produtos','vendas','clientes','catalogo'],extras:['verCusto'],sistema:true},
+ {id:'catalogo',nome:'Catálogo',desc:'Só cuida do catálogo online.',perms:['inicio','catalogo'],extras:['publicar'],sistema:true}
+]}
+function findByUser(u){for(var i=0;i<users.length;i++)if(norm(users[i].user)===norm(u))return users[i];return null}
+function findPerfil(id){for(var i=0;i<perfis.length;i++)if(perfis[i].id===id)return perfis[i];return null}
+function perfilNome(id){var p=findPerfil(id);return p?p.nome:(id||'—')}
+function expirado(u){if(!u.validade)return false;return new Date(u.validade+'T23:59:59')<new Date()}
+function vencendo(u){if(!u.validade||expirado(u))return false;var d=new Date(u.validade+'T23:59:59')-new Date();return d<=7*86400000}
+function situacao(u){if(!u.ativo)return['Bloqueado','bad'];if(expirado(u))return['Vencido','bad'];if(vencendo(u))return['Vence em breve','bad'];return['Liberado','ok']}
+
+/* ---------------- estado ---------------- */
+var users=[],perfis=[],acessosLog=[],ses=null,cur=null,curPerfil=null,pend=null,view='acessos',tentativas=0,travado=0;
+/* ---------------- auditoria ---------------- */
+function logAdd(act,alvo,det){
+  acessosLog.unshift({t:Date.now(),by:(ses&&ses.nome)||'sistema',act:act,alvo:alvo||'',det:det||''});
+  if(acessosLog.length>400)acessosLog.length=400;
+  kvSet(KEY_LOG,acessosLog);
+}
+function renderLog(){
+  $('logList').innerHTML=acessosLog.map(function(l){
+    return '<article class="logit"><b>'+esc(l.act)+'</b><time>'+esc(brWhen(l.t))+'</time><p>'+esc((l.by||'')+(l.alvo?' · '+l.alvo:'')+(l.det?' · '+l.det:''))+'</p></article>';
+  }).join('');
+  $('logEmpty').hidden=acessosLog.length>0;
+  $('logSub').textContent=acessosLog.length?'Últimas '+acessosLog.length+' ações registradas.':'Últimas ações feitas neste painel.';
+}
+
+/* ---------------- acessos ---------------- */
+function renderStats(){
+  var liberados=users.filter(function(u){return u.ativo&&!expirado(u)}).length;
+  var bloqueados=users.filter(function(u){return !u.ativo}).length;
+  var venc=users.filter(function(u){return u.validade&&vencendo(u)}).length+users.filter(function(u){return expirado(u)}).length;
+  var admins=users.filter(function(u){return(u.perms||[]).indexOf('acessos')>=0&&u.ativo}).length;
+  $('stats').innerHTML=[['Acessos',users.length],['Liberados',liberados],['Bloqueados',bloqueados],['Vencidos ou vencendo',venc],['Podem criar acessos',admins]]
+   .map(function(s){return '<div class="stat"><b>'+s[1]+'</b><span>'+s[0]+'</span></div>'}).join('');
+}
+function renderUsers(){
+  var q=norm($('q').value),st=$('fStatus').value,out=[];
+  users.forEach(function(u){
+    if(q&&norm(u.nome+u.user+perfilNome(u.perfil)).indexOf(q)<0)return;
+    if(st==='ativos'&&(!u.ativo||expirado(u)))return;
+    if(st==='bloqueados'&&u.ativo)return;
+    if(st==='vencendo'&&!(expirado(u)||vencendo(u)))return;
+    var s=situacao(u);
+    out.push('<article class="ucard'+(u.ativo?'':' off')+'">'+
+      '<div class="uhead"><span class="avatar">'+esc(initials(u.nome))+'</span>'+
+      '<span style="min-width:0"><span class="uname">'+esc(u.nome||'(sem nome)')+'</span><span class="uhandle">@'+esc(u.user)+' · '+esc(perfilNome(u.perfil))+'</span></span>'+
+      '<span class="chip '+s[1]+'" style="margin-left:auto">'+s[0]+'</span></div>'+
+      '<div class="chips">'+(u.perms||[]).map(function(k){return '<span class="chip on">'+esc(modLabel(k))+'</span>'}).join('')+
+        (u.extras||[]).map(function(k){return '<span class="chip">'+esc(exLabel(k))+'</span>'}).join('')+'</div>'+
+      '<div class="meta"><span>Criado em '+esc(brDate(u.criadoEm))+(u.criadoPor?' por '+esc(u.criadoPor):'')+'</span>'+
+      '<span>Último acesso: '+(u.ultimoAcesso?esc(brWhen(u.ultimoAcesso)):'nunca')+'</span>'+
+      (u.validade?'<span>Vale até '+esc(brDate(u.validade))+'</span>':'')+
+      (u.troca?'<span>Troca de senha pedida no 1º acesso</span>':'')+
+      (u.tel?'<span>'+esc(u.tel)+'</span>':'')+'</div>'+
+      '<div class="uacts">'+
+        '<button class="btn sm" data-act="edit" data-id="'+esc(u.id)+'">Editar</button>'+
+        '<button class="btn sm" data-act="senha" data-id="'+esc(u.id)+'">Nova senha</button>'+
+        '<button class="btn sm" data-act="'+(u.ativo?'bloquear':'liberar')+'" data-id="'+esc(u.id)+'">'+(u.ativo?'Bloquear':'Liberar')+'</button>'+
+        '<button class="btn sm danger" data-act="del" data-id="'+esc(u.id)+'">Excluir</button>'+
+      '</div></article>');
+  });
+  $('uList').innerHTML=out.join('');
+  $('uEmpty').hidden=out.length>0;
+}
+function saveUsers(act,alvo,det){return kvSet(KEY_USERS,users).then(function(){renderStats();renderUsers();if(act)logAdd(act,alvo,det)})}
+
+/* ---------------- perfis ---------------- */
+function renderPerfis(){
+  $('pList').innerHTML=perfis.map(function(p){
+    var n=users.filter(function(u){return u.perfil===p.id}).length;
+    return '<article class="ucard">'+
+      '<div class="uhead"><span class="avatar">'+esc(initials(p.nome))+'</span>'+
+      '<span style="min-width:0"><span class="uname">'+esc(p.nome)+'</span><span class="uhandle">'+n+' '+(n===1?'acesso':'acessos')+'</span></span></div>'+
+      (p.desc?'<p class="sub" style="margin:0">'+esc(p.desc)+'</p>':'')+
+      '<div class="chips">'+(p.perms||[]).map(function(k){return '<span class="chip on">'+esc(modLabel(k))+'</span>'}).join('')+
+        (p.extras||[]).map(function(k){return '<span class="chip">'+esc(exLabel(k))+'</span>'}).join('')+'</div>'+
+      '<div class="uacts"><button class="btn sm" data-pact="edit" data-id="'+esc(p.id)+'">Editar</button>'+
+      (p.sistema?'':'<button class="btn sm danger" data-pact="del" data-id="'+esc(p.id)+'">Excluir</button>')+'</div></article>';
+  }).join('');
+}
+
+/* ---------------- navegação ---------------- */
+var VIEWS=[['acessos','Acessos'],['perfis','Perfis e permissões'],['auditoria','Auditoria'],['backup','Backup e integração']];
+function goView(v){
+  view=v;
+  VIEWS.forEach(function(x){$('v-'+x[0]).hidden=x[0]!==v});
+  document.querySelectorAll('.nav[data-view]').forEach(function(b){b.setAttribute('aria-current',b.dataset.view===v?'page':'false')});
+  for(var i=0;i<VIEWS.length;i++)if(VIEWS[i][0]===v)$('title').textContent=VIEWS[i][1];
+  document.body.classList.remove('open');
+  if(v==='acessos'){renderStats();renderUsers()}
+  if(v==='perfis')renderPerfis();
+  if(v==='auditoria')renderLog();
+  window.scrollTo(0,0);
+}
+function applyTheme(t){
+  document.documentElement.setAttribute('data-theme',t);
+  try{localStorage.setItem('tema',t)}catch(e){}
+}
+function themeNow(){return document.documentElement.getAttribute('data-theme')==='dark'?'dark':'light'}
+/* ---------------- diálogo de confirmação ---------------- */
+function ask(o){
+  $('askT').textContent=o.t||'Confirmar';
+  $('askS').textContent=o.s||'';
+  $('askFld').hidden=!o.need;
+  if(o.need){$('askVal').value='';$('askLbl').textContent=o.lbl||'Digite para confirmar'}
+  $('askYes').textContent=o.ok||'Confirmar';
+  $('askYes').className='btn '+(o.danger?'danger':'main');
+  pend=o;
+  $('askDlg').showModal();
+  if(o.need)setTimeout(function(){$('askVal').focus()},60);
+}
+$('askYes').onclick=function(){
+  if(pend&&pend.need&&$('askVal').value.trim()!==pend.need){toast('Digite '+pend.need+' para confirmar.');return}
+  $('askDlg').close();
+  var o=pend;pend=null;
+  if(o&&o.cb)o.cb();
+};
+$('askNo').onclick=function(){$('askDlg').close();pend=null};
+
+/* ---------------- diálogo da senha (aparece uma vez) ---------------- */
+var curPw=null;
+function baseUrl(){return location.href.split('?')[0].replace(/admin\.html$/i,'')}
+function credTexto(u,pw){
+  return 'Acesso ao sistema de catálogo e estoque\nUsuário: '+u.user+'\nSenha: '+pw+
+    '\nEstoque: '+baseUrl()+'index.html\nCatálogo: '+baseUrl()+'index.html?catalogo';
+}
+function copiar(txt,msg){
+  var ok=function(){toast(msg||'Copiado.')};
+  if(navigator.clipboard&&navigator.clipboard.writeText)return navigator.clipboard.writeText(txt).then(ok,function(){fallback()});
+  fallback();
+  function fallback(){
+    var a=document.createElement('textarea');a.value=txt;a.setAttribute('readonly','');a.style.position='fixed';a.style.top='-1000px';
+    document.body.appendChild(a);a.select();try{document.execCommand('copy');ok()}catch(e){toast('Não consegui copiar: selecione e copie na mão.')}document.body.removeChild(a);
+  }
+}
+function showPw(u,pw){
+  curPw={u:u,pw:pw};
+  $('pwWho').textContent=u.nome;
+  $('pwUser').textContent='Usuário: '+u.user+' · Perfil: '+perfilNome(u.perfil);
+  $('pwVal').textContent=pw;
+  $('pwDlg').showModal();
+}
+$('pwOk').onclick=function(){$('pwDlg').close()};
+$('pwCopy').onclick=function(){if(curPw)copiar(credTexto(curPw.u,curPw.pw),'Usuário e senha copiados.')};
+$('pwWa').onclick=function(){
+  if(!curPw)return;
+  var tel=String(curPw.u.tel||'').replace(/\D/g,'');
+  window.open('https://wa.me/'+(tel?'55'+tel.replace(/^55/,''):'')+'?text='+encodeURIComponent(credTexto(curPw.u,curPw.pw)),'_blank','noopener');
+};
+
+/* ---------------- editor de acesso ---------------- */
+function chipSet(host,list,sel,kind){
+  host.innerHTML=list.map(function(x){
+    var on=sel.indexOf(x[0])>=0;
+    return '<button type="button" class="chip'+(on?' on':'')+'" data-k="'+esc(x[0])+'" data-kind="'+kind+'" aria-pressed="'+(on?'true':'false')+'">'+esc(x[1])+'</button>';
+  }).join('');
+}
+function chipTodas(host){return Array.prototype.map.call(host.querySelectorAll('.chip[aria-pressed="true"]'),function(b){return b.dataset.k})}
+function chipsLer(){return{perms:chipTodas($('fPerms')),extras:chipTodas($('fExtras'))}}
+['fPerms','fExtras'].forEach(function(id){
+  $(id).addEventListener('click',function(e){
+    var b=e.target.closest('.chip[data-k]');if(!b)return;
+    var on=b.getAttribute('aria-pressed')!=='true';
+    b.setAttribute('aria-pressed',on?'true':'false');b.classList.toggle('on',on);
+  });
+});
+$('fPerfil').onchange=function(){
+  var p=findPerfil(this.value);
+  $('fPerfilHelp').textContent=p&&p.desc?p.desc:'';
+  if(p){chipSet($('fPerms'),MODS,p.perms||[],'perm');chipSet($('fExtras'),EXTRAS,p.extras||[],'extra')}
+};
+function openUser(u){
+  cur=u||null;
+  $('uDlgT').textContent=u?'Editar acesso':'Novo acesso';
+  $('uDlgS').textContent=u?'Ajuste dados, permissões e situação deste acesso.':'A pessoa entra no estoque e no catálogo com estes dados.';
+  $('fPerfil').innerHTML=perfis.map(function(p){return '<option value="'+esc(p.id)+'">'+esc(p.nome)+'</option>'}).join('');
+  var p=u?findPerfil(u.perfil):perfis[0];
+  $('fPerfil').value=p?p.id:(perfis[0]?perfis[0].id:'');
+  $('fPerfilHelp').textContent=p&&p.desc?p.desc:'';
+  $('fNome2').value=u?u.nome:'';$('fUser').value=u?u.user:'';$('fTel').value=u?(u.tel||''):'';
+  $('fVal').value=u?(u.validade||''):'';$('fAtivo').checked=u?!!u.ativo:true;$('fTroca').checked=u?!!u.troca:false;
+  $('fNotas').value=u?(u.notas||''):'';
+  $('fPass').value='';$('fPass2').value='';
+  $('fAuto').checked=!u;$('fAuto').disabled=!!u;
+  $('fPassHelp').textContent=u?'Deixe em branco para manter a senha atual, ou use “Nova senha” na lista.':'Combine com a pessoa e entregue a senha mostrada ao salvar.';
+  chipSet($('fPerms'),MODS,(u&&u.perms&&u.perms.length?u.perms:(p?p.perms:[]))||[],'perm');
+  chipSet($('fExtras'),EXTRAS,(u?(u.extras||[]):(p?p.extras:[]))||[],'extra');
+  $('uErr').hidden=true;
+  $('userDlg').showModal();
+  setTimeout(function(){$('fNome2').focus()},60);
+}
+$('uCancel').onclick=function(){$('userDlg').close()};
+$('uSave').onclick=function(){
+  var err=$('uErr');err.hidden=true;
+  function bad(m){err.textContent=m;err.hidden=false;toast(m)}
+  var nome=$('fNome2').value.trim(),user=norm($('fUser').value),sel=chipsLer();
+  if(nome.length<2)return bad('Informe o nome de quem vai usar.');
+  if(user.length<3)return bad('O usuário precisa ter ao menos 3 caracteres.');
+  if(/[^a-z0-9._@-]/.test(user))return bad('No usuário use só letras, números, ponto, hífen ou underline.');
+  var outro=findByUser(user);
+  if(outro&&(!cur||outro.id!==cur.id))return bad('Já existe um acesso com o usuário “'+user+'”.');
+  if(!sel.perms.length)return bad('Escolha pelo menos uma permissão.');
+  var senha=$('fPass').value,s2=$('fPass2').value;
+  var auto=!cur&&$('fAuto').checked;                       /* senha gerada automaticamente */
+  if(!auto&&(!cur||senha||s2)){
+    if(senha.length<6)return bad('A senha precisa ter ao menos 6 caracteres.');
+    if(senha!==s2)return bad('As duas senhas não são iguais.');
+  }
+  var base={nome:nome,user:user,perfil:$('fPerfil').value,perms:sel.perms,extras:sel.extras,tel:$('fTel').value.trim(),
+    notas:$('fNotas').value.trim(),validade:$('fVal').value||'',ativo:$('fAtivo').checked,troca:$('fTroca').checked};
+  var now=new Date().toISOString(),plain='';
+  var prep;
+  if(!cur&&$('fAuto').checked){plain=novaSenha();prep=hashNew(plain)}
+  else if(senha){plain=senha;prep=hashNew(senha)}
+  else prep=Promise.resolve(null);
+  $('uSave').disabled=true;
+  prep.then(function(cred){
+    $('uSave').disabled=false;
+    if(!cur){
+      var u={id:'u'+Date.now().toString(36)+Math.random().toString(36).slice(2,6),criadoEm:now,criadoPor:(ses&&ses.nome)||'',senha:cred,ultimoAcesso:null,entradas:0};
+      Object.keys(base).forEach(function(k){u[k]=base[k]});
+      users.push(u);
+      saveUsers('Acesso criado','@'+u.user,'Perfil: '+perfilNome(u.perfil)).then(function(){
+        $('userDlg').close();toast('Acesso criado.');showPw(u,plain);
+      });
+    }else{
+      Object.keys(base).forEach(function(k){cur[k]=base[k]});
+      cur.atualizadoEm=now;if(cred)cur.senha=cred;
+      saveUsers(cred?'Senha redefinida':'Acesso atualizado','@'+cur.user,cred?'Nova senha definida pelo administrador':'').then(function(){
+        $('userDlg').close();toast(cred?'Nova senha pronta.':'Acesso atualizado.');if(cred)showPw(cur,plain);
+      });
+    }
+  });
+};
+/* ---------------- editor de perfil ---------------- */
+function slug(s){return norm(String(s).normalize('NFD').replace(/[\u0300-\u036f]/g,'')).replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'')}
+['pPerms','pExtras'].forEach(function(id){
+  $(id).addEventListener('click',function(e){
+    var b=e.target.closest('.chip[data-k]');if(!b)return;
+    var on=b.getAttribute('aria-pressed')!=='true';
+    b.setAttribute('aria-pressed',on?'true':'false');b.classList.toggle('on',on);
+  });
+});
+function openPerfil(p){
+  curPerfil=p||null;
+  $('pDlgT').textContent=p?'Editar perfil':'Novo perfil';
+  $('pNome').value=p?p.nome:'';$('pDesc').value=p?(p.desc||''):'';
+  chipSet($('pPerms'),MODS,(p?p.perms:['inicio','catalogo'])||[],'perm');
+  chipSet($('pExtras'),EXTRAS,(p?p.extras:[])||[],'extra');
+  $('pErr').hidden=true;
+  $('perfilDlg').showModal();
+  setTimeout(function(){$('pNome').focus()},60);
+}
+$('pCancel').onclick=function(){$('perfilDlg').close()};
+$('pSave').onclick=function(){
+  var err=$('pErr');err.hidden=true;
+  function bad(m){err.textContent=m;err.hidden=false;toast(m)}
+  var nome=$('pNome').value.trim(),perms=chipTodas($('pPerms')),extras=chipTodas($('pExtras'));
+  if(nome.length<2)return bad('Dê um nome ao perfil.');
+  if(!perms.length)return bad('Escolha pelo menos uma permissão.');
+  var id=curPerfil?curPerfil.id:slug(nome);
+  if(!curPerfil){
+    for(var i=0;i<perfis.length;i++)if(perfis[i].id===id)return bad('Já existe um perfil com esse nome.');
+  }
+  var novo={id:id,nome:nome,desc:$('pDesc').value.trim(),perms:perms,extras:extras,sistema:curPerfil?!!curPerfil.sistema:false};
+  if(curPerfil){var k=perfis.indexOf(curPerfil);perfis[k]=novo}else perfis.push(novo);
+  var qtd=users.filter(function(u){return u.perfil===id}).length;
+  kvSet(KEY_PERFIS,perfis).then(function(){
+    $('perfilDlg').close();renderPerfis();logAdd(curPerfil?'Perfil editado':'Perfil criado',nome,'');
+    toast('Perfil salvo.');
+    if(qtd)ask({t:'Atualizar os acessos deste perfil?',s:'Há '+qtd+' acesso(s) no perfil “'+nome+'”. Quer aplicar agora estas permissões a eles?',ok:'Aplicar',
+      cb:function(){
+        users.forEach(function(u){if(u.perfil===id){u.perms=perms.slice();u.extras=extras.slice()}});
+        saveUsers('Permissões aplicadas','Perfil: '+nome,qtd+' acesso(s)').then(function(){toast('Permissões aplicadas em '+qtd+' acesso(s).')});
+      }});
+  });
+};
+$('pList').addEventListener('click',function(e){
+  var b=e.target.closest('[data-pact]');if(!b)return;
+  var p=findPerfil(b.dataset.id);if(!p)return;
+  if(b.dataset.pact==='edit')return openPerfil(p);
+  var qtd=users.filter(function(u){return u.perfil===p.id}).length;
+  if(qtd)return toast('Mova os '+qtd+' acesso(s) deste perfil antes de excluí-lo.');
+  ask({t:'Excluir o perfil “'+p.nome+'”?',s:'O perfil sai da lista. Nenhum acesso será apagado.',ok:'Excluir',danger:true,
+    cb:function(){
+      perfis=perfis.filter(function(x){return x.id!==p.id});
+      kvSet(KEY_PERFIS,perfis).then(function(){renderPerfis();logAdd('Perfil excluído',p.nome,'');toast('Perfil excluído.')});
+    }});
+});
+$('newPerfil').onclick=function(){openPerfil(null)};
+
+/* ---------------- ações na lista de acessos ---------------- */
+function byId(id){for(var i=0;i<users.length;i++)if(users[i].id===id)return users[i];return null}
+function adminsAtivos(){return users.filter(function(u){return u.ativo&&!expirado(u)&&(u.perms||[]).indexOf('acessos')>=0})}
+function gerarNovaSenha(u){
+  var p=novaSenha();
+  hashNew(p).then(function(c){
+    u.senha=c;u.troca=true;u.atualizadoEm=new Date().toISOString();
+    return saveUsers('Senha redefinida','@'+u.user,'Nova senha gerada').then(function(){showPw(u,p);toast('Nova senha pronta.')});
+  });
+}
+$('uList').addEventListener('click',function(e){
+  var b=e.target.closest('[data-act]');if(!b)return;
+  var u=byId(b.dataset.id);if(!u)return;
+  var act=b.dataset.act;
+  if(act==='edit')return openUser(u);
+  if(act==='senha')return ask({t:'Gerar nova senha para '+u.nome+'?',s:'A senha atual deixa de funcionar. Você verá a nova senha uma única vez, para entregar à pessoa.',ok:'Gerar',
+    cb:function(){gerarNovaSenha(u)}});
+  if(act==='bloquear'){
+    if(adminsAtivos().length<=1&&(u.perms||[]).indexOf('acessos')>=0)return toast('Este é o último acesso com poder de administrador: crie outro antes de bloquear.');
+    return ask({t:'Bloquear o acesso de '+u.nome+'?',s:'A pessoa não vai mais entrar no estoque nem no catálogo.',ok:'Bloquear',danger:true,
+      cb:function(){u.ativo=false;u.atualizadoEm=new Date().toISOString();saveUsers('Acesso bloqueado','@'+u.user,'').then(function(){toast('Acesso bloqueado.')})}});
+  }
+  if(act==='liberar')return (function(){u.ativo=true;u.atualizadoEm=new Date().toISOString();saveUsers('Acesso liberado','@'+u.user,'').then(function(){toast('Acesso liberado.')})})();
+  if(act==='del'){
+    if(adminsAtivos().length<=1&&(u.perms||[]).indexOf('acessos')>=0)return toast('Este é o último acesso com poder de administrador: não posso excluir.');
+    return ask({t:'Excluir o acesso de '+u.nome+'?',s:'O usuário “'+u.user+'” perde o acesso ao sistema. Esta ação não pode ser desfeita.',ok:'Excluir',danger:true,
+      cb:function(){
+        var eraEu=ses&&ses.id===u.id;
+        users=users.filter(function(x){return x.id!==u.id});
+        saveUsers('Acesso excluído','@'+u.user,'').then(function(){
+          toast('Acesso excluído.');
+          if(eraEu){try{sessionStorage.removeItem('ses')}catch(e2){}ses=null;mostrarGate()}
+        });
+      }});
+  }
+});
+
+/* ---------------- entrada no painel ---------------- */
+function renderWho(){
+  $('whoBox').innerHTML='<span class="avatar">'+esc(initials(ses.nome))+'</span><span class="nm"><b>'+esc(ses.nome)+'</b><span>@'+esc(ses.user)+' · '+esc(perfilNome(ses.perfil))+'</span></span>';
+}
+function abrirApp(){
+  $('gate').hidden=true;$('app').hidden=false;
+  renderWho();goView('acessos');
+}
+function entrar(u,msg){
+  u.ultimoAcesso=Date.now();u.entradas=(u.entradas||0)+1;
+  ses={id:u.id,nome:u.nome,user:u.user,perfil:u.perfil,t:Date.now()};
+  try{sessionStorage.setItem('ses',JSON.stringify(ses))}catch(e){}
+  logAdd(msg||'Entrou no painel','@'+u.user,'Acesso nº '+(u.entradas||1));
+  kvSet(KEY_USERS,users);
+  $('gErr').hidden=true;
+  abrirApp();
+  toast('Bem-vindo, '+u.nome.split(' ')[0]+'.');
+}
+function mostrarGate(){
+  $('app').hidden=true;$('gate').hidden=false;
+  var vazio=!users.length;
+  $('gateT').textContent=vazio?'Crie o primeiro acesso':'Entrar no painel';
+  $('gateS').textContent=vazio?'Ninguém tem acesso ainda. Defina o administrador deste aparelho com nome, usuário e senha.':'Use o seu usuário e senha de administrador.';
+  $('fNomeG').hidden=!vazio;$('fPass2').hidden=!vazio;
+  $('gNome').value='';$('gUser').value='';$('gPass').value='';$('gPass2').value='';
+  $('gErr').hidden=true;$('gateHint').hidden=true;
+  $('gateForm').hidden=false;
+  $('gOk').textContent=vazio?'Criar acesso e entrar':'Entrar';
+  setTimeout(function(){(vazio?$('gNome'):$('gUser')).focus()},80);
+}
+$('gEye').onclick=function(){
+  var f=$('gPass');f.type=f.type==='password'?'text':'password';
+  if($('gPass2').hidden===false)$('gPass2').type=f.type;
+  f.focus();
+};
+$('gateForm').onsubmit=function(e){
+  e.preventDefault();
+  var vazio=!users.length,err=$('gErr');
+  function bad(m){err.textContent=m;err.hidden=false}
+  err.hidden=true;
+  if(travado>Date.now())return bad('Muitas tentativas seguidas. Aguarde ' + Math.ceil((travado-Date.now())/1000) + 's e tente de novo.');
+  var uu=norm($('gUser').value),pw=$('gPass').value;
+  if(vazio){
+    var nome=$('gNome').value.trim();
+    if(nome.length<2)return bad('Informe o seu nome.');
+    if(uu.length<3)return bad('Escolha um usuário com ao menos 3 caracteres.');
+    if(/[^a-z0-9._@-]/.test(uu))return bad('No usuário use só letras, números, ponto, hífen ou underline.');
+    if(pw.length<6)return bad('A senha precisa ter ao menos 6 caracteres.');
+    if(pw!==$('gPass2').value)return bad('As duas senhas não são iguais.');
+    $('gOk').disabled=true;
+    hashNew(pw).then(function(cred){
+      var u={id:'u'+Date.now().toString(36)+Math.random().toString(36).slice(2,6),nome:nome,user:uu,perfil:'admin',
+        perms:allMods(),extras:allExtras(),ativo:true,validade:'',troca:false,tel:'',
+        notas:'Administrador criado no primeiro acesso.',criadoEm:new Date().toISOString(),
+        criadoPor:'primeiro acesso',senha:cred,ultimoAcesso:null,entradas:0};
+      users.push(u);
+      kvSet(KEY_USERS,users).then(function(){
+        $('gOk').disabled=false;
+        perfis=perfis.length?perfis:seedPerfis();
+        kvSet(KEY_PERFIS,perfis);
+        entrar(u,'Administrador criado no primeiro acesso');
+      });
+    });
+    return;
+  }
+  var u=findByUser(uu);
+  if(!u||!u.senha){tentativas++;if(tentativas>=5){travado=Date.now()+30000;tentativas=0}return bad('Usuário ou senha incorretos.')}
+  hashCheck(pw,u.senha).then(function(ok){
+    if(!ok){tentativas++;if(tentativas>=5){travado=Date.now()+30000;tentativas=0}return bad('Usuário ou senha incorretos.')}
+    tentativas=0;
+    if(!u.ativo)return bad('Este acesso está bloqueado. Fale com o administrador.');
+    if(expirado(u))return bad('Este acesso venceu em '+brDate(u.validade)+'.');
+    if((u.perms||[]).indexOf('acessos')<0)return bad('Este acesso não tem permissão para abrir o painel.');
+    entrar(u,'Entrou no painel');
+  });
+};
+$('gHelp').onclick=function(){
+  var h=$('gateHint');h.hidden=false;
+  h.textContent='Perdeu a senha? Um administrador entra no painel e gera uma nova em “Nova senha”. Se ninguém mais entra, use “Zerar acessos” — os dados de estoque, vendas e catálogo não são apagados.';
+};
+$('gReset').onclick=function(){
+  ask({t:'Zerar todos os acessos?',s:'Isto apaga os acessos e perfis deste aparelho. Produtos, vendas e catálogo não são afetados. Depois você cria o primeiro acesso de novo.',ok:'Apagar',danger:true,need:'APAGAR',
+    cb:function(){
+      users=[];
+      Promise.all([kvSet(KEY_USERS,[])]).then(function(){
+        try{sessionStorage.removeItem('ses')}catch(e){}
+        ses=null;toast('Acessos apagados.');mostrarGate();
+      });
+    }});
+};
+/* ---------------- eventos gerais ---------------- */
+document.querySelectorAll('.nav[data-view]').forEach(function(b){b.onclick=function(){goView(b.dataset.view)}});
+$('menuBtn').onclick=function(){document.body.classList.toggle('open')};
+$('scrim').onclick=function(){document.body.classList.remove('open')};
+$('q').oninput=function(){renderUsers()};
+$('fStatus').onchange=function(){renderUsers()};
+$('newUser').onclick=function(){openUser(null)};
+function alternarTema(){applyTheme(themeNow()==='dark'?'light':'dark')}
+$('themeBtn').onclick=alternarTema;
+$('navThemes').onclick=alternarTema;
+$('navOut').onclick=function(){
+  ask({t:'Sair do painel?',s:'Você vai precisar do usuário e da senha para entrar de novo.',ok:'Sair',
+    cb:function(){
+      logAdd('Saiu do painel','@'+(ses?ses.user:''),'');
+      try{sessionStorage.removeItem('ses')}catch(e){}
+      ses=null;location.reload();
+    }});
+};
+$('logClear').onclick=function(){
+  ask({t:'Limpar o histórico?',s:'Os registros de auditoria serão apagados. Os acessos continuam iguais.',ok:'Limpar',danger:true,
+    cb:function(){acessosLog=[];kvSet(KEY_LOG,[]).then(function(){renderLog();toast('Histórico limpo.')})}});
+};
+$('cpSnippet').onclick=function(){copiar($('snip').textContent,'Trecho copiado. Cole no index.html.')};
+$('expBtn').onclick=function(){
+  var dados={app:'Meu estoque',tipo:'acessos',v:1,geradoEm:new Date().toISOString(),perfis:perfis,users:users};
+  var b=new Blob([JSON.stringify(dados,null,2)],{type:'application/json'});
+  var a=document.createElement('a');
+  a.href=URL.createObjectURL(b);
+  a.download='acessos-meu-estoque-'+new Date().toISOString().slice(0,10)+'.json';
+  document.body.appendChild(a);a.click();document.body.removeChild(a);
+  setTimeout(function(){URL.revokeObjectURL(a.href)},2000);
+  logAdd('Backup baixado','—',users.length+' acesso(s)');
+  toast('Backup gerado.');
+};
+$('impBtn').onclick=function(){$('impFile').click()};
+$('impFile').onchange=function(){
+  var inp=this,f=inp.files&&inp.files[0];
+  if(!f)return;
+  var rd=new FileReader();
+  rd.onload=function(){
+    var d=null;try{d=JSON.parse(String(rd.result))}catch(e){}
+    inp.value='';
+    if(!d||!Array.isArray(d.users))return toast('Arquivo inválido: não encontrei a lista de acessos.');
+    ask({t:'Restaurar backup?',s:'Vou trocar os '+users.length+' acesso(s) deste aparelho pelos '+d.users.length+' do arquivo, junto com os perfis.',ok:'Restaurar',danger:true,
+      cb:function(){
+        users=d.users.map(function(u){
+          u.id=u.id||('u'+Date.now().toString(36)+Math.random().toString(36).slice(2,6));
+          u.perms=Array.isArray(u.perms)?u.perms:[];u.extras=Array.isArray(u.extras)?u.extras:[];
+          return u;
+        });
+        if(Array.isArray(d.perfis)&&d.perfis.length)perfis=d.perfis;
+        Promise.all([kvSet(KEY_USERS,users),kvSet(KEY_PERFIS,perfis)]).then(function(){
+          logAdd('Backup restaurado','—',users.length+' acesso(s)');
+          toast('Acessos restaurados.');
+          renderPerfis();renderStats();renderUsers();
+          var eu=ses?byId(ses.id):null;
+          if(!eu||!eu.ativo||(eu.perms||[]).indexOf('acessos')<0){try{sessionStorage.removeItem('ses')}catch(e){}ses=null;mostrarGate()}
+        });
+      }});
+  };
+  rd.readAsText(f);
+};
+$('wipeBtn').onclick=function(){
+  ask({t:'Apagar todos os acessos?',s:'Isto apaga os acessos e perfis deste aparelho. Produtos, vendas e catálogo não são afetados.',ok:'Apagar',danger:true,need:'APAGAR',
+    cb:function(){
+      users=[];
+      kvSet(KEY_USERS,[]).then(function(){
+        logAdd('Acessos apagados','—','painel zerado');
+        try{sessionStorage.removeItem('ses')}catch(e){}
+        ses=null;toast('Acessos apagados.');mostrarGate();
+      });
+    }});
+};
+
+/* ---------------- início ---------------- */
+$('shopName').innerHTML='Meu estoque<small>Administrador</small>';
+(function(){
+  var loja=null;try{loja=localStorage.getItem('nome')}catch(e){}
+  if(loja)$('shopName').innerHTML=esc(loja)+'<small>Administrador</small>';
+})();
+if(!subtleOK())setTimeout(function(){toast('Navegador sem WebCrypto: as senhas usam um embaralhamento mais simples.')},1200);
+
+idb().then(function(){
+  return Promise.all([kvGet(KEY_USERS),kvGet(KEY_PERFIS),kvGet(KEY_LOG)]);
+}).then(function(r){
+  users=Array.isArray(r[0])?r[0].filter(function(u){return u&&u.user}):[];
+  perfis=Array.isArray(r[1])&&r[1].length?r[1]:seedPerfis();
+  if(!Array.isArray(r[1])||!r[1].length)kvSet(KEY_PERFIS,perfis);
+  acessosLog=Array.isArray(r[2])?r[2]:[];
+  var s=null;try{s=JSON.parse(sessionStorage.getItem('ses')||'null')}catch(e){}
+  var u=s?byId(s.id):null;
+  if(u&&u.ativo&&!expirado(u)&&(u.perms||[]).indexOf('acessos')>=0){
+    ses={id:u.id,nome:u.nome,user:u.user,perfil:u.perfil,t:s.t||Date.now()};
+    abrirApp();
+  }else{
+    mostrarGate();
+    if(/[?&]exp(=|&|$)/.test(location.search))toast('Sua sessão no sistema venceu. Entre novamente.');
+  }
+}).catch(function(){
+  users=[];perfis=seedPerfis();acessosLog=[];
+  mostrarGate();
+});
+</script>
+</body>
+</html>
